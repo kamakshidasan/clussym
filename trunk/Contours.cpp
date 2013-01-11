@@ -10,6 +10,8 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+
+#include "LB.hpp"
  
 int main(int argc, char* argv[])
 {
@@ -56,8 +58,7 @@ int main(int argc, char* argv[])
 	unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 	std::cout << "Regions = "<<nreg<<std::endl;
 	confilter->SetExtractionModeToSpecifiedRegions();
-	unsigned int i = 26;
-	//for(unsigned int i = 0; i < nreg; i++)
+	for(unsigned int i = 0; i < nreg; i++)
 	{
 		confilter->InitializeSpecifiedRegionList();
 		confilter->AddSpecifiedRegion(i);
@@ -66,6 +67,8 @@ int main(int argc, char* argv[])
 		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		cleanpolydata->Update();
 		vtkPolyData* polydata = cleanpolydata->GetOutput();
+		LB lb;
+		lb.FillMatrix(polydata);
 		std::cout << "Surface "<<s<<" Region "<<i<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 	}
 	
@@ -75,7 +78,8 @@ int main(int argc, char* argv[])
   // Create a mapper
   vtkSmartPointer<vtkPolyDataMapper> mapper =
 	  vtkSmartPointer<vtkPolyDataMapper>::New();
-  mapper->SetInputConnection(confilter->GetOutputPort());
+//  mapper->SetInputConnection(confilter->GetOutputPort());
+  	mapper->SetInputConnection(mc->GetOutputPort());
 
   mapper->ScalarVisibilityOff();    // utilize actor's property I set
  

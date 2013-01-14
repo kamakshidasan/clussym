@@ -6,6 +6,8 @@ class LB
 {
 public:
 	void FillMatrix(vtkPolyData*);
+private:
+	double Cotangent();
 };
 
 #endif

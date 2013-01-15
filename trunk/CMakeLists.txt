@@ -5,7 +5,7 @@ PROJECT(Contours)
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-add_executable(Contours Contours LB)
+add_executable(Contours Contours LB Decompose)
 
 target_link_libraries(Contours ${VTK_LIBRARIES})
 

@@ -7,7 +7,8 @@ class LB
 public:
 	void FillMatrix(vtkPolyData*);
 private:
-	double Cotangent();
+	double Cotangent(double v1[], double v2[]);
+	void GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[]);
 };
 
 #endif

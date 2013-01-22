@@ -15,19 +15,13 @@
 
 int main(int argc, char* argv[])
 {
-	if (argc < 3)
+	if (argc < 2)
 	{
 		std::cerr << "Usage: " << argv[0] 
-			<< " InputFile(.vtk) Threshold" << std::endl;
+			<< " InputFile(.vtk)"<< std::endl;
 		return EXIT_FAILURE;
 	}
 	const char* fileName = argv[1];
-	float threshold = atof(argv[2]);
-	int extractLargest = 1;
-	//if (argc == 4)
-	{
-		extractLargest = 0;//atoi(argv[3]);
-	}
 
 	// Load data
 	vtkSmartPointer<vtkStructuredPointsReader> reader =
@@ -40,37 +34,37 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
 	mc->SetInputConnection(reader->GetOutputPort());
-	mc->ComputeNormalsOn();
-	mc->ComputeGradientsOn();
+	mc->DebugOn();
+	mc->ComputeNormalsOff();
+	mc->ComputeGradientsOff();
+	mc->ComputeScalarsOff();
 
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter =
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
-	unsigned int s = 1;
+	unsigned int s = 8;
 //	for(unsigned int s = 0; s < 10; s++)
 	{
 		mc->SetValue(0, range[0] + s*(range[1] - range[0])/10.0);
 
 		confilter->SetInputConnection(mc->GetOutputPort());
-		vtkPolyData* currentComponent = NULL;
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
 		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 		std::cout << "Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
-		//	for(unsigned int i = 0; i < nreg; i++)
-		unsigned int i = 0;
+		unsigned int r = 4;
+//		for(unsigned int r = 0; r < nreg; r++)
 		{
 			confilter->InitializeSpecifiedRegionList();
-			confilter->AddSpecifiedRegion(i);
-			confilter->Update();
+			confilter->AddSpecifiedRegion(r);
 			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
 			LB lb;
 			lb.FillMatrix(polydata);
-			std::cout << "Surface "<<s<<" Region "<<i<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			std::cout << "Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 		}
 
 	}
@@ -79,8 +73,8 @@ int main(int argc, char* argv[])
 	// Create a mapper
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
-	//  mapper->SetInputConnection(confilter->GetOutputPort());
-	mapper->SetInputConnection(mc->GetOutputPort());
+	  mapper->SetInputConnection(confilter->GetOutputPort());
+	//mapper->SetInputConnection(mc->GetOutputPort());
 
 	mapper->ScalarVisibilityOff();    // utilize actor's property I set
 
@@ -88,6 +82,9 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkActor> actor =
 		vtkSmartPointer<vtkActor>::New();
 	actor->GetProperty()->SetColor(1,1,1);
+	actor->GetProperty()->SetInterpolationToFlat();
+	actor->GetProperty()->SetEdgeColor(1,0,0);
+	actor->GetProperty()->EdgeVisibilityOn();
 	actor->SetMapper(mapper);
 
 	vtkSmartPointer<vtkRenderer> renderer =

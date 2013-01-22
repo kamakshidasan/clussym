@@ -6,7 +6,7 @@
 #include <vtkCellArray.h>
 #include <vtkSmartPointer.h>
 
-#include <boost/numeric/ublas/vector.hpp>
+#include <eigen3/Eigen/Dense>
 
 #include "Utils.hpp"
 #include "LB.hpp"
@@ -20,7 +20,7 @@ void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 
 	double v01[3], v02[3];
 	Sub(xyz[1], xyz[0], v01);
-	Sub(xyz[2], xyz[0], v01);
+	Sub(xyz[2], xyz[0], v02);
 	cot[0] = Cotangent(v01, v02);	
 
 	double v10[3], v12[3];
@@ -42,17 +42,30 @@ void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 
 void LB::FillMatrix(vtkPolyData* mesh)
 {
+	using namespace Eigen;
 	vtkCellArray *polys = mesh->GetPolys();
 	unsigned int n = polys->GetNumberOfCells();
 	polys->InitTraversal();
 	vtkPoints *pts = mesh->GetPoints();
+	unsigned int numpts = pts->GetNumberOfPoints();
 	vtkIdType npts, *cpts;
+	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(numpts, numpts);
+	std::cout<< A <<std::endl;
 	while(polys->GetNextCell(npts, cpts))
 	{
 		assert(npts == 3);
+		printf("Points %d %d %d\n", cpts[0],cpts[1],cpts[2]);
 		double cot[3];
 		GetCots(cpts, pts, cot);
+		A(cpts[0], cpts[1]) += 0.5*cot[2];
+		A(cpts[1], cpts[0]) += 0.5*cot[2];
+		A(cpts[0], cpts[2]) += 0.5*cot[1];
+		A(cpts[2], cpts[0]) += 0.5*cot[1];
+		A(cpts[1], cpts[2]) += 0.5*cot[0];
+		A(cpts[2], cpts[1]) += 0.5*cot[0];
+		std::cout<< A <<std::endl;
 	}
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
 }
 
 double LB::Cotangent(double v1[], double v2[])

@@ -8,8 +8,8 @@
 
 #include <eigen3/Eigen/Dense>
 
-#include "Utils.hpp"
 #include "LB.hpp"
+#include "Utils.hpp"
 
 void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 {
@@ -40,6 +40,19 @@ void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 	cot[2] = Cotangent(v20, v21);	
 }
 
+bool LB::DuplicateCell(vtkIdType* cpts)
+{
+	unsigned int v[3];
+	v[0] = cpts[0];
+	v[1] = cpts[1];
+	v[2] = cpts[2];
+	Order(v[0], v[1]);	
+	Order(v[1], v[2]);	
+	Order(v[0], v[1]);
+
+	Tri tri(v);
+	return true;
+}
 void LB::FillMatrix(vtkPolyData* mesh)
 {
 	using namespace Eigen;
@@ -54,16 +67,19 @@ void LB::FillMatrix(vtkPolyData* mesh)
 	while(polys->GetNextCell(npts, cpts))
 	{
 		assert(npts == 3);
-		printf("Points %d %d %d\n", cpts[0],cpts[1],cpts[2]);
-		double cot[3];
-		GetCots(cpts, pts, cot);
-		A(cpts[0], cpts[1]) += 0.5*cot[2];
-		A(cpts[1], cpts[0]) += 0.5*cot[2];
-		A(cpts[0], cpts[2]) += 0.5*cot[1];
-		A(cpts[2], cpts[0]) += 0.5*cot[1];
-		A(cpts[1], cpts[2]) += 0.5*cot[0];
-		A(cpts[2], cpts[1]) += 0.5*cot[0];
-		std::cout<< A <<std::endl;
+		if(!DuplicateCell(cpts))
+		{
+			printf("Points %d %d %d\n", cpts[0],cpts[1],cpts[2]);
+			double cot[3];
+			GetCots(cpts, pts, cot);
+			A(cpts[0], cpts[1]) += 0.5*cot[2];
+			A(cpts[1], cpts[0]) += 0.5*cot[2];
+			A(cpts[0], cpts[2]) += 0.5*cot[1];
+			A(cpts[2], cpts[0]) += 0.5*cot[1];
+			A(cpts[1], cpts[2]) += 0.5*cot[0];
+			A(cpts[2], cpts[1]) += 0.5*cot[0];
+			std::cout<< A <<std::endl;
+		}
 	}
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
 }

@@ -46,7 +46,8 @@ int main(int argc, char* argv[])
 //	for(unsigned int s = 0; s < 10; s++)
 	{
 		mc->SetValue(0, range[0] + s*(range[1] - range[0])/10.0);
-
+		mc->Update();
+		mc->Print(std::cout);
 		confilter->SetInputConnection(mc->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
@@ -59,8 +60,10 @@ int main(int argc, char* argv[])
 			confilter->InitializeSpecifiedRegionList();
 			confilter->AddSpecifiedRegion(r);
 			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
+			cleanpolydata->DebugOn();
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
+			cleanpolydata->Print(std::cout);
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
 			LB lb;
 			lb.FillMatrix(polydata);

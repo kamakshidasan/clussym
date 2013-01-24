@@ -39,6 +39,14 @@ void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 	v21[2] = -v12[2];
 	cot[2] = Cotangent(v20, v21);	
 }
+std::size_t hash_value(const Tri & tri) 
+{
+	std::size_t h  = 0;
+	boost::hash_combine(h, tri.node[0]);
+	boost::hash_combine(h, tri.node[1]);
+	boost::hash_combine(h, tri.node[2]);
+	return h;
+}
 
 bool LB::DuplicateCell(vtkIdType* cpts)
 {
@@ -51,7 +59,14 @@ bool LB::DuplicateCell(vtkIdType* cpts)
 	Order(v[0], v[1]);
 
 	Tri tri(v);
-	return true;
+	bool dup = false;
+	if(trimap.find(tri) == trimap.end())
+	{
+		trimap[tri] = 1;
+		dup = true;
+	}
+
+	return dup;
 }
 void LB::FillMatrix(vtkPolyData* mesh)
 {

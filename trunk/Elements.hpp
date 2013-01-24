@@ -4,6 +4,8 @@
 #include <string.h>
 #include <assert.h>
 #include <list>
+
+#include <boost/functional/hash.hpp>
 #define my_float double
 #ifdef FIVE
 const unsigned int dim = 5;
@@ -89,11 +91,17 @@ struct Edge
 	}
 };
 
+
 struct Tri
 {
 	unsigned int node[3];
 	Tri(unsigned int n[3]) 
 	{ memcpy(node, n, sizeof(node));}
+	bool operator == (const Tri & rhs) const
+	{
+		return (node[0] == rhs.node[0]) && (node[1] == rhs.node[1]) && (node[2] == rhs.node[2]);
+	}
+	
 	bool operator < (const Tri & rhs) const
 	{
 		return node[0] < rhs.node[0] || 

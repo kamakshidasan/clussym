@@ -7,5 +7,7 @@ include(${VTK_USE_FILE})
 
 add_executable(Contours Contours LB Decompose)
 
-target_link_libraries(Contours ${VTK_LIBRARIES})
+include_directories("/home/ibis/Downloads/arpack++/include")
+
+target_link_libraries(Contours ${VTK_LIBRARIES} superlu arpack blas lapack gfortran) 
 

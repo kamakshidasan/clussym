@@ -1,15 +1,16 @@
-#include "vtkSmartPointer.h"
-#include "vtkStructuredPointsReader.h"
-#include "vtkStructuredPoints.h"
-#include "vtkMarchingCubes.h"
-#include "vtkPolyDataConnectivityFilter.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkCleanPolyData.h"
-#include "vtkActor.h"
-#include "vtkProperty.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
+#include <vtkSmartPointer.h>
+#include <vtkStructuredPointsReader.h>
+#include <vtkStructuredPoints.h>
+#include <vtkMarchingCubes.h>
+#include <vtkPolyDataConnectivityFilter.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkCleanPolyData.h>
+#include <vtkActor.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkPolyDataWriter.h>
 
 #include "LB.hpp"
 
@@ -34,7 +35,6 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
 	mc->SetInputConnection(reader->GetOutputPort());
-	mc->DebugOn();
 	mc->ComputeNormalsOff();
 	mc->ComputeGradientsOff();
 	mc->ComputeScalarsOff();
@@ -42,12 +42,11 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter =
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
-	unsigned int s = 8;
+	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+	float s = 8;
 //	for(unsigned int s = 0; s < 10; s++)
 	{
 		mc->SetValue(0, range[0] + s*(range[1] - range[0])/10.0);
-		mc->Update();
-		mc->Print(std::cout);
 		confilter->SetInputConnection(mc->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
@@ -55,19 +54,20 @@ int main(int argc, char* argv[])
 		std::cout << "Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
 		unsigned int r = 4;
-//		for(unsigned int r = 0; r < nreg; r++)
+//		for(unsigned int r = 1; r < nreg; r++)
 		{
 			confilter->InitializeSpecifiedRegionList();
 			confilter->AddSpecifiedRegion(r);
 			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
-			cleanpolydata->DebugOn();
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
-			cleanpolydata->Print(std::cout);
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
+			std::cout << "Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			LB lb;
 			lb.FillMatrix(polydata);
-			std::cout << "Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			writer->SetFileName("./out.vtk");
+			writer->SetInputConnection(cleanpolydata->GetOutputPort());
+			writer->Write();
 		}
 
 	}
@@ -76,8 +76,7 @@ int main(int argc, char* argv[])
 	// Create a mapper
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
-	  mapper->SetInputConnection(confilter->GetOutputPort());
-	//mapper->SetInputConnection(mc->GetOutputPort());
+	mapper->SetInputConnection(mc->GetOutputPort());
 
 	mapper->ScalarVisibilityOff();    // utilize actor's property I set
 

@@ -11,8 +11,11 @@
 #include <arlsmat.h>
 #include <arlssym.h>
 
+#include <flens/flens.cxx>
+
 #include "LB.hpp"
 #include "Utils.hpp"
+
 
 void LB::GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[])
 {
@@ -111,40 +114,51 @@ void LB::FillMatrix(vtkPolyData* mesh)
 	//std::cout<< A <<std::endl;
 	boost::unordered_map<Tri, unsigned int> trimap;
 	boost::unordered_map<Edge, unsigned int> edmap;
+
+	flens::GeMatrix<flens::FullStorage<float, flens::ColMajor> > flM(numpts, numpts), VL(numpts, numpts), VR(numpts, numpts);
 	unsigned int nnz = 0;
 	while(polys->GetNextCell(npts, cpts))
 	{
 		assert(npts == 3);
 		if(!DuplicateCell(cpts, trimap))
 		{
-			printf("Points %d %d %d\n", cpts[0],cpts[1],cpts[2]);
+//			printf("Points %d %d %d\n", cpts[0],cpts[1],cpts[2]);
 			double cot[3];
 			GetCots(cpts, pts, cot);
 
 			A(cpts[0], cpts[1]) += 0.5*cot[2];
 			A(cpts[1], cpts[0]) += 0.5*cot[2];
+			flM(cpts[0]+1, cpts[1]+1) += 0.5*cot[2];
+			flM(cpts[1]+1, cpts[0]+1) += 0.5*cot[2];
 			if(!DuplicateEdge(cpts[0], cpts[1], A(cpts[0], cpts[1]), edmap))
 			{
-				printf("New Edge %d %d (%d)\n", cpts[0], cpts[1], nnz);
+//				printf("New Edge %d %d (%d)\n", cpts[0], cpts[1], nnz);
 				nnz++;
 			}
 
+			flM(cpts[0]+1, cpts[2]+1) += 0.5*cot[1];
+			flM(cpts[2]+1, cpts[0]+1) += 0.5*cot[1];
 			A(cpts[0], cpts[2]) += 0.5*cot[1];
 			A(cpts[2], cpts[0]) += 0.5*cot[1];
 			if(!DuplicateEdge(cpts[0], cpts[2], A(cpts[0], cpts[2]), edmap))
 			{
-				printf("New Edge %d %d (%d)\n", cpts[0], cpts[2], nnz);
+//				printf("New Edge %d %d (%d)\n", cpts[0], cpts[2], nnz);
 				nnz++;
 			}
 
+			flM(cpts[1]+1, cpts[2]+1) += 0.5*cot[0];
+			flM(cpts[2]+1, cpts[1]+1) += 0.5*cot[0];
 			A(cpts[1], cpts[2]) += 0.5*cot[0];
 			A(cpts[2], cpts[1]) += 0.5*cot[0];
 			if(!DuplicateEdge(cpts[1], cpts[2], A(cpts[1], cpts[2]), edmap))
 			{
-				printf("New Edge %d %d (%d)\n", cpts[1], cpts[2], nnz);
+//				printf("New Edge %d %d (%d)\n", cpts[1], cpts[2], nnz);
 				nnz++;
 			}
 
+			flM(cpts[0]+1, cpts[0]+1) += 0.5*(cot[2] + cot[1]);
+			flM(cpts[1]+1, cpts[1]+1) += 0.5*(cot[2] + cot[0]);
+			flM(cpts[2]+1, cpts[2]+1) += 0.5*(cot[1] + cot[0]);
 			A(cpts[0], cpts[0]) += 0.5*(cot[2] + cot[1]);
 			A(cpts[1], cpts[1]) += 0.5*(cot[2] + cot[0]);
 			A(cpts[2], cpts[2]) += 0.5*(cot[1] + cot[0]);
@@ -165,10 +179,10 @@ void LB::FillMatrix(vtkPolyData* mesh)
 		}
 		else
 		{
-			printf("Removed Duplicate\n");
+//			printf("Removed Duplicate\n");
 		}
 	}
-	std::cout<< A <<std::endl;
+//	std::cout<< A <<std::endl;
 	float *Acsc = new float[nnz];
 	int *irow = new int[nnz];
 	int *pcol = new int[numpts+1];
@@ -188,11 +202,21 @@ void LB::FillMatrix(vtkPolyData* mesh)
 		pcol[i+1] = idx;
 	}
 	ARluSymMatrix<float> Am(numpts, nnz, Acsc, irow, pcol); 
-	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
-	std::cout<<"Eigen Values:"<<eigs.eigenvalues().transpose()<<std::endl;
-	ARluSymStdEig<float> dprob(2, Am, "SM");
-	dprob.FindEigenvectors();
-	std::cout<<dprob.Eigenvalue(0)<<" "<<dprob.Eigenvalue(1)<<std::endl;
+//	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
+//	std::cout<<"Eigen EigenVals:"<<eigs.eigenvalues().transpose()<<std::endl;
+	ARluSymStdEig<float> dprob(100, Am, "SM");
+	int nconv = dprob.FindEigenvectors();
+	std::cout<<"Arpack EigenVals:";
+	for(unsigned i = 0; i < nconv; i++)
+	{
+		std::cout<<dprob.Eigenvalue(i)<<" ";
+	}
+	std::cout<<std::endl;
+
+//	flens::DenseVector<flens::Array<float> > wr(numpts), wi(numpts), work;
+//	flens::lapack::ev(true, true, flM, wr, wi, VL, VR, work);
+
+//	std::cout << "wr = " << wr << std::endl;
 }
 
 double LB::Cotangent(double v1[], double v2[])
@@ -203,4 +227,4 @@ double LB::Cotangent(double v1[], double v2[])
 	double v1v2sin 	= sqrt(v1sqr*v2sqr - v1v2cos*v1v2cos);
 	double cot 	= v1v2cos / v1v2sin;
 	return cot;
-}
+}	

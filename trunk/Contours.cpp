@@ -43,18 +43,19 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
 	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-	float s = 1;
-//	for(unsigned int s = 0; s < 10; s++)
+//	unsigned int s = 1;
+	for(unsigned int s = 7; s < 9; s++)
 	{
-		mc->SetValue(0, range[0] + s*(range[1] - range[0])/10.0);
+		float isoval = range[0] + s*(range[1] - range[0])/9.0;
+		mc->SetValue(0, isoval);
 		confilter->SetInputConnection(mc->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
 		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
-		std::cout << "Regions = "<<nreg<<std::endl;
+		std::cout <<isoval<< " Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
-		unsigned int r = 0;
-//		for(unsigned int r = 0; r < nreg; r++)
+//		unsigned int r = 0;
+		for(unsigned int r = 0; r < nreg; r++)
 		{
 			confilter->InitializeSpecifiedRegionList();
 			confilter->AddSpecifiedRegion(r);
@@ -62,12 +63,15 @@ int main(int argc, char* argv[])
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
-			std::cout << "Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			LB lb;
-			lb.FillMatrix(polydata);
-			writer->SetFileName("./out.vtk");
-			writer->SetInputConnection(cleanpolydata->GetOutputPort());
-			writer->Write();
+			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			if(polydata->GetNumberOfPoints() > 10)
+			{
+				LB lb;
+				lb.FillMatrix(polydata);
+				//writer->SetFileName("./out.vtk");
+				//writer->SetInputConnection(cleanpolydata->GetOutputPort());
+				//writer->Write();
+			}
 		}
 
 	}

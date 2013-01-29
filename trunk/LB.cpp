@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 #include <assert.h>
 
 #include <vector>
@@ -8,10 +10,9 @@
 
 #include <eigen3/Eigen/Dense>
 
-#include <arlsmat.h>
 #include <arlssym.h>
 
-#include <flens/flens.cxx>
+//#include <flens/flens.cxx>
 
 #include "LB.hpp"
 #include "Utils.hpp"
@@ -115,7 +116,7 @@ void LB::FillMatrix(vtkPolyData* mesh)
 	boost::unordered_map<Tri, unsigned int> trimap;
 	boost::unordered_map<Edge, unsigned int> edmap;
 
-	flens::GeMatrix<flens::FullStorage<float, flens::ColMajor> > flM(numpts, numpts), VL(numpts, numpts), VR(numpts, numpts);
+	//flens::GeMatrix<flens::FullStorage<float, flens::ColMajor> > //flM(numpts, numpts), VL(numpts, numpts), VR(numpts, numpts);
 	unsigned int nnz = 0;
 	while(polys->GetNextCell(npts, cpts))
 	{
@@ -128,16 +129,16 @@ void LB::FillMatrix(vtkPolyData* mesh)
 
 			A(cpts[0], cpts[1]) += 0.5*cot[2];
 			A(cpts[1], cpts[0]) += 0.5*cot[2];
-			flM(cpts[0]+1, cpts[1]+1) += 0.5*cot[2];
-			flM(cpts[1]+1, cpts[0]+1) += 0.5*cot[2];
+			//flM(cpts[0]+1, cpts[1]+1) += 0.5*cot[2];
+			//flM(cpts[1]+1, cpts[0]+1) += 0.5*cot[2];
 			if(!DuplicateEdge(cpts[0], cpts[1], A(cpts[0], cpts[1]), edmap))
 			{
 //				printf("New Edge %d %d (%d)\n", cpts[0], cpts[1], nnz);
 				nnz++;
 			}
 
-			flM(cpts[0]+1, cpts[2]+1) += 0.5*cot[1];
-			flM(cpts[2]+1, cpts[0]+1) += 0.5*cot[1];
+			//flM(cpts[0]+1, cpts[2]+1) += 0.5*cot[1];
+			//flM(cpts[2]+1, cpts[0]+1) += 0.5*cot[1];
 			A(cpts[0], cpts[2]) += 0.5*cot[1];
 			A(cpts[2], cpts[0]) += 0.5*cot[1];
 			if(!DuplicateEdge(cpts[0], cpts[2], A(cpts[0], cpts[2]), edmap))
@@ -146,8 +147,8 @@ void LB::FillMatrix(vtkPolyData* mesh)
 				nnz++;
 			}
 
-			flM(cpts[1]+1, cpts[2]+1) += 0.5*cot[0];
-			flM(cpts[2]+1, cpts[1]+1) += 0.5*cot[0];
+			//flM(cpts[1]+1, cpts[2]+1) += 0.5*cot[0];
+			//flM(cpts[2]+1, cpts[1]+1) += 0.5*cot[0];
 			A(cpts[1], cpts[2]) += 0.5*cot[0];
 			A(cpts[2], cpts[1]) += 0.5*cot[0];
 			if(!DuplicateEdge(cpts[1], cpts[2], A(cpts[1], cpts[2]), edmap))
@@ -156,9 +157,9 @@ void LB::FillMatrix(vtkPolyData* mesh)
 				nnz++;
 			}
 
-			flM(cpts[0]+1, cpts[0]+1) += 0.5*(cot[2] + cot[1]);
-			flM(cpts[1]+1, cpts[1]+1) += 0.5*(cot[2] + cot[0]);
-			flM(cpts[2]+1, cpts[2]+1) += 0.5*(cot[1] + cot[0]);
+			//flM(cpts[0]+1, cpts[0]+1) += 0.5*(cot[2] + cot[1]);
+			//flM(cpts[1]+1, cpts[1]+1) += 0.5*(cot[2] + cot[0]);
+			//flM(cpts[2]+1, cpts[2]+1) += 0.5*(cot[1] + cot[0]);
 			A(cpts[0], cpts[0]) += 0.5*(cot[2] + cot[1]);
 			A(cpts[1], cpts[1]) += 0.5*(cot[2] + cot[0]);
 			A(cpts[2], cpts[2]) += 0.5*(cot[1] + cot[0]);
@@ -183,6 +184,14 @@ void LB::FillMatrix(vtkPolyData* mesh)
 		}
 	}
 //	std::cout<< A <<std::endl;
+	struct timeval timeval_start, timeval_end;
+	gettimeofday(&timeval_start, NULL);
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A, EigenvaluesOnly) ;
+	gettimeofday(&timeval_end, NULL);
+	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
+	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
+	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
+	std::cout<<"Eigen Time: "<<time_end - time_start<<std::endl;
 	float *Acsc = new float[nnz];
 	int *irow = new int[nnz];
 	int *pcol = new int[numpts+1];
@@ -201,20 +210,23 @@ void LB::FillMatrix(vtkPolyData* mesh)
 		}
 		pcol[i+1] = idx;
 	}
+	gettimeofday(&timeval_start, NULL);
 	ARluSymMatrix<float> Am(numpts, nnz, Acsc, irow, pcol); 
-//	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
-//	std::cout<<"Eigen EigenVals:"<<eigs.eigenvalues().transpose()<<std::endl;
-	ARluSymStdEig<float> dprob(100, Am, "SM");
+	ARluSymStdEig<float> dprob(50, Am, "SM");
 	int nconv = dprob.FindEigenvectors();
+	gettimeofday(&timeval_end, NULL);
+	time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
+	time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 	std::cout<<"Arpack EigenVals:";
 	for(unsigned i = 0; i < nconv; i++)
 	{
 		std::cout<<dprob.Eigenvalue(i)<<" ";
 	}
 	std::cout<<std::endl;
+	std::cout<<"Arpack Time: "<<time_end - time_start<<std::endl;
 
 //	flens::DenseVector<flens::Array<float> > wr(numpts), wi(numpts), work;
-//	flens::lapack::ev(true, true, flM, wr, wi, VL, VR, work);
+//	flens::lapack::ev(true, true, //flM, wr, wi, VL, VR, work);
 
 //	std::cout << "wr = " << wr << std::endl;
 }

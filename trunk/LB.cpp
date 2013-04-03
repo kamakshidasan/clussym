@@ -192,7 +192,7 @@ void LB::FillMatrix(vtkPolyData* mesh)
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
 	std::cout<<"Eigen Time: "<<time_end - time_start<<std::endl;
-	float *Acsc = new float[nnz];
+	/*float *Acsc = new float[nnz];
 	int *irow = new int[nnz];
 	int *pcol = new int[numpts+1];
 	float *eigv = new float[nnz];
@@ -224,7 +224,7 @@ void LB::FillMatrix(vtkPolyData* mesh)
 	}
 	std::cout<<std::endl;
 	std::cout<<"Arpack Time: "<<time_end - time_start<<std::endl;
-
+*/
 //	flens::DenseVector<flens::Array<float> > wr(numpts), wi(numpts), work;
 //	flens::lapack::ev(true, true, //flM, wr, wi, VL, VR, work);
 

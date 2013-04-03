@@ -43,10 +43,11 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
 	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+	float val[3] = {7.9,8,8.1};
 //	unsigned int s = 1;
-	for(unsigned int s = 7; s < 9; s++)
+	for(unsigned int s = 0; s < 3; s++)
 	{
-		float isoval = range[0] + s*(range[1] - range[0])/9.0;
+		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
 		mc->SetValue(0, isoval);
 		confilter->SetInputConnection(mc->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();

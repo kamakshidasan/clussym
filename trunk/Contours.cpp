@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
 	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-//	float s = 1;
-	for(unsigned int s = 7; s < 9; s++)
+	float s = 1;
+//	for(unsigned int s = 7; s < 9; s++)
 	{
 		mc->SetValue(0, range[0] + s*(range[1] - range[0])/9.0);
 		confilter->SetInputConnection(mc->GetOutputPort());
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
 		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 		std::cout << "Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
-//		unsigned int r = 0;
-		for(unsigned int r = 0; r < nreg; r++)
+		unsigned int r = 0;
+	//	for(unsigned int r = 0; r < nreg; r++)
 		{
 			confilter->InitializeSpecifiedRegionList();
 			confilter->AddSpecifiedRegion(r);

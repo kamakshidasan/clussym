@@ -103,7 +103,7 @@ bool LB::DuplicateCell(vtkIdType* cpts, boost::unordered_map<Tri, unsigned int> 
 	return dup;
 }
 
-void LB::FillMatrix(vtkPolyData* mesh)
+void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcords)
 {
 	using namespace Eigen;
 	vtkCellArray *polys = mesh->GetPolys();
@@ -184,16 +184,23 @@ void LB::FillMatrix(vtkPolyData* mesh)
 //			printf("Removed Duplicate\n");
 		}
 	}
-	std::cout<< A <<std::endl;
+//	std::cout<< A <<std::endl;
 	struct timeval timeval_start, timeval_end;
 	gettimeofday(&timeval_start, NULL);
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A, EigenvaluesOnly) ;
 	gettimeofday(&timeval_end, NULL);
 	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
+
+	std::vector<double> cords;
+	for(unsigned int i = 0; i < 10; i++)
+	{
+		cords.push_back(eigs.eigenvalues()[i]);
+	}
+	surfcords.push_back(cords);
 	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
 	std::cout<<"Eigen Time: "<<time_end - time_start<<std::endl;
-	float *Acsc = new float[nnz];
+	/*float *Acsc = new float[nnz];
 	int *irow = new int[nnz];
 	int *pcol = new int[numpts+1];
 	float *eigv = new float[nnz];
@@ -224,7 +231,7 @@ void LB::FillMatrix(vtkPolyData* mesh)
 		std::cout<<dprob.Eigenvalue(i)<<" ";
 	}
 	std::cout<<std::endl;
-	std::cout<<"Arpack Time: "<<time_end - time_start<<std::endl;
+	std::cout<<"Arpack Time: "<<time_end - time_start<<std::endl;*/
 //	flens::DenseVector<flens::Array<float> > wr(numpts), wi(numpts), work;
 //	flens::lapack::ev(true, true, //flM, wr, wi, VL, VR, work);
 

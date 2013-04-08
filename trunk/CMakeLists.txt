@@ -5,10 +5,10 @@ PROJECT(Contours)
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 add_definitions(-std=c++11)
-add_executable(Contours Contours LB Decompose)
+add_executable(Contours Contours LB Decompose Cluster)
 
 include_directories("/home/ibis/Downloads/arpack++/include")
 include_directories("/home/ibis/Downloads/FLENS-2012-10-01/")
 
-target_link_libraries(Contours ${VTK_LIBRARIES} arpack superlu) 
+target_link_libraries(Contours ${VTK_LIBRARIES} arpack superlu ANN) 
 

@@ -7,7 +7,7 @@
 class LB
 {
 public:
-	void FillMatrix(vtkPolyData*);
+	void GetEigen(vtkPolyData*, std::vector<std::vector<double> > & surfcords);
 private:
 	double Cotangent(double v1[], double v2[]);
 	void GetCots(vtkIdType *cpts, vtkPoints *pts, double cot[]);

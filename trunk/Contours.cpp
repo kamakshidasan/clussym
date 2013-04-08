@@ -13,6 +13,7 @@
 #include <vtkPolyDataWriter.h>
 
 #include "LB.hpp"
+#include "Cluster.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -43,12 +44,14 @@ int main(int argc, char* argv[])
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
 	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-	float val[3] = {7.9,8,8.1};
-//	unsigned int s = 1;
-	for(unsigned int s = 0; s < 3; s++)
+	std::vector<std::vector<double> > surfcords;
+	float val[] = {.84,.86,.88,.9};
+	unsigned int nsurf = 0;
+	for(unsigned int s = 0; s < 4; s++)
 	{
 		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
-		mc->SetValue(0, isoval);
+		mc->SetValue(0, val[s]);
+		//mc->SetValue(0, isoval);
 		confilter->SetInputConnection(mc->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
@@ -65,13 +68,16 @@ int main(int argc, char* argv[])
 			cleanpolydata->Update();
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
 			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			if(polydata->GetNumberOfPoints() > 10)
+			if(polydata->GetNumberOfPoints() > 20)
 			{
 				LB lb;
-				lb.FillMatrix(polydata);
-				//writer->SetFileName("./out.vtk");
-				//writer->SetInputConnection(cleanpolydata->GetOutputPort());
-				//writer->Write();
+				lb.GetEigen(polydata, surfcords);
+				char fn[100];
+				sprintf(fn,"%d.vtk",nsurf);
+				writer->SetFileName(fn);
+				writer->SetInputConnection(cleanpolydata->GetOutputPort());
+				writer->Write();
+				nsurf++;
 			}
 		}
 
@@ -79,6 +85,8 @@ int main(int argc, char* argv[])
 	//  mc->GenerateValues(10, -0.9615, 2.644);  
 
 	// Create a mapper
+	Cluster cl(surfcords);
+	cl.GetClusters();
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputConnection(mc->GetOutputPort());

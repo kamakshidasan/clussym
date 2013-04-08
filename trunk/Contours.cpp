@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
 		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
-		std::cout <<isoval<< " Regions = "<<nreg<<std::endl;
+		std::cout << "Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
 //		unsigned int r = 0;
 		for(unsigned int r = 0; r < nreg; r++)

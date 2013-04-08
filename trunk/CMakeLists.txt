@@ -4,6 +4,7 @@ PROJECT(Contours)
 
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
+
 add_definitions(-std=c++11)
 add_executable(Contours Contours LB Decompose Cluster)
 

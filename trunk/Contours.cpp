@@ -5,16 +5,56 @@
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCleanPolyData.h>
+#include <vtkTriangleFilter.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkPLYWriter.h>
+#include <vtkWindowedSincPolyDataFilter.h>
+#include <vtkDelaunay2D.h>
+#include <vtkDecimatePro.h>
+#include <vtkDoubleArray.h>
+#include <vtkPointData.h>
+
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Point_with_normal_3.h>
+
+#include <deque>
 
 #include "LB.hpp"
 #include "Cluster.hpp"
+#include "Remesh.hpp"
 
+
+
+typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+typedef Kernel::FT FT;
+typedef Kernel::Point_3 Point;
+typedef Kernel::Vector_3 Vector;
+typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
+
+void vtktoPointList(PointList & pl, vtkPolyData* mesh)
+{
+	vtkSmartPointer<vtkDoubleArray> normals = 
+		vtkDoubleArray::SafeDownCast(mesh->GetPointData()->GetNormals());
+	
+	assert(normals);
+	assert(normals->GetNumberOfTuples() == mesh->GetNumberOfPoints());
+
+	for(vtkIdType i = 0; i < mesh->GetNumberOfPoints(); i++) 
+	{ 
+		double p[3]; 
+		mesh->GetPoint(i, p);
+		Point pt(p[0], p[1], p[2]);
+		normals->GetTuple(i, p);
+		Vector n(p[0], p[1], p[2]);
+		pl.push_back(Point_with_normal(pt,n));
+	} 
+
+}
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -36,14 +76,24 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
 	mc->SetInputConnection(reader->GetOutputPort());
-	mc->ComputeNormalsOff();
+	mc->ComputeNormalsOn();
 	mc->ComputeGradientsOff();
 	mc->ComputeScalarsOff();
 
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter =
 		vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	// Create a 3D model using marching cubes
+	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
+
 	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+	vtkSmartPointer<vtkPLYWriter> PLYwriter = vtkSmartPointer<vtkPLYWriter>::New();
+	vtkSmartPointer<vtkDelaunay2D> delaunay = vtkSmartPointer<vtkDelaunay2D>::New();
+
+	  vtkSmartPointer<vtkWindowedSincPolyDataFilter> smoother =
+		      vtkSmartPointer<vtkWindowedSincPolyDataFilter>::New();
+	  unsigned int smoothingIterations = 50;
+	  double passBand = 0.001;
+	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
 	float val[] = {.84,.86,.88,.9};
 	unsigned int nsurf = 0;
@@ -67,15 +117,49 @@ int main(int argc, char* argv[])
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
+
+
+
+			smoother->SetInputConnection(cleanpolydata->GetOutputPort());
+			smoother->SetNumberOfIterations(smoothingIterations);
+			smoother->BoundarySmoothingOff();
+			smoother->FeatureEdgeSmoothingOn();
+			smoother->SetFeatureAngle(featureAngle);
+			smoother->SetPassBand(passBand);
+			smoother->NonManifoldSmoothingOn();
+			smoother->NormalizeCoordinatesOn();
+			smoother->Update();
+
+//			delaunay->SetInput(polydata);
+//			delaunay->SetSource(polydata);
+//			delaunay->Update();
+			polydata = smoother->GetOutput();	
 			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			unsigned int ntri = polydata->GetNumberOfPolys();
+			if(ntri > 300)
+			{
+				decimate->SetInputConnection(polydata->GetProducerPort());
+				float target = 1 - 300.0/ntri;
+				decimate->SetTargetReduction(target);
+				decimate->Update();
+//				polydata->ShallowCopy(decimate->GetOutput());
+				polydata = decimate->GetOutput();				
+				std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			}
 			if(polydata->GetNumberOfPoints() > 20)
 			{
+				PointList pl;
+				vtktoPointList(pl, polydata);
+				Remesh(pl);
+				//PointListtovtk();
 				LB lb;
 				lb.GetEigen(polydata, surfcords);
 				char fn[100];
 				sprintf(fn,"%d.vtk",nsurf);
 				writer->SetFileName(fn);
-				writer->SetInputConnection(cleanpolydata->GetOutputPort());
+				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
+				trifil->SetInputConnection(cleanpolydata->GetOutputPort());
+				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				nsurf++;
 			}

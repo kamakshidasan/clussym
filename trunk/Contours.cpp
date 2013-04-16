@@ -5,6 +5,7 @@
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCleanPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkTriangleFilter.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -18,6 +19,7 @@
 #include <vtkDecimatePro.h>
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
+#include <vtkLinearSubdivisionFilter.h>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Point_with_normal_3.h>
@@ -27,7 +29,6 @@
 #include "LB.hpp"
 #include "Cluster.hpp"
 #include "Remesh.hpp"
-
 
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
@@ -41,15 +42,15 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	vtkSmartPointer<vtkDoubleArray> normals = 
 		vtkDoubleArray::SafeDownCast(mesh->GetPointData()->GetNormals());
 	
-	assert(normals);
-	assert(normals->GetNumberOfTuples() == mesh->GetNumberOfPoints());
+	assert(mesh->GetPointData());
+	assert(mesh->GetPointData()->GetNumberOfTuples() == mesh->GetNumberOfPoints());
 
 	for(vtkIdType i = 0; i < mesh->GetNumberOfPoints(); i++) 
 	{ 
 		double p[3]; 
 		mesh->GetPoint(i, p);
 		Point pt(p[0], p[1], p[2]);
-		normals->GetTuple(i, p);
+		mesh->GetPointData()->GetTuple(i, p);
 		Vector n(p[0], p[1], p[2]);
 		pl.push_back(Point_with_normal(pt,n));
 	} 
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
 	mc->SetInputConnection(reader->GetOutputPort());
-	mc->ComputeNormalsOn();
+	mc->ComputeNormalsOff();
 	mc->ComputeGradientsOff();
 	mc->ComputeScalarsOff();
 
@@ -119,8 +120,7 @@ int main(int argc, char* argv[])
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
 
 
-
-			smoother->SetInputConnection(cleanpolydata->GetOutputPort());
+/*			smoother->SetInputConnection(cleanpolydata->GetOutputPort());
 			smoother->SetNumberOfIterations(smoothingIterations);
 			smoother->BoundarySmoothingOff();
 			smoother->FeatureEdgeSmoothingOn();
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 //			delaunay->SetInput(polydata);
 //			delaunay->SetSource(polydata);
 //			delaunay->Update();
-			polydata = smoother->GetOutput();	
+			polydata = smoother->GetOutput();	*/
 			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			unsigned int ntri = polydata->GetNumberOfPolys();
 			if(ntri > 300)
@@ -148,9 +148,23 @@ int main(int argc, char* argv[])
 			}
 			if(polydata->GetNumberOfPoints() > 20)
 			{
+				vtkSmartPointer<vtkLinearSubdivisionFilter> subdivisionFilter = 
+					vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+				subdivisionFilter->SetNumberOfSubdivisions(2);
+				subdivisionFilter->SetInputConnection(polydata->GetProducerPort());
+				polydata = subdivisionFilter->GetOutput();
 				PointList pl;
+				vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+				normalGenerator->SetInput(polydata);
+				normalGenerator->ComputePointNormalsOn();
+				normalGenerator->ComputeCellNormalsOff();
+				normalGenerator->SplittingOff();
+				normalGenerator->NonManifoldTraversalOff();
+				normalGenerator->Update();
+
+				polydata = normalGenerator->GetOutput();
 				vtktoPointList(pl, polydata);
-				Remesh(pl);
+				Remesh(pl, nsurf);
 				//PointListtovtk();
 				LB lb;
 				lb.GetEigen(polydata, surfcords);

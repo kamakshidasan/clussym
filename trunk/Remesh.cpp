@@ -24,7 +24,7 @@ typedef CGAL::Surface_mesh_default_triangulation_3 STr;
 typedef CGAL::Surface_mesh_complex_2_in_triangulation_3<STr> C2t3;
 typedef CGAL::Implicit_surface_3<Kernel, Poisson_reconstruction_function> Surface_3;
 
-int Remesh(PointList & points)
+int Remesh(PointList & points, int id)
 {
     // Poisson options
     FT sm_angle = 20.0; // Min triangle angle in degrees.
@@ -79,7 +79,9 @@ int Remesh(PointList & points)
       return EXIT_FAILURE;
 
     // saves reconstructed surface mesh
-    std::ofstream out("kitten_poisson-20-30-0.375.off");
+    char fn[100];
+    sprintf(fn, "%d.off", id);
+    std::ofstream out(fn);
     Polyhedron output_mesh;
     CGAL::output_surface_facets_to_polyhedron(c2t3, output_mesh);
     out << output_mesh;

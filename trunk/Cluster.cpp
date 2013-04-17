@@ -20,11 +20,11 @@ void Cluster::GetClusters()
 {
 	for(unsigned int i = 0; i < nPts; i++)
 	{
-		unsigned int sz = kdTree->annkFRSearch(datapts[i], 1.1, 0);
+		unsigned int sz = kdTree->annkFRSearch(datapts[i], 0.2, 0);
 		printf("For pt %d sphere contains %d\n", i, sz);
 		ANNidxArray nnIdx = new ANNidx[sz];						// allocate near neigh indices
 		ANNdistArray dists = new ANNdist[sz];						// allocate near neighbor dists
-		kdTree->annkFRSearch(datapts[i], 1.1, sz, nnIdx, dists);
+		kdTree->annkFRSearch(datapts[i], 0.2, sz, nnIdx, dists);
 
 		for (unsigned int j = 0; j < sz; j++) 
 		{

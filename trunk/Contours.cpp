@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
-			vtkPolyData* polydata = cleanpolydata->GetOutput();
+			vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
 
 
 /*			smoother->SetInputConnection(cleanpolydata->GetOutputPort());
@@ -164,18 +164,19 @@ int main(int argc, char* argv[])
 
 				polydata = normalGenerator->GetOutput();
 				vtktoPointList(pl, polydata);
-				Remesh(pl, nsurf);
+				vtkPolyData* newpoly = Remesh(pl, nsurf);
 				//PointListtovtk();
 				LB lb;
-				lb.GetEigen(polydata, surfcords);
+				lb.GetEigen(newpoly, surfcords);
 				char fn[100];
 				sprintf(fn,"%d.vtk",nsurf);
 				writer->SetFileName(fn);
 				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
-				trifil->SetInputConnection(cleanpolydata->GetOutputPort());
+				trifil->SetInput(newpoly);
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				nsurf++;
+				newpoly->Delete();
 			}
 		}
 

@@ -7,6 +7,6 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
 typedef std::vector<Point_with_normal> PointList;
 
-int Remesh(PointList & points, int id);
+vtkPolyData* Remesh(PointList & points, int id);
 
 #endif

@@ -9,7 +9,7 @@
 #include <CGAL/Point_with_normal_3.h>
 #include <CGAL/property_map.h>
 #include <CGAL/compute_average_spacing.h>
-#include <CGAL/IO/output_surface_facets_to_polyhedron.h>
+#include <CGAL/IO/Complex_2_in_triangulation_3_to_vtk.h>
 
 #include <fstream>
 
@@ -24,7 +24,7 @@ typedef CGAL::Surface_mesh_default_triangulation_3 STr;
 typedef CGAL::Surface_mesh_complex_2_in_triangulation_3<STr> C2t3;
 typedef CGAL::Implicit_surface_3<Kernel, Poisson_reconstruction_function> Surface_3;
 
-int Remesh(PointList & points, int id)
+vtkPolyData* Remesh(PointList & points, int id)
 {
     // Poisson options
     FT sm_angle = 20.0; // Min triangle angle in degrees.
@@ -42,7 +42,7 @@ int Remesh(PointList & points, int id)
     // Computes the Poisson indicator function f()
     // at each vertex of the triangulation.
     if ( ! function.compute_implicit_function() )
-      return EXIT_FAILURE;
+      return 0;
 
     // Computes average spacing
     FT average_spacing = CGAL::compute_average_spacing(points.begin(), points.end(),
@@ -76,15 +76,16 @@ int Remesh(PointList & points, int id)
                             CGAL::Manifold_with_boundary_tag());  // require manifold mesh
 
     if(tr.number_of_vertices() == 0)
-      return EXIT_FAILURE;
-
+      return 0;
+	
+    vtkPolyData* polydata = output_c2t3_to_vtk_polydata(c2t3);
     // saves reconstructed surface mesh
-    char fn[100];
+/*    char fn[100];
     sprintf(fn, "%d.off", id);
     std::ofstream out(fn);
     Polyhedron output_mesh;
     CGAL::output_surface_facets_to_polyhedron(c2t3, output_mesh);
     out << output_mesh;
-
-    return EXIT_SUCCESS;
+*/
+    return polydata;
 }

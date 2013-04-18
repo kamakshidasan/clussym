@@ -29,7 +29,7 @@ vtkPolyData* Remesh(PointList & points, int id)
     // Poisson options
     FT sm_angle = 20.0; // Min triangle angle in degrees.
     FT sm_radius = 30; // Max triangle size w.r.t. point set average spacing.
-    FT sm_distance = 0.375; // Surface Approximation error w.r.t. point set average spacing.
+    FT sm_distance = 0.3; // Surface Approximation error w.r.t. point set average spacing.
 
     // Creates implicit function from the read points using the default solver.
     // Note: this method requires an iterator over points

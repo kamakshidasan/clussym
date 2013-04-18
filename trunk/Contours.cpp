@@ -96,9 +96,9 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {.84,.86,.88,.9};
+	float val[] = {.94};
 	unsigned int nsurf = 0;
-	for(unsigned int s = 0; s < 4; s++)
+	for(unsigned int s = 0; s < 1; s++)
 	{
 		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
 		mc->SetValue(0, val[s]);
@@ -135,24 +135,30 @@ int main(int argc, char* argv[])
 //			delaunay->Update();
 			polydata = smoother->GetOutput();	*/
 			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			unsigned int ntri = polydata->GetNumberOfPolys();
-			if(ntri > 300)
-			{
-				decimate->SetInputConnection(polydata->GetProducerPort());
-				float target = 1 - 300.0/ntri;
-				decimate->SetTargetReduction(target);
-				decimate->Update();
-//				polydata->ShallowCopy(decimate->GetOutput());
-				polydata = decimate->GetOutput();				
-				std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			}
 			if(polydata->GetNumberOfPoints() > 20)
 			{
-				vtkSmartPointer<vtkLinearSubdivisionFilter> subdivisionFilter = 
+/*				vtkSmartPointer<vtkLinearSubdivisionFilter> subdivisionFilter = 
 					vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
 				subdivisionFilter->SetNumberOfSubdivisions(2);
 				subdivisionFilter->SetInputConnection(polydata->GetProducerPort());
 				polydata = subdivisionFilter->GetOutput();
+*/
+/*
+				unsigned int ntri = polydata->GetNumberOfPolys();
+				if(ntri > 5000)
+				{
+					decimate->SetInputConnection(polydata->GetProducerPort());
+					float target = 1 - 5000.0/ntri;
+					if(target > 0.8) target = 0.8;
+					decimate->SetTargetReduction(target);
+					decimate->Update();
+					//polydata->ShallowCopy(decimate->GetOutput());
+					polydata = decimate->GetOutput();				
+					std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
+						<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+				}
+*/
+
 				PointList pl;
 				vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
 				normalGenerator->SetInput(polydata);
@@ -165,9 +171,11 @@ int main(int argc, char* argv[])
 				polydata = normalGenerator->GetOutput();
 				vtktoPointList(pl, polydata);
 				vtkPolyData* newpoly = Remesh(pl, nsurf);
-				//PointListtovtk();
+
+				
+//				vtkPolyData* newpoly = polydata;
 				LB lb;
-				lb.GetEigen(newpoly, surfcords);
+				//lb.GetEigen(newpoly, surfcords);
 				char fn[100];
 				sprintf(fn,"%d.vtk",nsurf);
 				writer->SetFileName(fn);
@@ -176,7 +184,7 @@ int main(int argc, char* argv[])
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				nsurf++;
-				newpoly->Delete();
+			//	newpoly->Delete();
 			}
 		}
 

@@ -3,28 +3,30 @@
 Cluster::Cluster(std::vector<std::vector<double> > & surfcords) 
 {
 	nPts = surfcords.size();
-	dim = surfcords[0].size();
-	datapts = annAllocPts(nPts, dim);
-
-	for(unsigned int i = 0; i < nPts; i++)
+	if(nPts)
 	{
-		for(unsigned int d = 0; d < dim; d++)
-			datapts[i][d] = surfcords[i][d]/surfcords[i][dim-1];
+		dim = surfcords[0].size();
+		datapts = annAllocPts(nPts, dim);
+
+		for(unsigned int i = 0; i < nPts; i++)
+		{
+			for(unsigned int d = 0; d < dim; d++)
+				datapts[i][d] = surfcords[i][d]/surfcords[i][dim-1];
+		}
+
+		kdTree = new ANNkd_tree(datapts, nPts, dim);	
 	}
-
-	kdTree = new ANNkd_tree(datapts, nPts, dim);	
-
 }
 
 void Cluster::GetClusters()
 {
 	for(unsigned int i = 0; i < nPts; i++)
 	{
-		unsigned int sz = kdTree->annkFRSearch(datapts[i], 0.2, 0);
+		unsigned int sz = kdTree->annkFRSearch(datapts[i], 1.2, 0);
 		printf("For pt %d sphere contains %d\n", i, sz);
 		ANNidxArray nnIdx = new ANNidx[sz];						// allocate near neigh indices
 		ANNdistArray dists = new ANNdist[sz];						// allocate near neighbor dists
-		kdTree->annkFRSearch(datapts[i], 0.2, sz, nnIdx, dists);
+		kdTree->annkFRSearch(datapts[i], 1.2, sz, nnIdx, dists);
 
 		for (unsigned int j = 0; j < sz; j++) 
 		{
@@ -38,7 +40,10 @@ void Cluster::GetClusters()
 
 Cluster::~Cluster()
 {
-	delete kdTree;
-	annDeallocPts(datapts);
-	annClose();
+	if(nPts)
+	{
+		delete kdTree;
+		annDeallocPts(datapts);
+		annClose();
+	}	
 }

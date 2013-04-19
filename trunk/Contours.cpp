@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {.94};
+	float val[] = {.9};
 	unsigned int nsurf = 0;
 	for(unsigned int s = 0; s < 1; s++)
 	{
@@ -134,7 +134,6 @@ int main(int argc, char* argv[])
 //			delaunay->SetSource(polydata);
 //			delaunay->Update();
 			polydata = smoother->GetOutput();	*/
-			std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(polydata->GetNumberOfPoints() > 20)
 			{
 /*				vtkSmartPointer<vtkLinearSubdivisionFilter> subdivisionFilter = 
@@ -170,21 +169,25 @@ int main(int argc, char* argv[])
 
 				polydata = normalGenerator->GetOutput();
 				vtktoPointList(pl, polydata);
+				//vtkSmartPointer<vtkPolyData> newpoly = polydata;
 				vtkPolyData* newpoly = Remesh(pl, nsurf);
 
+				cleanpolydata->SetInput(newpoly);
+				cleanpolydata->Update();
+				polydata = cleanpolydata->GetOutput();
 				
-//				vtkPolyData* newpoly = polydata;
+				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				LB lb;
-				//lb.GetEigen(newpoly, surfcords);
+				lb.GetEigen(polydata, surfcords);
 				char fn[100];
 				sprintf(fn,"%d.vtk",nsurf);
 				writer->SetFileName(fn);
 				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
-				trifil->SetInput(newpoly);
+				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				nsurf++;
-			//	newpoly->Delete();
+				newpoly->Delete();
 			}
 		}
 

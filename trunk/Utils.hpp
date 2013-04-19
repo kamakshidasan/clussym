@@ -27,8 +27,12 @@ template <class T> inline void Sub(T u[3], T v[3], T res[3])
 	res[1] = u[1] - v[1];
 	res[2] = u[2] - v[2];
 }
-
 template <class T> inline T Dot(T u[3], T v[3])
+{
+	return (u[0]*v[0] + u[1]*v[1] + u[2]*v[2]);
+}
+
+template <class T> inline T NormDot(T u[3], T v[3])
 {
 	return (u[0]*v[0] + u[1]*v[1] + u[2]*v[2])/(sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2])*sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]));
 }
@@ -44,7 +48,7 @@ template <class T> inline void Order(T & a, T & b)
 		b = t;
 	}
 }
-/*
+
 inline void Cross(my_float u[3], my_float v[3], my_float n[3])
 {
 	n[0] = u[1]*v[2] - u[2]*v[1];
@@ -52,6 +56,7 @@ inline void Cross(my_float u[3], my_float v[3], my_float n[3])
 	n[2] = u[0]*v[1] - u[1]*v[0];
 }
 
+/*
 inline void MatAdd(my_float* A, my_float* B, my_float* C, unsigned int n, int sign = 1)
 {
 	for(unsigned int i = 0; i < n; i++)

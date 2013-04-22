@@ -270,18 +270,17 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 	}
 	//assert(fabs(sumvorarea - sumtriarea) < 0.00001);
 //	printf("Tot area %f\n", sumtriarea);
-
 	BOOST_FOREACH(edmaptype i, edmap) 
 	{
 		nnzcnt++;
-		float aij = A(i.first.node[0], i.first.node[1]);
-		float aji = A(i.first.node[1], i.first.node[0]);
+//		float aij = A(i.first.node[0], i.first.node[1]);
+//		float aji = A(i.first.node[1], i.first.node[0]);
 
 		A(i.first.node[0], i.first.node[1]) /= 2*sqrt(ndvorarea[i.first.node[0]]*ndvorarea[i.first.node[1]]);
 		if(i.first.node[0] != i.first.node[1])
 			A(i.first.node[1], i.first.node[0]) /= 2*sqrt(ndvorarea[i.first.node[1]]*ndvorarea[i.first.node[0]]);
-		aij = A(i.first.node[0], i.first.node[1]);
-		aji = A(i.first.node[1], i.first.node[0]);
+//		aij = A(i.first.node[0], i.first.node[1]);
+//		aji = A(i.first.node[1], i.first.node[0]);
 		assert(fabs(A(i.first.node[0], i.first.node[1]) - A(i.first.node[1], i.first.node[0])) < 0.000001);
 	}
 	//assert(nnzcnt == nnz);
@@ -295,13 +294,15 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 
 	std::vector<double> cords;
-	for(unsigned int i = 0; i < 10; i++)
+	printf("Eigen Values: ");
+	for(unsigned int i = 1; i <= 10; i++)
 	{
-		cords.push_back(eigs.eigenvalues()[i]);
-		//cords.push_back(eigs.eigenvalues()[i].real());
+		cords.push_back(1.0/(sumtriarea*eigs.eigenvalues()[i]));
+		printf("%lf ", cords[i-1]);
 	}
+	printf("\n");
 	surfcords.push_back(cords);
-	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
+//	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
 //	std::cout<<"Eigen Time: "<<time_end - time_start<<std::endl;
 	/*float *Acsc = new float[nnz];
 	int *irow = new int[nnz];

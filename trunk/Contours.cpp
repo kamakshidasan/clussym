@@ -96,9 +96,9 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {.9};
+	float val[] = {0.86, .9};
 	unsigned int nsurf = 0;
-	for(unsigned int s = 0; s < 1; s++)
+	for(unsigned int s = 0; s < 2; s++)
 	{
 		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
 		mc->SetValue(0, val[s]);
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
 				polydata = normalGenerator->GetOutput();
 				vtktoPointList(pl, polydata);
-				//vtkSmartPointer<vtkPolyData> newpoly = polydata;
+			//	vtkSmartPointer<vtkPolyData> newpoly = polydata;
 				vtkPolyData* newpoly = Remesh(pl, nsurf);
 
 				cleanpolydata->SetInput(newpoly);

@@ -11,7 +11,7 @@ Cluster::Cluster(std::vector<std::vector<double> > & surfcords)
 		for(unsigned int i = 0; i < nPts; i++)
 		{
 			for(unsigned int d = 0; d < dim; d++)
-				datapts[i][d] = surfcords[i][d]/surfcords[i][dim-1];
+				datapts[i][d] = surfcords[i][d];
 		}
 
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	

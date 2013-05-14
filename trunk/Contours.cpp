@@ -19,6 +19,9 @@
 #include <vtkDecimatePro.h>
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
+#include <vtkThreshold.h>
+#include <vtkVolume.h>
+#include <vtkContourFilter.h>
 #include <vtkLinearSubdivisionFilter.h>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -74,8 +77,17 @@ int main(int argc, char* argv[])
 	double range[2];
 	vtkStructuredPoints* vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
+	vtkSmartPointer<vtkContourFilter> ctr =
+		vtkSmartPointer<vtkContourFilter>::New();
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
+	vtkSmartPointer<vtkThreshold> thr = vtkSmartPointer<vtkThreshold>::New();
+	thr->SetInputConnection(reader->GetOutputPort());
+	thr->AllScalarsOff();
+	thr->ThresholdBetween(0.8, 0.916);
+
+	ctr->SetInputConnection(thr->GetOutputPort());
+	ctr->SetValue(0,0.915);
 	mc->SetInputConnection(reader->GetOutputPort());
 	mc->ComputeNormalsOff();
 	mc->ComputeGradientsOff();
@@ -96,9 +108,9 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {0.86, .9};
+	float val[] = {0.83, 0.86, 0.89, 0.92, 0.95, 0.98, 1.01, 1.04, 1.07, 1.1};
 	unsigned int nsurf = 0;
-	for(unsigned int s = 0; s < 2; s++)
+	for(unsigned int s = 0; s < 0; s++)
 	{
 		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
 		mc->SetValue(0, val[s]);
@@ -142,21 +154,6 @@ int main(int argc, char* argv[])
 				subdivisionFilter->SetInputConnection(polydata->GetProducerPort());
 				polydata = subdivisionFilter->GetOutput();
 */
-/*
-				unsigned int ntri = polydata->GetNumberOfPolys();
-				if(ntri > 5000)
-				{
-					decimate->SetInputConnection(polydata->GetProducerPort());
-					float target = 1 - 5000.0/ntri;
-					if(target > 0.8) target = 0.8;
-					decimate->SetTargetReduction(target);
-					decimate->Update();
-					//polydata->ShallowCopy(decimate->GetOutput());
-					polydata = decimate->GetOutput();				
-					std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
-						<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-				}
-*/
 
 				PointList pl;
 				vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -176,6 +173,24 @@ int main(int argc, char* argv[])
 				cleanpolydata->Update();
 				polydata = cleanpolydata->GetOutput();
 				
+
+				unsigned int ntri = polydata->GetNumberOfPolys();
+				if(ntri > 20000)
+				{
+					decimate->SetInputConnection(polydata->GetProducerPort());
+					float target = 1 - 20000.0/ntri;
+					if(target > 0.8) target = 0.8;
+					decimate->SetTargetReduction(target);
+					decimate->Update();
+					//polydata->ShallowCopy(decimate->GetOutput());
+					polydata = decimate->GetOutput();				
+					std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
+						<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+				}
+
+
+
+
 				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				LB lb;
 				lb.GetEigen(polydata, surfcords);
@@ -195,11 +210,12 @@ int main(int argc, char* argv[])
 	//  mc->GenerateValues(10, -0.9615, 2.644);  
 
 	// Create a mapper
-	Cluster cl(surfcords);
-	cl.GetClusters();
+//	Cluster cl(surfcords);
+//	cl.GetClusters();
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputConnection(mc->GetOutputPort());
+	mapper->SetInputConnection(ctr->GetOutputPort());
+
 
 	mapper->ScalarVisibilityOff();    // utilize actor's property I set
 
@@ -215,6 +231,7 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkRenderer> renderer =
 		vtkSmartPointer<vtkRenderer>::New();
 	renderer->AddActor(actor);
+
 
 	vtkSmartPointer<vtkRenderWindow> renwin =
 		vtkSmartPointer<vtkRenderWindow>::New();

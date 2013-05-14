@@ -297,7 +297,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 	printf("Eigen Values: ");
 	for(unsigned int i = 1; i <= 10; i++)
 	{
-		cords.push_back(1.0/(sumtriarea*eigs.eigenvalues()[i]));
+		cords.push_back(1.0/(eigs.eigenvalues()[i]));
 		printf("%lf ", cords[i-1]);
 	}
 	printf("\n");

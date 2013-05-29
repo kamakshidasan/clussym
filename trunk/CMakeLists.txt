@@ -9,11 +9,11 @@ include(${VTK_USE_FILE})
 include(${CGAL_USE_FILE})
 
 
-add_executable(Contours Contours LB Decompose Cluster Remesh BD)
+add_executable(Contours Contours LB Decompose Cluster Remesh Utils BD)
 
 include_directories("/usr/include/eigen3/")
 include_directories("/home/ibis/Downloads/arpack++/include")
 include_directories("/home/ibis/Downloads/FLENS-2012-10-01/")
 
-target_link_libraries(Contours ${VTK_LIBRARIES} arpack superlu ANN) 
+target_link_libraries(Contours ${VTK_LIBRARIES} arpack superlu ANN tourtre) 
 

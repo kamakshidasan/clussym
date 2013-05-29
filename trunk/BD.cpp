@@ -5,7 +5,7 @@ extern "C" {
 #include "tourtre.h"
 }
 
-
+int SIZEX, SIZEY, SIZEZ;
 void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	unsigned int x,y,z;

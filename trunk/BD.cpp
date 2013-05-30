@@ -1,9 +1,6 @@
 #include "BD.hpp"
 #include "Utils.hpp"
 #include <algorithm>
-extern "C" {
-#include "tourtre.h"
-}
 
 int SIZEX, SIZEY, SIZEZ;
 void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype)
@@ -115,6 +112,36 @@ bool FnCmp::operator()(const unsigned int & l, const unsigned int & r)
 	return ((*pverts)[l].w < (*pverts)[r].w);
 }
 
+BDBranch* BD::BuildSymTree(ctBranch* b, BDBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & h)
+{
+	node->ht = 1;
+	node->ext = b->extremum;
+	node->sad = b->saddle;
+	node->sadw = m_vlist[node->sad].w;
+	node->extw = m_vlist[node->ext].w;
+//	node->cl.push_back(SplitBr (0,node->sad, 0));
+	node->orgbr = node;
+	bridsarr[brid] = brid;
+	b->data = &bridsarr[brid];
+	node->brid = brid;
+	unsigned int totch = 0;
+	unsigned int ht = 1;
+	for ( ctBranch * c = b->children.head; c != NULL; c = c->nextChild )
+	{
+		unsigned int chch = 0;
+		BDBranch* chnode = new BDBranch;
+		chnode->par = node;
+		chnode->lev = node->lev+1;
+		node->ch.push_back(chnode);
+		brid++;
+		BuildSymTree(c, chnode, brid, chch, ht);
+		if(node->ht < chnode->ht+1) node->ht = chnode->ht+1;
+		totch += chch;
+	}
+	ch = totch + 1;
+	node->totch = ch;
+	return node;
+}
 
 
 BD::BD(std::vector<Vertex> & verts) : m_vlist(verts)
@@ -144,10 +171,27 @@ void BD::BuildBD()
 	ctNode** nodesOut;
 	size_t numarcs, numNodes;
 	ct_arcsAndNodes(*arcs, &arcsOut, &numarcs, &nodesOut, &numNodes);
+	bridsarr = std::vector<unsigned int>(numNodes,0);
 	ctBranch* root = ct_decompose( ctx );
 
 	//create branch decomposition
 	ctBranch ** brvertmap;
 	brvertmap = ct_branchMap(ctx);
+	
+	unsigned int brid = 1;
+	BDBranch* bdroot = new BDBranch;
+	bdroot->par = NULL;
+	bdroot->lev = 1;
+	BDBranch* node = BuildSymTree(root, bdroot, brid, bdroot->totch, bdroot->ht);
+	vtobrmap = std::vector<unsigned int>(m_vlist.size(), 0);
+	for(unsigned int i = 0; i < m_vlist.size(); i++)
+	{
+		vtobrmap[i] = *(int*)brvertmap[i]->data;
+	}
+
+	assert(node == bdroot);
+	ct_cleanup( ctx );
+
+
 
 }

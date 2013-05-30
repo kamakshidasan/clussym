@@ -32,6 +32,7 @@
 #include "LB.hpp"
 #include "Cluster.hpp"
 #include "Remesh.hpp"
+#include "BD.hpp"
 
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
@@ -39,6 +40,8 @@ typedef Kernel::FT FT;
 typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
+
+std::vector<Vertex> vlist;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
@@ -59,6 +62,23 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	} 
 
 }
+
+void ComputeBD(vtkStructuredPoints *vtkstrpts, std::vector<Vertex> & vlist)
+{
+	unsigned int n = vtkstrpts->GetNumberOfPoints();
+	vtkDataArray* pscl = vtkstrpts->GetPointData()->GetScalars(); 
+	for(unsigned int i = 0; i < n; i++)
+	{
+		double p[3], f;
+		vtkstrpts->GetPoint(i, p);
+		f = pscl->GetComponent(i, 0);
+		Vertex v(p,f);
+		vlist.push_back(v);	
+	}
+	BD bd(vlist);
+	bd.BuildBD();
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -76,6 +96,7 @@ int main(int argc, char* argv[])
 	reader->Update();
 	double range[2];
 	vtkStructuredPoints* vtkstrpts = reader->GetOutput();
+	ComputeBD(vtkstrpts, vlist);
 	vtkstrpts->GetScalarRange(range);
 	vtkSmartPointer<vtkContourFilter> ctr =
 		vtkSmartPointer<vtkContourFilter>::New();

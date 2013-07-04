@@ -19,6 +19,7 @@
 #include <vtkDelaunay2D.h>
 #include <vtkDecimatePro.h>
 #include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include <vtkThreshold.h>
 #include <vtkVolume.h>
@@ -47,24 +48,31 @@ std::vector<Vertex> vlist;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
-	vtkSmartPointer<vtkDoubleArray> normals = 
-		vtkDoubleArray::SafeDownCast(mesh->GetPointData()->GetNormals());
+	vtkSmartPointer<vtkFloatArray> normals = 
+		vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetArray("Normals"));
 	
-	assert(mesh->GetPointData());
-	assert(mesh->GetPointData()->GetNumberOfTuples() == mesh->GetNumberOfPoints());
-
 	for(vtkIdType i = 0; i < mesh->GetNumberOfPoints(); i++) 
 	{ 
 		double p[3]; 
 		mesh->GetPoint(i, p);
 		Point pt(p[0], p[1], p[2]);
-		mesh->GetPointData()->GetTuple(i, p);
-		Vector n(p[0], p[1], p[2]);
-		pl.push_back(Point_with_normal(pt,n));
+		printf("%lf %lf %lf\n", p[0],p[1],p[2]);
+		if(normals)
+		{
+			normals->GetTuple(i, p);
+			printf("%lf %lf %lf\n", p[0],p[1],p[2]);
+			Vector n(p[0], p[1], p[2]);
+			pl.push_back(Point_with_normal(pt,n));
+		}
+		else
+		{
+			printf("No normals\n");
+			exit(0);
+		}
 	} 
 
 }
-
+/*
 void ComputeBD(vtkStructuredPoints *vtkstrpts, std::vector<Vertex> & vlist)
 {
 	unsigned int n = vtkstrpts->GetNumberOfPoints();
@@ -78,9 +86,17 @@ void ComputeBD(vtkStructuredPoints *vtkstrpts, std::vector<Vertex> & vlist)
 		vlist.push_back(v);	
 	}
 	BD bd(vlist);
-	bd.BuildBD();
+	 
+	vtkSmartPointer<vtkIntArray> brlbl =
+		vtkSmartPointer<vtkIntArray>::New();
+	brlbl->SetName("Branch");
+	brlbl->SetNumberOfComponents(1);
+	brlbl->SetNumberOfValues(vlist.size());
+	bd.BuildBD(brlbl);
+	
+	vtkstrpts->GetPointData()->SetScalars(brlbl);
 }
-
+*/
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -98,7 +114,7 @@ int main(int argc, char* argv[])
 	reader->Update();
 	double range[2];
 	vtkStructuredPoints* vtkstrpts = reader->GetOutput();
-	ComputeBD(vtkstrpts, vlist);
+//	ComputeBD(vtkstrpts, vlist);
 	vtkstrpts->GetScalarRange(range);
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 	bidarray->SetName("bids");
@@ -120,11 +136,11 @@ int main(int argc, char* argv[])
 	vtkstrpts->GetPointData()->AddArray(bidarray);
 
 	vtkstrpts->Update();	
-//	vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
-//		vtkSmartPointer<vtkStructuredPointsWriter>::New();
-//	strpwriter->SetInput(vtkstrpts);
-//	strpwriter->SetFileName("t.vtk");
-//	strpwriter->Update();
+	vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
+		vtkSmartPointer<vtkStructuredPointsWriter>::New();
+	strpwriter->SetInput(vtkstrpts);
+	strpwriter->SetFileName("t.vtk");
+	strpwriter->Update();
 
 	vtkSmartPointer<vtkContourFilter> ctr =
 		vtkSmartPointer<vtkContourFilter>::New();
@@ -134,7 +150,7 @@ int main(int argc, char* argv[])
 	thr->SetInputConnection(reader->GetOutputPort());
 	thr->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "bids");
 	thr->AllScalarsOff();
-	thr->ThresholdBetween(2, 2);
+	thr->ThresholdBetween(20, 20);
 
 	ctr->SetInputConnection(thr->GetOutputPort());
 	ctr->ComputeNormalsOff();
@@ -162,7 +178,7 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {0.91, 0.86, 0.89, 0.92, 0.95, 0.98, 1.01, 1.04, 1.07, 1.1};
+	float val[] = {0.83, 0.86, 0.89, 0.92, 0.95, 0.98, 1.01, 1.04, 1.07, 1.1};
 	unsigned int nsurf = 0;
 	vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
 	for(unsigned int s = 0; s < 1; s++)
@@ -216,7 +232,7 @@ int main(int argc, char* argv[])
 				normalGenerator->ComputePointNormalsOn();
 				normalGenerator->ComputeCellNormalsOff();
 				normalGenerator->SplittingOff();
-				normalGenerator->NonManifoldTraversalOn();
+				normalGenerator->NonManifoldTraversalOff();
 				normalGenerator->Update();
 
 				polydata = normalGenerator->GetOutput();
@@ -226,7 +242,7 @@ int main(int argc, char* argv[])
 				vtkPolyData* newpoly = Remesh(pl, nsurf);
 
 				char fn[100];
-				sprintf(fn,"%d.vtk",0);
+				sprintf(fn,"%dct.vtk",1);
 				writer->SetFileName(fn);
 				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
 				trifil->SetInput(polydata);
@@ -236,7 +252,7 @@ int main(int argc, char* argv[])
 				cleanpolydata->SetInput(newpoly);
 				cleanpolydata->Update();
 				polydata = cleanpolydata->GetOutput();
-				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			//	std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				
 
 				unsigned int ntri = polydata->GetNumberOfPolys();
@@ -256,7 +272,7 @@ int main(int argc, char* argv[])
 
 
 
-				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			//	std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				LB lb;
 //				lb.GetEigen(polydata, surfcords);
 				/*sprintf(fn,"%d.vtk",nsurf);

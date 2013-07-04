@@ -1,5 +1,6 @@
 #include <vtkSmartPointer.h>
 #include <vtkStructuredPointsReader.h>
+#include <vtkStructuredPointsWriter.h>
 #include <vtkStructuredPoints.h>
 #include <vtkMarchingCubes.h>
 #include <vtkPolyDataConnectivityFilter.h>
@@ -29,6 +30,7 @@
 
 #include <deque>
 
+#include "BD.hpp"
 #include "LB.hpp"
 #include "Cluster.hpp"
 #include "Remesh.hpp"
@@ -77,17 +79,48 @@ int main(int argc, char* argv[])
 	double range[2];
 	vtkStructuredPoints* vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
+	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
+	bidarray->SetName("bids");
+
+	std::vector<Vertex> verts;
+	vtkSmartPointer<vtkDataArray> ps = vtkstrpts->GetPointData()->GetScalars();
+	for(unsigned int i = 0; i < vtkstrpts->GetNumberOfPoints(); i++)
+	{
+		double p[3];
+		double w = ps->GetComponent(i,0);
+		vtkstrpts->GetPoint(i,p);
+		verts.push_back(Vertex(p,w));
+	}
+
+	BD bd(verts);
+	bd.BuildBD();
+	std::vector<int> & bmap = bd.GetVertMap();
+	bidarray->SetArray(&bmap[0], bmap.size(), 1);
+	vtkstrpts->GetPointData()->AddArray(bidarray);
+
+	vtkstrpts->Update();	
+//	vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
+//		vtkSmartPointer<vtkStructuredPointsWriter>::New();
+//	strpwriter->SetInput(vtkstrpts);
+//	strpwriter->SetFileName("t.vtk");
+//	strpwriter->Update();
+
 	vtkSmartPointer<vtkContourFilter> ctr =
 		vtkSmartPointer<vtkContourFilter>::New();
 	vtkSmartPointer<vtkMarchingCubes> mc =
 		vtkSmartPointer<vtkMarchingCubes>::New();
 	vtkSmartPointer<vtkThreshold> thr = vtkSmartPointer<vtkThreshold>::New();
 	thr->SetInputConnection(reader->GetOutputPort());
+	thr->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "bids");
 	thr->AllScalarsOff();
-	thr->ThresholdBetween(0.8, 0.916);
+	thr->ThresholdBetween(2, 2);
 
 	ctr->SetInputConnection(thr->GetOutputPort());
-	ctr->SetValue(0,0.915);
+	ctr->ComputeNormalsOff();
+	ctr->ComputeGradientsOff();
+	ctr->ComputeScalarsOff();
+	ctr->SetValue(0,0.91);
+	ctr->Update();
 	mc->SetInputConnection(reader->GetOutputPort());
 	mc->ComputeNormalsOff();
 	mc->ComputeGradientsOff();
@@ -108,28 +141,29 @@ int main(int argc, char* argv[])
 	  double passBand = 0.001;
 	  double featureAngle = 120.0;
 	std::vector<std::vector<double> > surfcords;
-	float val[] = {0.83, 0.86, 0.89, 0.92, 0.95, 0.98, 1.01, 1.04, 1.07, 1.1};
+	float val[] = {0.91, 0.86, 0.89, 0.92, 0.95, 0.98, 1.01, 1.04, 1.07, 1.1};
 	unsigned int nsurf = 0;
-	for(unsigned int s = 0; s < 0; s++)
+	vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+	for(unsigned int s = 0; s < 1; s++)
 	{
 		float isoval = range[0] + val[s]*(range[1] - range[0])/9.0;
 		mc->SetValue(0, val[s]);
 		//mc->SetValue(0, isoval);
-		confilter->SetInputConnection(mc->GetOutputPort());
+		confilter->SetInputConnection(ctr->GetOutputPort());
 		confilter->SetExtractionModeToAllRegions();
 		confilter->Update();
 		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 		std::cout << "Regions = "<<nreg<<std::endl;
 		confilter->SetExtractionModeToSpecifiedRegions();
 //		unsigned int r = 0;
-		for(unsigned int r = 0; r < nreg; r++)
+		for(unsigned int r = 0; r < 1; r++)
 		{
 			confilter->InitializeSpecifiedRegionList();
 			confilter->AddSpecifiedRegion(r);
 			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
 			cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 			cleanpolydata->Update();
-			vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
+			polydata = cleanpolydata->GetOutput();
 
 
 /*			smoother->SetInputConnection(cleanpolydata->GetOutputPort());
@@ -161,17 +195,27 @@ int main(int argc, char* argv[])
 				normalGenerator->ComputePointNormalsOn();
 				normalGenerator->ComputeCellNormalsOff();
 				normalGenerator->SplittingOff();
-				normalGenerator->NonManifoldTraversalOff();
+				normalGenerator->NonManifoldTraversalOn();
 				normalGenerator->Update();
 
 				polydata = normalGenerator->GetOutput();
+				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				vtktoPointList(pl, polydata);
 			//	vtkSmartPointer<vtkPolyData> newpoly = polydata;
 				vtkPolyData* newpoly = Remesh(pl, nsurf);
 
+				char fn[100];
+				sprintf(fn,"%d.vtk",0);
+				writer->SetFileName(fn);
+				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
+				trifil->SetInput(polydata);
+				writer->SetInputConnection(trifil->GetOutputPort());
+				writer->Write();
+
 				cleanpolydata->SetInput(newpoly);
 				cleanpolydata->Update();
 				polydata = cleanpolydata->GetOutput();
+				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				
 
 				unsigned int ntri = polydata->GetNumberOfPolys();
@@ -193,14 +237,13 @@ int main(int argc, char* argv[])
 
 				std::cout <<"Surface "<<s<<" Region "<<r<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 				LB lb;
-				lb.GetEigen(polydata, surfcords);
-				char fn[100];
-				sprintf(fn,"%d.vtk",nsurf);
+//				lb.GetEigen(polydata, surfcords);
+				/*sprintf(fn,"%d.vtk",nsurf);
 				writer->SetFileName(fn);
 				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();
+				writer->Write();*/
 				nsurf++;
 				newpoly->Delete();
 			}
@@ -214,7 +257,7 @@ int main(int argc, char* argv[])
 //	cl.GetClusters();
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputConnection(ctr->GetOutputPort());
+	mapper->SetInput(polydata);
 
 
 	mapper->ScalarVisibilityOff();    // utilize actor's property I set

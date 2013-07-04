@@ -1,8 +1,14 @@
 #include "BD.hpp"
 #include "Utils.hpp"
 #include <algorithm>
+extern "C" {
+#include "tourtre.h"
+}
 
-int SIZEX, SIZEY, SIZEZ;
+int SIZEX = 64;
+int SIZEY = 64;
+int SIZEZ = 64;
+
 void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	unsigned int x,y,z;
@@ -98,7 +104,8 @@ size_t neighbours(size_t v, size_t * ar, void* data)
 	BD* bd = (BD*) data;
 	std::vector<unsigned int> nbrs;
 	bd->GetNeighbours(v, nbrs, 0);
-	memcpy(ar, &nbrs[0], sizeof(unsigned int)*nbrs.size());
+	for(unsigned int i = 0; i < nbrs.size(); i++)
+		ar[i] = nbrs[i];
 	return nbrs.size();
 }
 
@@ -112,7 +119,7 @@ bool FnCmp::operator()(const unsigned int & l, const unsigned int & r)
 	return ((*pverts)[l].w < (*pverts)[r].w);
 }
 
-BDBranch* BD::BuildSymTree(ctBranch* b, BDBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & h)
+SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & h)
 {
 	node->ht = 1;
 	node->ext = b->extremum;
@@ -129,7 +136,7 @@ BDBranch* BD::BuildSymTree(ctBranch* b, BDBranch* node, unsigned int & brid, uns
 	for ( ctBranch * c = b->children.head; c != NULL; c = c->nextChild )
 	{
 		unsigned int chch = 0;
-		BDBranch* chnode = new BDBranch;
+		SymBranch* chnode = new SymBranch;
 		chnode->par = node;
 		chnode->lev = node->lev+1;
 		node->ch.push_back(chnode);
@@ -160,7 +167,7 @@ void BD::BuildBD()
 
 	std::sort(vidx.begin(), vidx.end(), FnCmp(&m_vlist));
 
-	for ( int i = 0; i < nv; ++i )
+	for(unsigned int i = 0; i < nv; ++i )
 	{
 		ar[i] = vidx[i];
 	}	
@@ -171,27 +178,29 @@ void BD::BuildBD()
 	ctNode** nodesOut;
 	size_t numarcs, numNodes;
 	ct_arcsAndNodes(*arcs, &arcsOut, &numarcs, &nodesOut, &numNodes);
-	bridsarr = std::vector<unsigned int>(numNodes,0);
 	ctBranch* root = ct_decompose( ctx );
 
 	//create branch decomposition
 	ctBranch ** brvertmap;
 	brvertmap = ct_branchMap(ctx);
-	
+
 	unsigned int brid = 1;
-	BDBranch* bdroot = new BDBranch;
-	bdroot->par = NULL;
-	bdroot->lev = 1;
-	BDBranch* node = BuildSymTree(root, bdroot, brid, bdroot->totch, bdroot->ht);
-	vtobrmap = std::vector<unsigned int>(m_vlist.size(), 0);
+	bridsarr = std::vector<unsigned int>(numNodes,0);
+	symroot = new SymBranch;
+	symroot->par = NULL;
+	symroot->lev = 1;
+	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht);
+
+	vtobrmap = std::vector<int>(m_vlist.size(), 0);
 	for(unsigned int i = 0; i < m_vlist.size(); i++)
 	{
 		vtobrmap[i] = *(int*)brvertmap[i]->data;
 	}
 
-	assert(node == bdroot);
-	ct_cleanup( ctx );
+	
+}
 
-
-
+std::vector<int> & BD::GetVertMap()
+{
+	return vtobrmap;	
 }

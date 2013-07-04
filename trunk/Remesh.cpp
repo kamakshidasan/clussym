@@ -80,12 +80,5 @@ vtkPolyData* Remesh(PointList & points, int id)
 	
     vtkPolyData* polydata = output_c2t3_to_vtk_polydata(c2t3);
     // saves reconstructed surface mesh
-/*    char fn[100];
-    sprintf(fn, "%d.off", id);
-    std::ofstream out(fn);
-    Polyhedron output_mesh;
-    CGAL::output_surface_facets_to_polyhedron(c2t3, output_mesh);
-    out << output_mesh;
-*/
     return polydata;
 }

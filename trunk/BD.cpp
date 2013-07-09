@@ -197,7 +197,7 @@ void BD::BuildBD()
 		vtobrmap[i] = *(int*)brvertmap[i]->data;
 	}
 
-	
+       	ct_cleanup( ctx );
 }
 
 std::vector<int> & BD::GetVertMap()

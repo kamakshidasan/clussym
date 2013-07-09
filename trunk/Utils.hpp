@@ -27,10 +27,14 @@ inline void Sub(my_float u[3], my_float v[3], my_float res[3])
 	res[1] = u[1] - v[1];
 	res[2] = u[2] - v[2];
 }
+inline my_float NormDot(my_float u[3], my_float v[3])
+{
+	return (u[0]*v[0] + u[1]*v[1] + u[2]*v[2])/(sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2])*sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]));
+}
 
 inline my_float Dot(my_float u[3], my_float v[3])
 {
-	return (u[0]*v[0] + u[1]*v[1] + u[2]*v[2])/(sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2])*sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]));
+	return (u[0]*v[0] + u[1]*v[1] + u[2]*v[2]);
 }
 
 inline void Cross(my_float u[3], my_float v[3], my_float n[3])

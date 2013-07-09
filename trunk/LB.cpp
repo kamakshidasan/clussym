@@ -28,6 +28,9 @@ void LB::GetCotsLensArea(vtkIdType *cpts, vtkPoints *pts, double cot[], double l
 	pts->GetPoint(cpts[1],xyz[1]);
 	pts->GetPoint(cpts[2],xyz[2]);
 
+//	printf("p1 %lf %lf %lf\n", xyz[0][0], xyz[0][1], xyz[0][2]);
+//	printf("p2 %lf %lf %lf\n", xyz[1][0], xyz[1][1], xyz[1][2]);
+//	printf("p3 %lf %lf %lf\n", xyz[2][0], xyz[2][1], xyz[2][2]);
 	double v01[3], v02[3];
 	Sub(xyz[1], xyz[0], v01);
 	Sub(xyz[2], xyz[0], v02);
@@ -55,9 +58,11 @@ void LB::GetCotsLensArea(vtkIdType *cpts, vtkPoints *pts, double cot[], double l
 	len[1] = Dot(v20, v20);
 	cot[2] = Cotangent(v20, v21, area[2]);
 
+//	printf("Area %lf %lf %lf\n",area[0],area[1],area[2]);
 	assert(fabs(area[0] - area[1]) < 0.000001);
 	assert(fabs(area[1] - area[2]) < 0.000001);
 	assert(fabs(area[0] - area[2]) < 0.000001);
+
 
 	a = area[0];
 }
@@ -344,11 +349,14 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 
 double LB::Cotangent(double v1[], double v2[], double & area)
 {
+//	printf("v1 %lf %lf %lf\n", v1[0], v1[1], v1[2]);
+//	printf("v2 %lf %lf %lf\n", v2[0], v2[1], v2[2]);
 	double v1v2cos 	= Dot(v1,v2);
 	double v1sqr 	= Dot(v1,v1);
 	double v2sqr	= Dot(v2,v2);
 	double v1v2sin 	= sqrt(v1sqr*v2sqr - v1v2cos*v1v2cos);
 	double cot 	= v1v2cos / v1v2sin;
 	area = v1v2sin/2;
+//	printf("v1v2cos %lf v1sqr %lf v2sqr %lf v1v2sin %lf area %lf  cot %lf\n", v1v2cos, v1sqr, v2sqr, v1v2sin, area, cot);
 	return cot;
 }	

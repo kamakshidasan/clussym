@@ -24,7 +24,7 @@ typedef CGAL::Surface_mesh_default_triangulation_3 STr;
 typedef CGAL::Surface_mesh_complex_2_in_triangulation_3<STr> C2t3;
 typedef CGAL::Implicit_surface_3<Kernel, Poisson_reconstruction_function> Surface_3;
 
-vtkPolyData* Remesh(PointList & points, int id)
+vtkPolyData* Remesh(PointList & points)
 {
     // Poisson options
     FT sm_angle = 20.0; // Min triangle angle in degrees.

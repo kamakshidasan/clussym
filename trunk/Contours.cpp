@@ -31,13 +31,12 @@
 #include "Contours.hpp"
 
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
-typedef Kernel::FT FT;
-typedef Kernel::Point_3 Point;
-typedef Kernel::Vector_3 Vector;
+	typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+	typedef Kernel::FT FT;
+	typedef Kernel::Point_3 Point;
+	typedef Kernel::Vector_3 Vector;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
 
-std::vector<Vertex> vlist;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
@@ -94,100 +93,106 @@ void ComputeBD(vtkStructuredPoints *vtkstrpts, std::vector<Vertex> & vlist)
 void Contours::GenerateContour(SymBranch* curbr, std::vector<float> & fvals)
 {
 	std::vector<float>::iterator fit = fvals.begin();
+
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
+	vtkSmartPointer<vtkThreshold> thr = vtkSmartPointer<vtkThreshold>::New();
+	vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
+	vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+	vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+	vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
+
 	for(; fit != fvals.end(); fit++)
 	{
-		vtkSmartPointer<vtkThreshold> thr = vtkSmartPointer<vtkThreshold>::New();
-		thr->SetInputConnection(reader->GetOutputPort());
-		thr->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "bids");
-		if(curbr->brid == 1)
-			thr->AllScalarsOn();
-		else
-			thr->AllScalarsOff();
-
-		thr->ThresholdBetween(curbr->brid, curbr->brid);
-
-		vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
-		ctr->SetInputConnection(thr->GetOutputPort());
-		ctr->ComputeNormalsOff();
-		ctr->ComputeGradientsOff();
-		ctr->ComputeScalarsOff();
-		ctr->SetValue(0,*fit);
-		ctr->Update();
-
-		vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter =
-			vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
-
-		confilter->SetInputConnection(ctr->GetOutputPort());
-		confilter->SetExtractionModeToAllRegions();
-		confilter->Update();
-		unsigned int nreg = confilter->GetNumberOfExtractedRegions();
-
-		if(nreg == 1)
+		float isoval = *fit;
+		if((isoval > verts[curbr->ext].w && isoval < verts[curbr->sad].w) ||
+		   (isoval < verts[curbr->ext].w && isoval > verts[curbr->sad].w))
 		{
-			vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
+			thr->SetInputConnection(reader->GetOutputPort());
+			thr->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "bids");
+			if(curbr->brid == 1)
+				thr->AllScalarsOn();
+			else
+				thr->AllScalarsOff();
+
+			thr->ThresholdBetween(curbr->brid, curbr->brid);
+
+			ctr->SetInputConnection(thr->GetOutputPort());
+			ctr->ComputeNormalsOff();
+			ctr->ComputeGradientsOff();
+			ctr->ComputeScalarsOff();
+			ctr->SetValue(0,*fit);
+			ctr->Update();
+
 			cleanpolydata->SetInputConnection(ctr->GetOutputPort());
 			cleanpolydata->Update();
 			vtkPolyData* polydata = cleanpolydata->GetOutput();
-			if(polydata->GetNumberOfPoints() > 20)
+
+			confilter->SetInputConnection(ctr->GetOutputPort());
+			confilter->SetExtractionModeToAllRegions();
+			confilter->Update();
+
+			unsigned int nreg = confilter->GetNumberOfExtractedRegions();
+
+			std::cout <<"brid "<<curbr->brid<<" fn "<<*fit<<" nreg "<<nreg<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			if(nreg == 1)
 			{
-
-				PointList pl;
-				vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-				normalGenerator->SetInput(polydata);
-				normalGenerator->ComputePointNormalsOn();
-				normalGenerator->ComputeCellNormalsOff();
-				normalGenerator->SplittingOff();
-				normalGenerator->NonManifoldTraversalOff();
-				normalGenerator->Update();
-
-				polydata = normalGenerator->GetOutput();
-				std::cout <<"brid "<<curbr->brid<<" fn "<<*fit<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-				vtktoPointList(pl, polydata);
-				//	vtkSmartPointer<vtkPolyData> newpoly = polydata;
-				vtkPolyData* newpoly = Remesh(pl);
-
-				cleanpolydata->SetInput(newpoly);
-				cleanpolydata->Update();
-				polydata = cleanpolydata->GetOutput();
-
-				char fn[100];
-				sprintf(fn,"%dct.vtk",1);
-				vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-				writer->SetFileName(fn);
-				vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
-				trifil->SetInput(polydata);
-				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();
-
-				unsigned int ntri = polydata->GetNumberOfPolys();
-				if(ntri > 20000)
+				if(polydata->GetNumberOfPoints() > 20)
 				{
-					decimate->SetInputConnection(polydata->GetProducerPort());
-					float target = 1 - 20000.0/ntri;
-					if(target > 0.8) target = 0.8;
-					decimate->SetTargetReduction(target);
-					decimate->Update();
-					//polydata->ShallowCopy(decimate->GetOutput());
-					polydata = decimate->GetOutput();				
-					std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
-						<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+					PointList pl;
+					normalGenerator->SetInput(polydata);
+					normalGenerator->ComputePointNormalsOn();
+					normalGenerator->ComputeCellNormalsOff();
+					normalGenerator->SplittingOff();
+					normalGenerator->NonManifoldTraversalOff();
+					normalGenerator->Update();
+
+					polydata = normalGenerator->GetOutput();
+					vtktoPointList(pl, polydata);
+					//	vtkSmartPointer<vtkPolyData> newpoly = polydata;
+					vtkPolyData* newpoly = Remesh(pl);
+
+					cleanpolydata->SetInput(newpoly);
+					cleanpolydata->Update();
+					polydata = cleanpolydata->GetOutput();
+
+					char fn[100];
+					sprintf(fn,"%dct.vtk",1);
+					writer->SetFileName(fn);
+					trifil->SetInput(polydata);
+					writer->SetInputConnection(trifil->GetOutputPort());
+					writer->Write();
+
+					unsigned int ntri = polydata->GetNumberOfPolys();
+					if(ntri > 20000)
+					{
+						decimate->SetInputConnection(polydata->GetProducerPort());
+						float target = 1 - 20000.0/ntri;
+						if(target > 0.8) target = 0.8;
+						decimate->SetTargetReduction(target);
+						decimate->Update();
+						//polydata->ShallowCopy(decimate->GetOutput());
+						polydata = decimate->GetOutput();				
+						std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
+							<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+					}
+
+					std::vector<std::vector<double> > surfcords;
+					LB lb;
+					lb.GetEigen(polydata, surfcords);
+					allcts->AddInputConnection(polydata->GetProducerPort());
+					newpoly->Delete();
+
 				}
 
-				std::vector<std::vector<double> > surfcords;
-				LB lb;
-				lb.GetEigen(polydata, surfcords);
-				newpoly->Delete();
-
 			}
-
 		}
 	}
 }
 
 void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals)
 {
-	if(curbr->brid == 20)
 	GenerateContour(curbr, fvals);
 	std::list<SymBranch*>::iterator brit = curbr->ch.begin();
 	for(; brit != curbr->ch.end(); brit++)
@@ -196,7 +201,8 @@ void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals)
 	}
 }
 
-Contours::Contours(const char* fname)
+Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> & allcontours)
+			: allcts(allcontours)
 {
 	reader = vtkSmartPointer<vtkStructuredPointsReader>::New();
 	reader->SetFileName(fname);
@@ -232,6 +238,7 @@ void Contours::ExtractSymmetry()
 	}
 
 	fvals.push_back(0.85);
+	fvals.push_back(0.98);
 	ComputeBD(vtkstrpts);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();

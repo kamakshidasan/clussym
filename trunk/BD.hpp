@@ -47,7 +47,7 @@ public:
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;
-	std::vector<unsigned int> bridsarr;
+	std::vector<SymBranch*> bridsarr;
 	SymBranch* symroot;
 };
 #endif

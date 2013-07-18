@@ -128,7 +128,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, u
 	node->extw = m_vlist[node->ext].w;
 //	node->cl.push_back(SplitBr (0,node->sad, 0));
 	node->orgbr = node;
-	bridsarr[brid] = brid;
+	bridsarr[brid] = node;
 	b->data = &bridsarr[brid];
 	node->brid = brid;
 	unsigned int totch = 0;
@@ -185,7 +185,7 @@ void BD::BuildBD()
 	brvertmap = ct_branchMap(ctx);
 
 	unsigned int brid = 1;
-	bridsarr = std::vector<unsigned int>(numNodes,0);
+	bridsarr = std::vector<SymBranch*>(numNodes,0);
 	symroot = new SymBranch;
 	symroot->par = NULL;
 	symroot->lev = 1;

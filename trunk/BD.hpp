@@ -17,7 +17,7 @@ struct SymBranch
 	SymBranch() {};
 	SymBranch(unsigned int extn, unsigned int sadn, unsigned int cln, unsigned int levn,
 			unsigned int bridn, SymBranch* pbr) :
-		ext(extn), sad(sadn), lev(levn), brid(bridn), par(pbr), orgbr(0), totch(0), ht(1)
+		ext(extn), sad(sadn), lev(levn), bid(bridn), par(pbr), orgbr(0), totch(0), ht(1)
 		{
 	//		cl.push_back(SplitBr(0,sad,cln));
 		};
@@ -28,7 +28,7 @@ struct SymBranch
 	my_float sadw;
 //	std::vector<SplitBr> cl;
 	unsigned int lev;
-	unsigned int brid;
+	unsigned int bid;
 	SymBranch* par;
 	SymBranch* orgbr;
 	std::list<SymBranch*> ch;

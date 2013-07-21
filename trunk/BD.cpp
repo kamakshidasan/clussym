@@ -130,7 +130,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, u
 	node->orgbr = node;
 	bridsarr[brid] = node;
 	b->data = &bridsarr[brid];
-	node->brid = brid;
+	node->bid = brid;
 	unsigned int totch = 0;
 	unsigned int ht = 1;
 	for ( ctBranch * c = b->children.head; c != NULL; c = c->nextChild )

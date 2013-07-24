@@ -14,6 +14,7 @@
 #include <vtkDecimatePro.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkIdTypeArray.h>
 #include <vtkPointData.h>
 #include <vtkThreshold.h>
 #include <vtkVolume.h>
@@ -22,6 +23,7 @@
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkExtractSelection.h>
+#include <vtkInformation.h>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Point_with_normal_3.h>
@@ -41,8 +43,6 @@ typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
 
-
-std::vector<Vertex> verts;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
@@ -131,7 +131,7 @@ void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> & extr, SymB
 	unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 
 	std::cout <<"brid "<<curbr->bid<<" fn "<<isoval<<" nreg "<<nreg<<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-	if(nreg == 1)
+//	if(nreg == 1)
 	{
 		if(polydata->GetNumberOfPoints() > 20)
 		{
@@ -146,7 +146,7 @@ void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> & extr, SymB
 			polydata = normalGenerator->GetOutput();
 			vtktoPointList(pl, polydata);
 			//	vtkSmartPointer<vtkPolyData> newpoly = polydata;
-			vtkPolyData* newpoly = Remesh(pl);
+			/*vtkPolyData* newpoly = Remesh(pl);
 
 			cleanpolydata->SetInput(newpoly);
 			cleanpolydata->Update();
@@ -169,64 +169,77 @@ void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> & extr, SymB
 				decimate->Update();
 				//polydata->ShallowCopy(decimate->GetOutput());
 				polydata = decimate->GetOutput();				
-				std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
-					<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			}
+					std::cout <<"After decimate "<<polydata->GetNumberOfCells()<<" "
+						<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+				}
 
-			std::vector<std::vector<double> > surfcords;
-			LB lb;
-			lb.GetEigen(polydata, surfcords);
-			allcts->AddInputConnection(polydata->GetProducerPort());
-			newpoly->Delete();
+				std::vector<std::vector<double> > surfcords;
+				LB lb;
+				lb.GetEigen(polydata, surfcords);*/
+				allcts->AddInputConnection(polydata->GetProducerPort());
+				/*newpoly->Delete();
 
+			}*/
+
+		}
+	}
+}
+
+void Contours::GenerateGridIds(SymBranch* curbr, std::vector<unsigned int> & bidarray, float isoval)
+{
+	std::list<SymBranch*>::iterator it = curbr->ch.begin();
+	assert(!bidarray[curbr->bid]);
+	bidarray[curbr->bid] = 1;
+	std::cout<<" genbid "<<curbr->bid<<endl;
+	for(; it != curbr->ch.end(); it++)
+	{
+		if((verts[(*it)->ext].w > verts[(*it)->sad].w && verts[(*it)->ext].w < isoval) ||
+				(verts[(*it)->ext].w < verts[(*it)->sad].w && verts[(*it)->sad].w < isoval))
+		{
+			GenerateGridIds(*it, bidarray, isoval);
 		}
 
 	}
 }
-
-void Contours::GenerateGridIds(SymBranch* curbr, vtkSmartPointer<vtkIntArray> & bidarray)
-{
-	bidarray->InsertNextValue(curbr->bid);
-	std::list<SymBranch*>::iterator it = curbr->ch.begin();
-	for(; it != curbr->ch.end(); it++)
-	{
-		GenerateGridIds(*it, bidarray);
-	}
-}
-void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals)
+void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vtkSmartPointer<vtkExtractSelection> & extr)
 {
 	std::vector<float>::iterator fit = fvals.begin();
-
 	{
-		vtkSmartPointer<vtkExtractSelection> extr = vtkSmartPointer<vtkExtractSelection>::New();
-		bool gengrid = true;
 		for(; fit != fvals.end(); fit++)
 		{
 			float isoval = *fit;
 			if((isoval > verts[curbr->ext].w && isoval < verts[curbr->sad].w) ||
 					(isoval < verts[curbr->ext].w && isoval > verts[curbr->sad].w))
 			{
-				if(gengrid)
+				std::vector<unsigned int> bidarray(bd->NumBr()+1, 0);
+				std::cout<<"For bid "<<curbr->bid<<endl;
+				GenerateGridIds(curbr, bidarray, isoval);
+				vtkSmartPointer<vtkIdTypeArray> ptids = vtkSmartPointer<vtkIdTypeArray>::New();
+				ptids->SetNumberOfComponents(1);
+				std::vector<int> & bmap = bd->GetVertMap();
+				unsigned int nsz = 0;
+				for(vtkIdType i = 0; i < verts.size(); i++)
 				{
-					vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
-					bidarray->SetName("bids");
-					gengrid = false;
-					GenerateGridIds(curbr, bidarray);
-					vtkSmartPointer<vtkSelection> select = vtkSmartPointer<vtkSelection>::New();
-					vtkSmartPointer<vtkSelectionNode> node= vtkSmartPointer<vtkSelectionNode>::New();
-					node->SetContentType(vtkSelectionNode::VALUES);
-					node->SetFieldType(vtkSelectionNode::POINT);
-					node->SetSelectionList(bidarray);
-					select->AddNode(node);
-					extr->SetInput(0, reader->GetOutput());
-					extr->SetInput(1, select);
-					extr->Update();
-					vtkSmartPointer<vtkUnstructuredGridWriter> strpwriter =
-						vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-					strpwriter->SetInput(extr->GetOutput());
-					strpwriter->SetFileName("u.vtk");
-					strpwriter->Update();
+					if(bidarray[bmap[i]] && isoval > verts[i].w)
+					{
+						ptids->InsertNextValue(i);
+						nsz++;
+					}
 				}
+				vtkSmartPointer<vtkSelection> select = vtkSmartPointer<vtkSelection>::New();
+				vtkSmartPointer<vtkSelectionNode> node= vtkSmartPointer<vtkSelectionNode>::New();
+				node->SetFieldType(vtkSelectionNode::POINT);
+				node->SetContentType(vtkSelectionNode::INDICES);
+				node->GetProperties()->Set(vtkSelectionNode::CONTAINING_CELLS(), 1);
+				node->SetSelectionList(ptids);
+				select->AddNode(node);
+				extr->SetInput(1, select);
+				extr->Update();
+				vtkSmartPointer<vtkUnstructuredGridWriter> strpwriter =
+					vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+				strpwriter->SetInput(extr->GetOutput());
+				strpwriter->SetFileName("u.vtk");
+				strpwriter->Update();
 				GenerateContour(extr, curbr, isoval);
 			}
 		}
@@ -234,7 +247,7 @@ void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals)
 	std::list<SymBranch*>::iterator brit = curbr->ch.begin();
 	for(; brit != curbr->ch.end(); brit++)
 	{
-		GenerateIsoSpace(*brit, fvals);
+		//		GenerateIsoSpace(*brit, fvals, extr);
 	}
 }
 
@@ -276,7 +289,7 @@ void Contours::ExtractSymmetry()
 	}
 
 	fvals.push_back(0.85);
-	fvals.push_back(0.98);
+	fvals.push_back(0.99);
 	ComputeBD(vtkstrpts);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
@@ -292,6 +305,8 @@ void Contours::ExtractSymmetry()
 	strpwriter->SetFileName("t.vtk");
 	strpwriter->Update();
 
-	GenerateIsoSpace(bd->symroot, fvals);
+	vtkSmartPointer<vtkExtractSelection> extr = vtkSmartPointer<vtkExtractSelection>::New();
+	extr->SetInput(0, reader->GetOutput());
+	GenerateIsoSpace(bd->bridsarr[86], fvals, extr);
 }
 

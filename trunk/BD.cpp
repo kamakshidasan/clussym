@@ -129,7 +129,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, u
 //	node->cl.push_back(SplitBr (0,node->sad, 0));
 	node->orgbr = node;
 	bridsarr[brid] = node;
-	b->data = &bridsarr[brid];
+	b->data = node;
 	node->bid = brid;
 	unsigned int totch = 0;
 	unsigned int ht = 1;
@@ -190,11 +190,12 @@ void BD::BuildBD()
 	symroot->par = NULL;
 	symroot->lev = 1;
 	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht);
+	numbr = brid;
 
 	vtobrmap = std::vector<int>(m_vlist.size(), 0);
 	for(unsigned int i = 0; i < m_vlist.size(); i++)
 	{
-		vtobrmap[i] = *(int*)brvertmap[i]->data;
+		vtobrmap[i] = ((SymBranch*)brvertmap[i]->data)->bid;
 	}
 
        	ct_cleanup( ctx );

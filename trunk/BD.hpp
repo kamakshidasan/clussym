@@ -41,14 +41,16 @@ class BD
 {
 public:
 	BD(std::vector<Vertex> & verts);
-	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & ht);
 	void BuildBD();
+	unsigned int NumBr() { return numbr; };
+	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & ht);
 	void GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;
 	std::vector<SymBranch*> bridsarr;
 	SymBranch* symroot;
+	unsigned int numbr;
 };
 #endif
 

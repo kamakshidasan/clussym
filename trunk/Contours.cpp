@@ -1,6 +1,7 @@
 #include <vtkStructuredPointsWriter.h>
-#include <vtkUnstructuredGridWriter.h>
 #include <vtkStructuredPoints.h>
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkMarchingCubes.h>
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkPolyDataMapper.h>
@@ -96,7 +97,7 @@ void ComputeBD(vtkStructuredPoints *vtkstrpts, std::vector<Vertex> & vlist)
 }
 */
 
-void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> & extr, SymBranch* curbr, float isoval)
+void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> extr, SymBranch* curbr, float isoval)
 {
 
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
@@ -185,8 +186,42 @@ void Contours::GenerateContour(vtkSmartPointer<vtkExtractSelection> & extr, SymB
 	}
 }
 
-void Contours::GenerateGridIds(SymBranch* curbr, std::vector<unsigned int> & bidarray, float isoval)
+void Contours::GenerateGridIds(SymBranch* curbr, std::vector<unsigned int> & cidarray, float isoval)
 {
+	vtkSmartPointer<vtkThreshold> thr = vtkSmartPointer<vtkThreshold>::New();
+	thr->SetInputConnection(reader->GetOutputPort());
+	thr->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "bids");
+	thr->AllScalarsOn();
+	thr->ThresholdBetween(curbr->bid, curbr->bid);
+	thr->Update();
+	
+	vtkUnstructuredGrid* ugrid = thr->GetOutput();
+	vtkSmartPointer<vtkUnstructuredGridWriter> strpwriter =
+					vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+	strpwriter->SetInput(thr->GetOutput());
+	strpwriter->SetFileName("u.vtk");
+	strpwriter->Update();
+
+	unsigned int ncells = ugrid->GetNumberOfCells();
+	unsigned int i = 0;
+	vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
+	vtkFloatArray* pscalars = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetScalars());
+	for(; i < ncells; i++)
+	{
+		ugrid->GetCellPoints(i, ptids);
+		unsigned int npts = ptids->GetNumberOfIds();
+		assert(npts == 8);
+		unsigned int crossing[8];
+		for(vtkIdType j = 0; j < npts; j++)
+		{
+			unsigned int id = ptids->GetId(j);
+			float fval = pscalars->GetValue(id);
+			crossing[j] =  fval <= isoval ? 0 : 1;
+		}
+
+	}
+/*
+
 	std::list<SymBranch*>::iterator it = curbr->ch.begin();
 	assert(!bidarray[curbr->bid]);
 	bidarray[curbr->bid] = 1;
@@ -199,9 +234,9 @@ void Contours::GenerateGridIds(SymBranch* curbr, std::vector<unsigned int> & bid
 			GenerateGridIds(*it, bidarray, isoval);
 		}
 
-	}
+	}*/
 }
-void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vtkSmartPointer<vtkExtractSelection> & extr)
+void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vtkSmartPointer<vtkExtractSelection> extr)
 {
 	std::vector<float>::iterator fit = fvals.begin();
 	{
@@ -211,16 +246,16 @@ void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vt
 			if((isoval > verts[curbr->ext].w && isoval < verts[curbr->sad].w) ||
 					(isoval < verts[curbr->ext].w && isoval > verts[curbr->sad].w))
 			{
-				std::vector<unsigned int> bidarray(bd->NumBr()+1, 0);
 				std::cout<<"For bid "<<curbr->bid<<endl;
-				GenerateGridIds(curbr, bidarray, isoval);
+				std::vector<unsigned int> cids;
+				GenerateGridIds(curbr, cids, isoval);
 				vtkSmartPointer<vtkIdTypeArray> ptids = vtkSmartPointer<vtkIdTypeArray>::New();
 				ptids->SetNumberOfComponents(1);
 				std::vector<int> & bmap = bd->GetVertMap();
 				unsigned int nsz = 0;
 				for(vtkIdType i = 0; i < verts.size(); i++)
 				{
-					if(bidarray[bmap[i]] && isoval > verts[i].w)
+					//if(bidarray[bmap[i]] && isoval > verts[i].w)
 					{
 						ptids->InsertNextValue(i);
 						nsz++;
@@ -254,13 +289,18 @@ void Contours::GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vt
 Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> & allcontours)
 			: allcts(allcontours)
 {
-	reader = vtkSmartPointer<vtkStructuredPointsReader>::New();
+	reader = vtkStructuredPointsReader::New();
 	reader->SetFileName(fname);
 	reader->Update();
 }
 
+Contours::~Contours()
+{
+	reader->Delete();
+}
 
-void Contours::ComputeBD(vtkStructuredPoints* vtkstrpts)
+
+void Contours::ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 {
 	vtkSmartPointer<vtkDataArray> ps = vtkstrpts->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < vtkstrpts->GetNumberOfPoints(); i++)
@@ -278,7 +318,7 @@ void Contours::ComputeBD(vtkStructuredPoints* vtkstrpts)
 void Contours::ExtractSymmetry()
 {
 	double range[2];
-	vtkStructuredPoints* vtkstrpts = reader->GetOutput();
+	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
 	std::vector<float> fvals;
@@ -306,7 +346,7 @@ void Contours::ExtractSymmetry()
 	strpwriter->Update();
 
 	vtkSmartPointer<vtkExtractSelection> extr = vtkSmartPointer<vtkExtractSelection>::New();
-	extr->SetInput(0, reader->GetOutput());
+	extr->SetInput(0, vtkstrpts);
 	GenerateIsoSpace(bd->bridsarr[86], fvals, extr);
 }
 

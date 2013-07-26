@@ -17,8 +17,8 @@ class Contours
 	private:
 		void ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts);
 		void GenerateContour(vtkSmartPointer<vtkExtractSelection>  extr, class SymBranch* curbr, float isoval);
-		void GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals, vtkSmartPointer<vtkExtractSelection> extr);
-		void GenerateGridIds(SymBranch* curbr, std::vector<unsigned int> & cidarray, float isoval);
+		void GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals);
+		void IntersectingCells(class vtkUnstructuredGrid* ugrid, unsigned int brid, vtkIdTypeArray* cidarray, float isoval);
 		class BD* bd;
 		vtkStructuredPointsReader* reader;
 		vtkSmartPointer<vtkAppendPolyData> & allcts;

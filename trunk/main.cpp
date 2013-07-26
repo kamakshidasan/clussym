@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
+	allcontours->Update();
 	mapper->SetInput(allcontours->GetOutput());
 
 

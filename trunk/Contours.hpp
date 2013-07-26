@@ -7,21 +7,22 @@
 #include <vector>
 #include <vtkAppendPolyData.h>
 #include <vtkExtractSelection.h>
+#include <vtkContourFilter.h>
 
 class Contours
 {
 	public:
-		Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> & allcontours);
+		Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours);
 		~Contours();
 		void ExtractSymmetry();
 	private:
 		void ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts);
-		void GenerateContour(vtkSmartPointer<vtkExtractSelection>  extr, class SymBranch* curbr, float isoval);
-		void GenerateIsoSpace(SymBranch* curbr, std::vector<float> & fvals);
-		void IntersectingCells(class vtkUnstructuredGrid* ugrid, unsigned int brid, vtkIdTypeArray* cidarray, float isoval);
 		class BD* bd;
+		void ProcessContour(vtkSmartPointer<vtkPolyData> contour);
+		void ProcessIsoSurface(float isoval, vtkSmartPointer<vtkContourFilter> ctr);
+		void GenerateIsoSpace(std::vector<float> & fvals);
 		vtkStructuredPointsReader* reader;
-		vtkSmartPointer<vtkAppendPolyData> & allcts;
+		vtkSmartPointer<vtkAppendPolyData> allcts;
 		std::vector<Vertex> verts;
 };
 #endif

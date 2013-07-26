@@ -21,6 +21,7 @@ class Contours
 		void ProcessContour(vtkSmartPointer<vtkPolyData> contour);
 		void ProcessIsoSurface(float isoval, vtkSmartPointer<vtkContourFilter> ctr);
 		void GenerateIsoSpace(std::vector<float> & fvals);
+		void FindBrId(vtkSmartPointer<vtkPolyData> contour);
 		vtkStructuredPointsReader* reader;
 		vtkSmartPointer<vtkAppendPolyData> allcts;
 		std::vector<Vertex> verts;

@@ -13,6 +13,7 @@
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkDelaunay2D.h>
 #include <vtkDecimatePro.h>
+#include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
@@ -70,7 +71,32 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	} 
 
 }
+void Contours::FindBrId(vtkSmartPointer<vtkPolyData> contour)
+{
+	vtkSmartPointer<vtkCellArray> cells = contour->GetPolys();
+	cells->InitTraversal();
+	vtkIdType* cellpts;
+	vtkIdType  numpts;
 
+	while(cells->GetNextCell(numpts, cellpts))
+	{
+		double centre[3], a[3], b[3], c[3];
+		
+		contour->GetPoint(cellpts[0], a);
+		contour->GetPoint(cellpts[1], b);
+		contour->GetPoint(cellpts[2], c);
+
+		centre[0] = (a[0]+b[0]+c[0])/3.0;
+		centre[1] = (a[1]+b[1]+c[1])/3.0;
+		centre[2] = (a[2]+b[2]+c[2])/3.0;
+
+		 double p[3] = {1.0,1.0,1.0}; 
+		 int subid; 
+		 double pcoords[3] = {0,0,0}; 
+		 double weights[8]; 
+		 contour->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+	}
+}
 void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
 {
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
@@ -93,7 +119,7 @@ void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
 		cleanpolydata->SetInput(mesh);
 		cleanpolydata->Update();
 		contour = cleanpolydata->GetOutput();
-
+		FindBrId(contour);
 		unsigned int ntri = contour->GetNumberOfPolys();
 		if(ntri > 20000)
 		{

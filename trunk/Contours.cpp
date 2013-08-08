@@ -71,17 +71,21 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	} 
 
 }
-void Contours::FindBrId(vtkSmartPointer<vtkPolyData> contour)
+int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 {
 	vtkSmartPointer<vtkCellArray> cells = contour->GetPolys();
 	cells->InitTraversal();
 	vtkIdType* cellpts;
 	vtkIdType  numpts;
-
+	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
+	std::vector<int> & bmap = bd->GetVertMap();
+	int bid = -1;
 	while(cells->GetNextCell(numpts, cellpts))
 	{
 		double centre[3], a[3], b[3], c[3];
-		
+
+		assert(numpts == 3);
+
 		contour->GetPoint(cellpts[0], a);
 		contour->GetPoint(cellpts[1], b);
 		contour->GetPoint(cellpts[2], c);
@@ -90,12 +94,30 @@ void Contours::FindBrId(vtkSmartPointer<vtkPolyData> contour)
 		centre[1] = (a[1]+b[1]+c[1])/3.0;
 		centre[2] = (a[2]+b[2]+c[2])/3.0;
 
-		 double p[3] = {1.0,1.0,1.0}; 
-		 int subid; 
-		 double pcoords[3] = {0,0,0}; 
-		 double weights[8]; 
-		 contour->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+		double p[3] = {1.0,1.0,1.0}; 
+		int subid; 
+		double pcoords[3] = {0,0,0}; 
+		double weights[8]; 
+		unsigned int cid = vtkstrpts->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+		//printf("centre (%f %f %f) cid %d\n",centre[0], centre[1], centre[2],cid);
+		assert(cid >= 0);
+		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
+		vtkstrpts->GetCellPoints(cid, ptids);
+		assert(8 == ptids->GetNumberOfIds());
+		bid = bmap[ptids->GetId(0)];
+		bool iddiff = false;
+		for(unsigned int i = 1; i < 8; i++)
+		{
+			if(bid != bmap[ptids->GetId(i)])
+			{
+				iddiff = true;
+				bid = -1;
+				break;
+			}
+		}
+		if(iddiff == false) break;
 	}
+	return bid;
 }
 void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
 {
@@ -119,12 +141,11 @@ void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
 		cleanpolydata->SetInput(mesh);
 		cleanpolydata->Update();
 		contour = cleanpolydata->GetOutput();
-		FindBrId(contour);
 		unsigned int ntri = contour->GetNumberOfPolys();
-		if(ntri > 20000)
+		if(ntri > 10000)
 		{
 			decimate->SetInputConnection(contour->GetProducerPort());
-			float target = 1 - 20000.0/ntri;
+			float target = 1 - 10000.0/ntri;
 			if(target > 0.8) target = 0.8;
 			decimate->SetTargetReduction(target);
 			decimate->Update();
@@ -152,15 +173,18 @@ void Contours::ProcessIsoSurface(float isoval, vtkSmartPointer<vtkContourFilter>
 	confilter->Update();
 
 	unsigned int nreg = confilter->GetNumberOfExtractedRegions();
+	confilter->SetExtractionModeToSpecifiedRegions();
 
 	for(unsigned int r = 0; r < nreg; r++)
 	{
-		std::cout<<" fn "<<isoval<<" nreg "<<r<<std::endl;
 		confilter->InitializeSpecifiedRegionList();
 		confilter->AddSpecifiedRegion(r);
 		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
+		int bid = FindBranchId(polydata);
+		std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+		std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 		ProcessContour(polydata);
 	}
 }
@@ -225,7 +249,7 @@ void Contours::ExtractSymmetry()
 		//fvals.push_back(isoval);
 	}
 
-	fvals.push_back(0.987);
+	fvals.push_back(0.94);
 	ComputeBD(vtkstrpts);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();

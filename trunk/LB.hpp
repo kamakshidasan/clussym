@@ -7,7 +7,7 @@
 class LB
 {
 public:
-	void GetEigen(vtkPolyData*, std::vector<std::vector<double> > & surfcords);
+	void GetEigen(vtkPolyData*, std::vector<float> & cords);
 private:
 	double Cotangent(double v1[], double v2[], double & area);
 	void GetVorArea(double cot[3], double len[3], double triarea, double vorarea[3]);

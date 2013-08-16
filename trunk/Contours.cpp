@@ -44,6 +44,7 @@ typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
 
+std::vector<CompNode*> comps;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
@@ -119,7 +120,7 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 	}
 	return bid;
 }
-void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
+void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 {
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
 	vtkSmartPointer<vtkPolyDataNormals> gennorms = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -155,15 +156,41 @@ void Contours::ProcessContour(vtkSmartPointer<vtkPolyData> contour)
 				  <<" "<<contour->GetNumberOfPoints()<<std::endl;
 		}
 
-		std::vector<std::vector<double> > surfcords;
 		LB lb;
-		lb.GetEigen(contour, surfcords);
+		lb.GetEigen(contour, c->cords);
 		allcts->AddInputConnection(contour->GetProducerPort());
 
 		mesh->Delete();
 	}
 }
-void Contours::ProcessIsoSurface(float isoval, vtkSmartPointer<vtkContourFilter> ctr)
+
+void Contours::SetChildComps(CompNode* c, float curf, float prevf)
+{
+	SymBranch* b = bd->GetBranch(c->bid);
+	boost::unordered_map<unsigned int, CompNode*>::iterator cit;
+	cit = topcomps.find(c->bid);
+	if(cit != topcomps.end())
+	{
+		cit->second->par = c;
+		c->ch.push_back(cit->second);
+	}
+
+	std::list<SymBranch*>::iterator bit = b->ch.begin();
+	for(; bit != b->ch.end(); bit++)
+	{
+		float sadw = verts[(*bit)->sad].w ;
+		if(sadw >= prevf && sadw < curf)
+		{
+			cit = topcomps.find((*bit)->bid);
+			assert(cit != topcomps.end());
+			cit->second->par = c;
+			c->ch.push_back(cit->second);
+		}
+	}
+
+}
+
+void Contours::ProcessIsoSurface(float isoval, float prevf, vtkSmartPointer<vtkContourFilter> ctr)
 {
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
@@ -185,7 +212,11 @@ void Contours::ProcessIsoSurface(float isoval, vtkSmartPointer<vtkContourFilter>
 		int bid = FindBranchId(polydata);
 		std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 		std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-		ProcessContour(polydata);
+		CompNode* c = new CompNode(cid++, bid, isoval);
+		comps.push_back(c);
+		GenCompCords(c, polydata);
+		SetChildComps(c, isoval, prevf);
+		
 	}
 }
 
@@ -198,21 +229,23 @@ void Contours::GenerateIsoSpace(std::vector<float> & fvals)
 	ctr->ComputeScalarsOff();
 
 	std::vector<float>::iterator fit = fvals.begin();
-	float isoval = *fit;
+	float prevf = *fit;
 	for(; fit != fvals.end(); fit++)
 	{
-		ctr->SetValue(0, isoval);
+		ctr->SetValue(0, *fit);
 		ctr->Update();
-		ProcessIsoSurface(isoval, ctr);
+		ProcessIsoSurface(*fit, prevf, ctr);
+		prevf = *fit;
 	}
 }
 
 Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours)
-			: allcts(allcontours)
+			: allcts(allcontours), cid(1)
 {
 	reader = vtkStructuredPointsReader::New();
 	reader->SetFileName(fname);
 	reader->Update();
+	comps.push_back(0);
 }
 
 Contours::~Contours()

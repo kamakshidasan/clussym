@@ -45,6 +45,7 @@ public:
 	unsigned int NumBr() { return numbr; };
 	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & ht);
 	void GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
+	SymBranch* GetBranch(unsigned int bid) { return bridsarr[bid]; };
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;

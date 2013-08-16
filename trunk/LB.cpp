@@ -157,7 +157,7 @@ void LB::GetVorArea(double cot[3], double len[3], double triarea, double vorarea
 	//printf("VorArea %f %f %f\n", vorarea[0], vorarea[1], vorarea[2]);
 }
 
-void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcords)
+void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 {
 	using namespace Eigen;
 
@@ -298,7 +298,6 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 
-	std::vector<double> cords;
 	printf("Eigen Values: ");
 	for(unsigned int i = 1; i <= 10; i++)
 	{
@@ -306,7 +305,6 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<std::vector<double> > & surfcor
 		printf("%lf ", cords[i-1]);
 	}
 	printf("\n");
-	surfcords.push_back(cords);
 //	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;
 //	std::cout<<"Eigen Time: "<<time_end - time_start<<std::endl;
 	/*float *Acsc = new float[nnz];

@@ -36,6 +36,7 @@
 #include "Cluster.hpp"
 #include "Remesh.hpp"
 #include "Contours.hpp"
+#include "CompMgr.hpp"
 
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
@@ -44,7 +45,6 @@ typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
 typedef CGAL::Point_with_normal_3<Kernel> Point_with_normal;
 
-std::vector<CompNode*> comps;
 
 void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 {
@@ -125,43 +125,40 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
 	vtkSmartPointer<vtkPolyDataNormals> gennorms = vtkSmartPointer<vtkPolyDataNormals>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
-	if(contour->GetNumberOfPoints() > 20)
+	PointList pl;
+	gennorms->SetInput(contour);
+	gennorms->ComputePointNormalsOn();
+	gennorms->ComputeCellNormalsOff();
+	gennorms->SplittingOff();
+	gennorms->NonManifoldTraversalOff();
+	gennorms->Update();
+
+	contour = gennorms->GetOutput();
+	vtktoPointList(pl, contour);
+	vtkPolyData* mesh = Remesh(pl);
+
+	cleanpolydata->SetInput(mesh);
+	cleanpolydata->Update();
+	contour = cleanpolydata->GetOutput();
+	unsigned int ntri = contour->GetNumberOfPolys();
+	if(ntri > 10000)
 	{
-		PointList pl;
-		gennorms->SetInput(contour);
-		gennorms->ComputePointNormalsOn();
-		gennorms->ComputeCellNormalsOff();
-		gennorms->SplittingOff();
-		gennorms->NonManifoldTraversalOff();
-		gennorms->Update();
-
-		contour = gennorms->GetOutput();
-		vtktoPointList(pl, contour);
-		vtkPolyData* mesh = Remesh(pl);
-
-		cleanpolydata->SetInput(mesh);
-		cleanpolydata->Update();
-		contour = cleanpolydata->GetOutput();
-		unsigned int ntri = contour->GetNumberOfPolys();
-		if(ntri > 10000)
-		{
-			decimate->SetInputConnection(contour->GetProducerPort());
-			float target = 1 - 10000.0/ntri;
-			if(target > 0.8) target = 0.8;
-			decimate->SetTargetReduction(target);
-			decimate->Update();
-			contour = decimate->GetOutput();				
-			std::cout <<"After decimate "<<contour->GetNumberOfCells()
-				  <<" "<<contour->GetNumberOfPolys()
-				  <<" "<<contour->GetNumberOfPoints()<<std::endl;
-		}
-
-		LB lb;
-		lb.GetEigen(contour, c->cords);
-		allcts->AddInputConnection(contour->GetProducerPort());
-
-		mesh->Delete();
+		decimate->SetInputConnection(contour->GetProducerPort());
+		float target = 1 - 10000.0/ntri;
+		if(target > 0.8) target = 0.8;
+		decimate->SetTargetReduction(target);
+		decimate->Update();
+		contour = decimate->GetOutput();				
+		std::cout <<"After decimate "<<contour->GetNumberOfCells()
+			<<" "<<contour->GetNumberOfPolys()
+			<<" "<<contour->GetNumberOfPoints()<<std::endl;
 	}
+
+	LB lb;
+	lb.GetEigen(contour, c->cords);
+	allcts->AddInputConnection(contour->GetProducerPort());
+
+	mesh->Delete();
 }
 
 void Contours::SetChildComps(CompNode* c, float curf, float prevf)
@@ -190,7 +187,7 @@ void Contours::SetChildComps(CompNode* c, float curf, float prevf)
 
 }
 
-void Contours::ProcessIsoSurface(float isoval, float prevf, vtkSmartPointer<vtkContourFilter> ctr)
+void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr)
 {
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
@@ -202,6 +199,8 @@ void Contours::ProcessIsoSurface(float isoval, float prevf, vtkSmartPointer<vtkC
 	unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 	confilter->SetExtractionModeToSpecifiedRegions();
 
+	float isoval = fvals[fid];
+
 	for(unsigned int r = 0; r < nreg; r++)
 	{
 		confilter->InitializeSpecifiedRegionList();
@@ -209,18 +208,20 @@ void Contours::ProcessIsoSurface(float isoval, float prevf, vtkSmartPointer<vtkC
 		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
-		int bid = FindBranchId(polydata);
-		std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
-		std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-		CompNode* c = new CompNode(cid++, bid, isoval);
-		comps.push_back(c);
-		GenCompCords(c, polydata);
-		SetChildComps(c, isoval, prevf);
-		
+
+		if(polydata->GetNumberOfPoints() > 20)
+		{
+			int bid = FindBranchId(polydata);
+			std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			CompNode* c = new CompNode(cid++, bid, fid);
+			GenCompCords(c, polydata);
+			compmgr->AddComp(c);
+		}
 	}
 }
 
-void Contours::GenerateIsoSpace(std::vector<float> & fvals)
+void Contours::GenerateIsoSpace()
 {
 	vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
 	ctr->SetInputConnection(reader->GetOutputPort());
@@ -228,24 +229,24 @@ void Contours::GenerateIsoSpace(std::vector<float> & fvals)
 	ctr->ComputeGradientsOff();
 	ctr->ComputeScalarsOff();
 
-	std::vector<float>::iterator fit = fvals.begin();
-	float prevf = *fit;
-	for(; fit != fvals.end(); fit++)
+	unsigned int i = 0;
+	unsigned int prev = 0;
+	for(; i < fvals.size(); i++)
 	{
-		ctr->SetValue(0, *fit);
+		ctr->SetValue(0, fvals[i]);
 		ctr->Update();
-		ProcessIsoSurface(*fit, prevf, ctr);
-		prevf = *fit;
+		ProcessIsoSurface(i, prev, ctr);
+		prev = i;
 	}
+	compmgr->Cluster();
 }
 
 Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours)
-			: allcts(allcontours), cid(1)
+			: allcts(allcontours), cid(0)
 {
 	reader = vtkStructuredPointsReader::New();
 	reader->SetFileName(fname);
 	reader->Update();
-	comps.push_back(0);
 }
 
 Contours::~Contours()
@@ -275,7 +276,6 @@ void Contours::ExtractSymmetry()
 	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
-	std::vector<float> fvals;
 	for(unsigned int i = 1; i < 10; i++)
 	{
 		float isoval = range[0] + i*(range[1] - range[0])/10.0;
@@ -283,6 +283,8 @@ void Contours::ExtractSymmetry()
 	}
 
 	fvals.push_back(0.94);
+	
+	compmgr = new CompMgr(fvals.size());
 	ComputeBD(vtkstrpts);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
@@ -298,6 +300,6 @@ void Contours::ExtractSymmetry()
 	strpwriter->SetFileName("t.vtk");
 	strpwriter->Update();
 
-	GenerateIsoSpace(fvals);
+	GenerateIsoSpace();
 }
 

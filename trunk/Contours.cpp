@@ -185,6 +185,8 @@ void Contours::SetChildComps(CompNode* c, float curf, float prevf)
 		}
 	}
 
+	topcomps[c->bid] = c;
+
 }
 
 void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr)

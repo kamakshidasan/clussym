@@ -214,9 +214,15 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		if(polydata->GetNumberOfPoints() > 20)
 		{
 			int bid = FindBranchId(polydata);
+
 			std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			CompNode* c = new CompNode(cid++, bid, fid);
+			SymBranch* b = bd->GetBranch(c->bid);
+			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
+			cit = b->comps.find(fid);
+			assert(cit == b->comps.end());
+			b->comps[fid] = c->id;
 			GenCompCords(c, polydata);
 			compmgr->AddComp(c);
 		}
@@ -286,8 +292,8 @@ void Contours::ExtractSymmetry()
 
 	fvals.push_back(0.94);
 	
-	compmgr = new CompMgr(fvals.size());
 	ComputeBD(vtkstrpts);
+	compmgr = new CompMgr(fvals.size(), bd);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 	bidarray->SetName("bids");

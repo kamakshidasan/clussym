@@ -2,6 +2,7 @@
 #define BD_HPP
 
 #include "Elements.hpp"
+#include <boost/unordered_map.hpp>
 
 class FnCmp
 {
@@ -15,7 +16,7 @@ class FnCmp
 struct SymBranch
 {
 	SymBranch() {};
-	SymBranch(unsigned int extn, unsigned int sadn, unsigned int cln, unsigned int levn,
+	SymBranch(unsigned int extn, unsigned int sadn, unsigned int fsz, unsigned int levn,
 			unsigned int bridn, SymBranch* pbr) :
 		ext(extn), sad(sadn), lev(levn), bid(bridn), par(pbr), orgbr(0), totch(0), ht(1)
 		{
@@ -34,6 +35,7 @@ struct SymBranch
 	std::list<SymBranch*> ch;
 	unsigned int totch;
 	unsigned int ht;
+	boost::unordered_map<unsigned int, unsigned int> comps;
 	
 };
 

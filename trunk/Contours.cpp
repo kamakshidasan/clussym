@@ -133,6 +133,7 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	gennorms->NonManifoldTraversalOff();
 	gennorms->Update();
 
+	//cleanpolydata->SetInput(contour);
 	contour = gennorms->GetOutput();
 	vtktoPointList(pl, contour);
 	vtkPolyData* mesh = Remesh(pl);
@@ -141,10 +142,10 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
-	if(ntri > 10000)
+	if(ntri > 1000)
 	{
 		decimate->SetInputConnection(contour->GetProducerPort());
-		float target = 1 - 10000.0/ntri;
+		float target = 1 - 1000.0/ntri;
 		if(target > 0.8) target = 0.8;
 		decimate->SetTargetReduction(target);
 		decimate->Update();
@@ -290,7 +291,7 @@ void Contours::ExtractSymmetry()
 		//fvals.push_back(isoval);
 	}
 
-	fvals.push_back(0.94);
+	fvals.push_back(1.05);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

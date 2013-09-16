@@ -137,7 +137,13 @@ void CompMgr::Cluster()
 	unsigned int csz = comps.size();
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A);
+	std::cout<<A<<std::endl;
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
+	for(unsigned int i = 0; i < csz; i++)
+	{
+
+		std::cout<<"Eigen Vector "<<i<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
+	}
 	Matrix<float, Dynamic, Dynamic> U = A;
 	UpSweep(U);
 }

@@ -17,6 +17,7 @@ struct CompNode
 	unsigned int bid;
 	std::vector<float> cords;
 	unsigned int fnid;
+	unsigned int csz;
 	std::list<CompNode*> ch;
 	boost::unordered_map<unsigned int, float> votes;
 	float Vote(CompNode* other);

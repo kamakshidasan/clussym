@@ -1,5 +1,6 @@
 #include <sys/time.h>
 
+#define NDEBUG
 #include <assert.h>
 
 #include <vector>
@@ -19,7 +20,6 @@
 #include "Utils.hpp"
 
 #include <boost/foreach.hpp>
-
 void LB::GetCotsLensArea(vtkIdType *cpts, vtkPoints *pts, double cot[], double len[], double & a)
 {
 	double xyz[3][3];
@@ -180,7 +180,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 		assert(npts == 3);
 		if(!DuplicateCell(cpts, trimap))
 		{
-			//printf("3 %d %d %d\n", cpts[0],cpts[1],cpts[2]);
+//			printf("3 %d %d %d\n", cpts[0],cpts[1],cpts[2]);
 			double cot[3], len[3], vorarea[3], triarea;
 			GetCotsLensArea(cpts, pts, cot, len, triarea);
 			
@@ -358,3 +358,4 @@ double LB::Cotangent(double v1[], double v2[], double & area)
 //	printf("v1v2cos %lf v1sqr %lf v2sqr %lf v1v2sin %lf area %lf  cot %lf\n", v1v2cos, v1sqr, v2sqr, v1v2sin, area, cot);
 	return cot;
 }	
+#undef NDEBUG

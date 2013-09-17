@@ -26,20 +26,20 @@
 #include <vtkExtractSelection.h>
 #include <vtkInformation.h>
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Point_with_normal_3.h>
+//#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+//#include <CGAL/Point_with_normal_3.h>
+//#include "Remesh.hpp"
 
 #include <deque>
 
 #include "BD.hpp"
 #include "LB.hpp"
 #include "Cluster.hpp"
-#include "Remesh.hpp"
 #include "Contours.hpp"
 #include "CompMgr.hpp"
 
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+/*typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::FT FT;
 typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
@@ -71,7 +71,7 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 		}
 	} 
 
-}
+}*/
 int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 {
 	vtkSmartPointer<vtkCellArray> cells = contour->GetPolys();
@@ -126,7 +126,7 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
 	vtkSmartPointer<vtkPolyDataNormals> gennorms = vtkSmartPointer<vtkPolyDataNormals>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
-	PointList pl;
+	/*PointList pl;
 	gennorms->SetInput(contour);
 	gennorms->ComputePointNormalsOn();
 	gennorms->ComputeCellNormalsOff();
@@ -134,19 +134,20 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	gennorms->NonManifoldTraversalOff();
 	gennorms->Update();
 
-	cleanpolydata->SetInput(contour);
-	/*contour = gennorms->GetOutput();
+	contour = gennorms->GetOutput();
 	vtktoPointList(pl, contour);
 	vtkPolyData* mesh = Remesh(pl);
 
 	cleanpolydata->SetInput(mesh);*/
+
+	cleanpolydata->SetInput(contour);
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
-	if(ntri > 1000)
+	if(ntri > 5000)
 	{
 		decimate->SetInputConnection(contour->GetProducerPort());
-		float target = 1 - 1000.0/ntri;
+		float target = 1 - 5000.0/ntri;
 		if(target > 0.8) target = 0.8;
 		decimate->SetTargetReduction(target);
 		decimate->Update();
@@ -231,6 +232,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			assert(cit == b->comps.end());
 			b->comps[fid] = c->id;
 			GenCompCords(c, polydata);
+			c->csz = polydata->GetNumberOfPoints();
 			compmgr->AddComp(c);
 		}
 	}
@@ -297,7 +299,8 @@ void Contours::ExtractSymmetry()
 		//fvals.push_back(isoval);
 	}
 
-	fvals.push_back(1.03);
+	fvals.push_back(0.91);
+	fvals.push_back(0.93);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

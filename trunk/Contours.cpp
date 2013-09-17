@@ -109,7 +109,8 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 		bool iddiff = false;
 		for(unsigned int i = 1; i < 8; i++)
 		{
-			if(bid != bmap[ptids->GetId(i)])
+			unsigned int bid1 = bmap[ptids->GetId(i)];
+			if(bid != bid1)
 			{
 				iddiff = true;
 				bid = -1;
@@ -133,12 +134,12 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	gennorms->NonManifoldTraversalOff();
 	gennorms->Update();
 
-	//cleanpolydata->SetInput(contour);
-	contour = gennorms->GetOutput();
+	cleanpolydata->SetInput(contour);
+	/*contour = gennorms->GetOutput();
 	vtktoPointList(pl, contour);
 	vtkPolyData* mesh = Remesh(pl);
 
-	cleanpolydata->SetInput(mesh);
+	cleanpolydata->SetInput(mesh);*/
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
@@ -159,7 +160,7 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	lb.GetEigen(contour, c->cords);
 	allcts->AddInputConnection(contour->GetProducerPort());
 
-	mesh->Delete();
+	//mesh->Delete();
 }
 
 void Contours::SetChildComps(CompNode* c, float curf, float prevf)
@@ -215,6 +216,11 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		if(polydata->GetNumberOfPoints() > 20)
 		{
 			int bid = FindBranchId(polydata);
+			if(bid == -1) 
+			{
+				std::cout<<"Branch Id is -1!!!"<<std::endl;
+				continue;
+			}
 
 			std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
@@ -291,7 +297,7 @@ void Contours::ExtractSymmetry()
 		//fvals.push_back(isoval);
 	}
 
-	fvals.push_back(1.05);
+	fvals.push_back(1.03);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

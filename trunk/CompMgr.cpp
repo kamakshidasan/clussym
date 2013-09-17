@@ -107,7 +107,9 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
 				float fval = Match(comps[cid1], comps[cid2], U);
-				U(cid1, cid2) += fval;	
+				U(cid1, cid2) += fval;
+				U(cid2, cid1) += fval;
+				std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
 
 			}
 			//ClearChildren(fnmap[fidx][i]);
@@ -137,15 +139,16 @@ void CompMgr::Cluster()
 	unsigned int csz = comps.size();
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A);
-	std::cout<<A<<std::endl;
-	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(A);
+	Matrix<float, Dynamic, Dynamic> U = A;
+	UpSweep(U);
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
+	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
 	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
 	for(unsigned int i = 0; i < csz; i++)
 	{
 		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
 	}
-	Matrix<float, Dynamic, Dynamic> U = A;
-	UpSweep(U);
+
 }
 float CompNode::Vote(CompNode* other)
 {

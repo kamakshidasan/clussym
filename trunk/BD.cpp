@@ -205,3 +205,6 @@ std::vector<int> & BD::GetVertMap()
 {
 	return vtobrmap;	
 }
+void BD::AppendExportMask(unsigned int, std::vector<unsigned int> & mask)
+{
+}

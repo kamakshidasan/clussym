@@ -28,7 +28,8 @@ class CompMgr
 	public:
 		CompMgr(unsigned int fsz, class BD* pbd);
 		void AddComp(CompNode* c);
-		void Cluster();
+		void ClusterComps();
+		void Group(unsigned int);
 	private:
 		float Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic> & A);
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);
@@ -37,6 +38,10 @@ class CompMgr
 		std::vector<CompNode*> comps;
 		std::vector<std::vector<unsigned int> > fnmap;
 		BD* bd;
+		class Cluster* cl;
+		Matrix<float, Dynamic, Dynamic> symcords;
+
+
 };
 
 

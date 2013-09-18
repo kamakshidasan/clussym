@@ -1,4 +1,5 @@
 #include "CompMgr.hpp"
+#include "Cluster.hpp"
 #include "BD.hpp"
 #include <assert.h>
 #include <math.h>
@@ -39,8 +40,8 @@ void CompMgr::SetParent(CompNode* c, unsigned int pfid)
 		}
 		else
 		{
-			b = b->par;
 			assert(b->par);
+			b = b->par;
 		}
 	}
 }
@@ -155,7 +156,7 @@ void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 
 }
 
-void CompMgr::Cluster()
+void CompMgr::ClusterComps()
 {
 	unsigned int csz = comps.size();
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
@@ -165,11 +166,33 @@ void CompMgr::Cluster()
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
 	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
 	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
+	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
+
+
+	unsigned int trunc = 0;
 	for(unsigned int i = 0; i < csz; i++)
 	{
+		unsigned int j = csz-i-1;
+		if(eigs.eigenvalues()[j] < 0.5)
+		{
+			trunc = i;
+			break;
+		}
 		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
 	}
 
+	symcords= V.topRightCorner(csz, trunc);
+	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
+	cl = new Cluster(symcords);
+	for(unsigned int i = 0; i < csz; i++)
+	{
+		Group(i);
+	}
+}
+
+void CompMgr::Group(unsigned int cid)
+{
+	cl->GetCluster(cid);
 }
 float CompNode::Vote(CompNode* other)
 {

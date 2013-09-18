@@ -3,11 +3,13 @@
 
 #include <vector>
 #include <ANN/ANN.h>
+#include <eigen3/Eigen/Dense>
+using namespace Eigen;
 class Cluster
 {
 	public:
-		Cluster(std::vector<std::vector<double> > & surfcords);
-		void GetClusters();
+		Cluster(class Matrix<float, Dynamic, Dynamic> & cords);
+		void GetCluster(unsigned int);
 		~Cluster();
 	private:
 		ANNpointArray datapts;

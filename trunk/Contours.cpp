@@ -13,6 +13,7 @@
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkDelaunay2D.h>
 #include <vtkDecimatePro.h>
+#include <vtkQuadricDecimation.h>
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
@@ -123,7 +124,8 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 }
 void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 {
-	vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
+	vtkSmartPointer<vtkQuadricDecimation> decimate = vtkSmartPointer<vtkQuadricDecimation>::New();
+	//vtkSmartPointer<vtkDecimatePro> decimate = vtkSmartPointer<vtkDecimatePro>::New();
 	vtkSmartPointer<vtkPolyDataNormals> gennorms = vtkSmartPointer<vtkPolyDataNormals>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
 	/*PointList pl;
@@ -144,10 +146,10 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
-	if(ntri > 5000)
+	if(ntri > 1000)
 	{
 		decimate->SetInputConnection(contour->GetProducerPort());
-		float target = 1 - 5000.0/ntri;
+		float target = 1 - 1000.0/ntri;
 		if(target > 0.8) target = 0.8;
 		decimate->SetTargetReduction(target);
 		decimate->Update();
@@ -255,7 +257,7 @@ void Contours::GenerateIsoSpace()
 		ProcessIsoSurface(i, prev, ctr);
 		prev = i;
 	}
-	compmgr->Cluster();
+	compmgr->ClusterComps();
 }
 
 Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours)

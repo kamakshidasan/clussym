@@ -63,10 +63,26 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic>
 	boost::unordered_map<unsigned int, LNode> nodes;
 	bool create = true;
 
+	std::cout<<"Children of "<<c1->id<<" ";
+	for(; it1 != c1->ch.end(); it1++)
+	{
+		std::cout<<(*it1)->id<<" ";
+	}
+	std::cout<<std::endl;
+	std::cout<<"Children of "<<c2->id<<" ";
+	for(; it2 != c2->ch.end(); it2++)
+	{
+		std::cout<<(*it2)->id<<" ";
+	}
+	std::cout<<std::endl;
+
+	it1 = c1->ch.begin();
 	for(; it1 != c1->ch.end(); it1++)
 	{
 		LNode n1 = g.addNode();
-		ndmap[n1] = (*it1)->id;
+		unsigned int id1 = (*it1)->id;
+		ndmap[n1] = id1;
+		it2 = c2->ch.begin();
 		for(; it2 != c2->ch.end(); it2++)
 		{
 			unsigned int id2 = (*it2)->id;
@@ -79,27 +95,32 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic>
 			LNode n2 = nodes[id2];
 			LEdge e = g.addEdge(n1,n2);
 			edmap[e] = A(ndmap[n1],ndmap[n2]);
+			std::cout<<"Edge "<<id1<<" "<<id2<<" wt:"<< edmap[e]<<std::endl;
 		}
+		create = false;
 	}
 	
 	lemon::MaxWeightedMatching<LGraph,LEdgeMap> mwm(g, edmap);
       	mwm.run();
 	float tot = mwm.matchingWeight();
+	std::cout<<"Matching "<<tot<<std::endl;
 	return tot;
 }
 
 void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 {
-	for(unsigned int fidx = 0; fidx < fnmap.size() - 1; fidx++)
+	for(unsigned int fidx = 0; fidx < fnmap.size(); fidx++)
 	{
-		unsigned int fidxsz = fnmap[fidx].size();
-		for(unsigned int i = 0; i < fnmap[fidx].size(); i++)
+		if(fidx < fnmap.size() - 1)
 		{
-			unsigned int cid = fnmap[fidx][i];
-			SetParent(comps[cid], fidx+1);
-
+			unsigned int fidxsz = fnmap[fidx].size();
+			for(unsigned int i = 0; i < fnmap[fidx].size(); i++)
+			{
+				unsigned int cid = fnmap[fidx][i];
+				SetParent(comps[cid], fidx+1);
+			}
 		}
-
+		if(fidx == 0) continue;
 		for(unsigned int i = 0; i < fnmap[fidx].size() - 1; i++)
 		{	
 			unsigned int cid1 = fnmap[fidx][i];

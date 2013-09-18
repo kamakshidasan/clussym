@@ -9,7 +9,7 @@ include(${VTK_USE_FILE})
 include(${CGAL_USE_FILE})
 
 
-add_executable(sym main Contours LB Decompose Cluster Utils BD CompMgr)
+add_executable(sym main Contours LB Decompose Cluster Utils BD CompMgr Export)
 
 include_directories("/usr/include/eigen3/")
 include_directories("/home/ibis/Downloads/arpack++/include")

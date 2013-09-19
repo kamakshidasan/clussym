@@ -7,8 +7,6 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
-#include <vtkTriangleFilter.h>
-#include <vtkPolyDataWriter.h>
 #include <vtkPLYWriter.h>
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkDelaunay2D.h>
@@ -146,11 +144,11 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
-	if(ntri > 1000)
+	if(ntri > 2000)
 	{
 		decimate->SetInputConnection(contour->GetProducerPort());
-		float target = 1 - 1000.0/ntri;
-		if(target > 0.8) target = 0.8;
+		float target = 1 - 2000.0/ntri;
+		if(target > 0.95) target = 0.95;
 		decimate->SetTargetReduction(target);
 		decimate->Update();
 		contour = decimate->GetOutput();				
@@ -225,7 +223,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				continue;
 			}
 
-			std::cout<<" fn "<<isoval<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout<<" fnid "<<fid<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			CompNode* c = new CompNode(cid++, bid, fid);
 			SymBranch* b = bd->GetBranch(c->bid);
@@ -236,6 +234,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			GenCompCords(c, polydata);
 			c->csz = polydata->GetNumberOfPoints();
 			compmgr->AddComp(c);
+			char fn[100];
+			sprintf(fn,"%d.vtk",c->id);
+			writer->SetFileName(fn);
+			trifil->SetInput(polydata);
+			writer->SetInputConnection(trifil->GetOutputPort());
+			writer->Write();
+
 		}
 	}
 }
@@ -266,6 +271,8 @@ Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcont
 	reader = vtkStructuredPointsReader::New();
 	reader->SetFileName(fname);
 	reader->Update();
+	trifil = vtkSmartPointer<vtkTriangleFilter>::New();
+	writer = vtkSmartPointer<vtkPolyDataWriter>::New();
 }
 
 Contours::~Contours()
@@ -295,14 +302,13 @@ void Contours::ExtractSymmetry()
 	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
-	for(unsigned int i = 1; i < 10; i++)
+	for(unsigned int i = 1; i < 3; i++)
 	{
 		float isoval = range[0] + i*(range[1] - range[0])/10.0;
-		//fvals.push_back(isoval);
+		printf("isoval %f\n",isoval);
+		fvals.push_back(isoval);
 	}
 
-	fvals.push_back(0.91);
-	fvals.push_back(0.93);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

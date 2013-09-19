@@ -10,6 +10,8 @@
 #include <vtkExtractSelection.h>
 #include <vtkContourFilter.h>
 #include <boost/unordered_map.hpp>
+#include <vtkTriangleFilter.h>
+#include <vtkPolyDataWriter.h>
 
 class Contours
 {
@@ -32,5 +34,7 @@ class Contours
 		boost::unordered_map<unsigned int, CompNode*> topcomps;
 		unsigned int cid;
 		std::vector<float> fvals;
+		vtkSmartPointer<vtkTriangleFilter> trifil;
+		vtkSmartPointer<vtkPolyDataWriter> writer;
 };
 #endif

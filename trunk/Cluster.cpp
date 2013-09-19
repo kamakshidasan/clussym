@@ -21,11 +21,11 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords)
 
 void Cluster::GetCluster(unsigned int id)
 {
-	unsigned int sz = kdTree->annkFRSearch(datapts[id], 1, 0);
+	unsigned int sz = kdTree->annkFRSearch(datapts[id], 10, 0);
 	printf("For pt %d sphere contains %d\n", id, sz);
 	ANNidxArray nnIdx = new ANNidx[sz];						// allocate near neigh indices
 	ANNdistArray dists = new ANNdist[sz];						// allocate near neighbor dists
-	kdTree->annkFRSearch(datapts[id], 1, sz, nnIdx, dists);
+	kdTree->annkFRSearch(datapts[id], 10, sz, nnIdx, dists);
 
 	for (unsigned int j = 0; j < sz; j++) 
 	{

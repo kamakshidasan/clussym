@@ -3,6 +3,7 @@
 #include "BD.hpp"
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
 #include <lemon/matching.h>
 
 CompMgr::CompMgr(unsigned int fsz, BD* pbd) : fnmap(fsz), bd(pbd)
@@ -19,6 +20,7 @@ void CompMgr::AddComp(CompNode* c)
 		CompNode* other = comps[compidx];
 		float val = c->Vote(other);
 		c->votes[other->id] = val;
+		printf("Vote(%d %d) = %f\n", c->id, other->id, val);
 
 	}
 	fnmap[c->fnid].push_back(c->id);
@@ -124,6 +126,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 		if(fidx == 0) continue;
 		for(unsigned int i = 0; i < fnmap[fidx].size() - 1; i++)
 		{	
+			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
@@ -131,9 +134,11 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 				float fval = Match(comps[cid1], comps[cid2], U);
 				U(cid1, cid2) += fval;
 				U(cid2, cid1) += fval;
+				if(U(cid1,cid2) > maxval) 
+					maxval = U(cid1,cid2);
 				std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
-
 			}
+			U(cid1,cid1) = 1.0+comps[cid1]->ch.size();
 			//ClearChildren(fnmap[fidx][i]);
 		}
 		//ClearChildren(fnmap[fidx][fidxsz]);
@@ -161,6 +166,7 @@ void CompMgr::ClusterComps()
 	unsigned int csz = comps.size();
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A);
+	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
 	Matrix<float, Dynamic, Dynamic> U = A;
 	UpSweep(U);
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
@@ -199,10 +205,13 @@ float CompNode::Vote(CompNode* other)
 	float diff = 0;
 	std::vector<float>::iterator it1 = cords.begin();
 	std::vector<float>::iterator it2 = other->cords.begin();
+	float anorm = 0, bnorm = 0;
 	for(; it1 != cords.end(); it1++, it2++)
 	{
+		anorm += (*it1)*(*it1);
+		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-diff);
+	return exp(-(diff/(anorm+bnorm)));
 }
 

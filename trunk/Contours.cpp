@@ -223,7 +223,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				continue;
 			}
 
-			std::cout<<" fnid "<<fid<<" r of nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout<<" fnid "<<fid<<"cid,  nreg "<<cid<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			CompNode* c = new CompNode(cid++, bid, fid);
 			SymBranch* b = bd->GetBranch(c->bid);
@@ -306,9 +306,11 @@ void Contours::ExtractSymmetry()
 	{
 		float isoval = range[0] + i*(range[1] - range[0])/10.0;
 		printf("isoval %f\n",isoval);
-		fvals.push_back(isoval);
+//		fvals.push_back(isoval);
 	}
 
+	fvals.push_back(-0.024);
+	fvals.push_back(-0.021);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

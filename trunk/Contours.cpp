@@ -306,11 +306,11 @@ void Contours::ExtractSymmetry()
 	{
 		float isoval = range[0] + i*(range[1] - range[0])/10.0;
 		printf("isoval %f\n",isoval);
-//		fvals.push_back(isoval);
+		fvals.push_back(isoval);
 	}
 
-	fvals.push_back(-0.024);
-	fvals.push_back(-0.021);
+//	fvals.push_back(-0.024);
+//	fvals.push_back(-0.021);
 	
 	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals.size(), bd);

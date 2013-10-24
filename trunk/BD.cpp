@@ -238,12 +238,12 @@ void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask)
 	SymBranch* br = bridsarr[bid];
 	MaskBranches(br, brmask);
 }
-void BD::SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
+void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
 {
 	const float minval = m_vlist[symroot->ext].w;
 	const float maxval = m_vlist[symroot->sad].w;
 	char clnm[50];
-	sprintf(clnm, "%d-%d.raw",cid, bid);
+	sprintf(clnm, "%d-%d.raw",clid, cid);
 	FILE* fpminbin = fopen(clnm, "w+b");
 
 	vmask = std::vector<unsigned int> (m_vlist.size(), 0);

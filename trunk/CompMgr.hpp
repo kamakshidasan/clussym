@@ -29,7 +29,7 @@ class CompMgr
 		CompMgr(std::vector<float> & fnvals, class BD* pbd);
 		void AddComp(CompNode* c);
 		void ClusterComps();
-		void Export(unsigned int cid);
+		void Export(unsigned int clid, unsigned int cid);
 	private:
 		float Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic> & A);
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);

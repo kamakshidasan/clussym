@@ -26,10 +26,10 @@ using namespace Eigen;
 class CompMgr
 {
 	public:
-		CompMgr(unsigned int fsz, class BD* pbd);
+		CompMgr(std::vector<float> & fnvals, class BD* pbd);
 		void AddComp(CompNode* c);
 		void ClusterComps();
-		void Group(unsigned int);
+		void Export(unsigned int cid);
 	private:
 		float Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic> & A);
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);
@@ -40,8 +40,7 @@ class CompMgr
 		BD* bd;
 		class Cluster* cl;
 		Matrix<float, Dynamic, Dynamic> symcords;
-
-
+		std::vector<float> & fvals;
 };
 
 

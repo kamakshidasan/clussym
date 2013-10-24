@@ -292,7 +292,7 @@ void Contours::ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 		verts.push_back(Vertex(p,w));
 	}
 	
-	bd = new BD(verts);
+	bd = new BD(verts, 64, 64, 64);
 	bd->BuildBD();
 }
 
@@ -302,7 +302,7 @@ void Contours::ExtractSymmetry()
 	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
-	for(unsigned int i = 1; i < 3; i++)
+	for(unsigned int i = 1; i < 10; i++)
 	{
 		float isoval = range[0] + i*(range[1] - range[0])/10.0;
 		printf("isoval %f\n",isoval);
@@ -313,7 +313,7 @@ void Contours::ExtractSymmetry()
 //	fvals.push_back(-0.021);
 	
 	ComputeBD(vtkstrpts);
-	compmgr = new CompMgr(fvals.size(), bd);
+	compmgr = new CompMgr(fvals, bd);
 
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 	bidarray->SetName("bids");

@@ -4,10 +4,8 @@
 extern "C" {
 #include "tourtre.h"
 }
-
-int SIZEX = 64;
-int SIZEY = 64;
-int SIZEZ = 64;
+#include <string>
+#include <stdio.h>
 
 void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
@@ -16,7 +14,7 @@ void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigne
 //		GetCofaces(k+1,nbrs);
 //	else
 	{
-		DeIndex(k,x,y,z);
+		DeIndex(k,x,y,z, SIZEX, SIZEY, SIZEZ);
 
 		assert(x >= 0 && x < SIZEX);
 		assert(y >= 0 && y < SIZEY);
@@ -24,73 +22,73 @@ void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigne
 
 		if(y > 0)
 		{
-			nbrs.push_back(Index(x,y-1,z));
+			nbrs.push_back(Index(x,y-1,z, SIZEX, SIZEY, SIZEZ));
 			if(z > 0)
-				nbrs.push_back(Index(x,y-1,z-1));
+				nbrs.push_back(Index(x,y-1,z-1, SIZEX, SIZEY, SIZEZ));
 			if(z < SIZEZ-1)
-				nbrs.push_back(Index(x,y-1,z+1));
+				nbrs.push_back(Index(x,y-1,z+1, SIZEX, SIZEY, SIZEZ));
 		}
 		if(y < SIZEY-1)
 		{
-			nbrs.push_back(Index(x,y+1,z));
+			nbrs.push_back(Index(x,y+1,z, SIZEX, SIZEY, SIZEZ));
 			if(z > 0)
-				nbrs.push_back(Index(x,y+1,z-1));
+				nbrs.push_back(Index(x,y+1,z-1, SIZEX, SIZEY, SIZEZ));
 			if(z < SIZEZ-1)
-				nbrs.push_back(Index(x,y+1,z+1));
+				nbrs.push_back(Index(x,y+1,z+1, SIZEX, SIZEY, SIZEZ));
 		}
 		if(z > 0)
-			nbrs.push_back(Index(x,y,z-1));
+			nbrs.push_back(Index(x,y,z-1, SIZEX, SIZEY, SIZEZ));
 		if(z < SIZEZ-1)
-			nbrs.push_back(Index(x,y,z+1));
+			nbrs.push_back(Index(x,y,z+1, SIZEX, SIZEY, SIZEZ));
 
 		if(x > 0)
 		{
-			nbrs.push_back(Index(x-1,y,z));
+			nbrs.push_back(Index(x-1,y,z, SIZEX, SIZEY, SIZEZ));
 			if(z > 0)
-				nbrs.push_back(Index(x-1,y,z-1));
+				nbrs.push_back(Index(x-1,y,z-1, SIZEX, SIZEY, SIZEZ));
 			if(z < SIZEZ-1)
-				nbrs.push_back(Index(x-1,y,z+1));
+				nbrs.push_back(Index(x-1,y,z+1, SIZEX, SIZEY, SIZEZ));
 			if(y < SIZEY-1)
 			{
-				nbrs.push_back(Index(x-1,y+1,z));
+				nbrs.push_back(Index(x-1,y+1,z, SIZEX, SIZEY, SIZEZ));
 				if(z > 0)
-					nbrs.push_back(Index(x-1,y+1,z-1));
+					nbrs.push_back(Index(x-1,y+1,z-1, SIZEX, SIZEY, SIZEZ));
 				if(z < SIZEZ-1)
-					nbrs.push_back(Index(x-1,y+1,z+1));
+					nbrs.push_back(Index(x-1,y+1,z+1, SIZEX, SIZEY, SIZEZ));
 			}
 			if(y > 0)
 			{
-				nbrs.push_back(Index(x-1,y-1,z));
+				nbrs.push_back(Index(x-1,y-1,z, SIZEX, SIZEY, SIZEZ));
 				if(z > 0)
-					nbrs.push_back(Index(x-1,y-1,z-1));
+					nbrs.push_back(Index(x-1,y-1,z-1, SIZEX, SIZEY, SIZEZ));
 				if(z < SIZEZ-1)
-					nbrs.push_back(Index(x-1,y-1,z+1));
+					nbrs.push_back(Index(x-1,y-1,z+1, SIZEX, SIZEY, SIZEZ));
 			}
 		}
 
 
 		if(x < SIZEX -1)
 		{
-			nbrs.push_back(Index(x+1,y,z));
+			nbrs.push_back(Index(x+1,y,z, SIZEX, SIZEY, SIZEZ));
 			if(z > 0)
-				nbrs.push_back(Index(x+1,y,z-1));
+				nbrs.push_back(Index(x+1,y,z-1, SIZEX, SIZEY, SIZEZ));
 			if(z < SIZEZ - 1)
-				nbrs.push_back(Index(x+1,y,z+1));
+				nbrs.push_back(Index(x+1,y,z+1, SIZEX, SIZEY, SIZEZ));
 			if(y < SIZEY - 1)
 			{
-				nbrs.push_back(Index(x+1,y+1,z));
+				nbrs.push_back(Index(x+1,y+1,z, SIZEX, SIZEY, SIZEZ));
 				if(z > 0)
-					nbrs.push_back(Index(x+1,y+1,z-1));
+					nbrs.push_back(Index(x+1,y+1,z-1, SIZEX, SIZEY, SIZEZ));
 				if(z < SIZEZ - 1)
-					nbrs.push_back(Index(x+1,y+1,z+1));
+					nbrs.push_back(Index(x+1,y+1,z+1, SIZEX, SIZEY, SIZEZ));
 			}
 			if(y > 0)
 			{
-				nbrs.push_back(Index(x+1,y-1,z));
+				nbrs.push_back(Index(x+1,y-1,z, SIZEX, SIZEY, SIZEZ));
 				if(z > 0)
-					nbrs.push_back(Index(x+1,y-1,z-1));
+					nbrs.push_back(Index(x+1,y-1,z-1, SIZEX, SIZEY, SIZEZ));
 				if(z < SIZEZ - 1)
-					nbrs.push_back(Index(x+1,y-1,z+1));
+					nbrs.push_back(Index(x+1,y-1,z+1, SIZEX, SIZEY, SIZEZ));
 			}
 
 		}
@@ -151,7 +149,8 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, u
 }
 
 
-BD::BD(std::vector<Vertex> & verts) : m_vlist(verts)
+BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(verts), 
+	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz)
 {
 }
 void BD::BuildBD()
@@ -205,6 +204,66 @@ std::vector<int> & BD::GetVertMap()
 {
 	return vtobrmap;	
 }
+bool BD::BrType(unsigned int bid, int type)
+{
+	SymBranch* br = bridsarr[bid];
+	unsigned int ext = br->ext;
+	unsigned int sad = br->sad;
+
+	if(type == -1 && (bid == 1 || m_vlist[ext].w > m_vlist[sad].w))
+		return true;
+	else if(type == 1 && (bid == 1 || m_vlist[ext].w < m_vlist[sad].w))
+		return true;
+	else
+		return false;
+}
 void BD::AppendExportMask(unsigned int, std::vector<unsigned int> & mask)
 {
+}
+void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask)
+{
+
+	brmask[br->bid] = 1;
+
+	std::list<SymBranch*>::iterator bit = br->ch.begin();
+	for(; bit != br->ch.end(); bit++)
+	{
+		MaskBranches(*bit, brmask);
+	}
+
+}
+void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask)
+{
+	brmask = std::vector<unsigned int> (bridsarr.size(), 0);
+	SymBranch* br = bridsarr[bid];
+	MaskBranches(br, brmask);
+}
+void BD::SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
+{
+	const float minval = m_vlist[symroot->ext].w;
+	const float maxval = m_vlist[symroot->sad].w;
+	char clnm[50];
+	sprintf(clnm, "%d-%d.raw",cid, bid);
+	FILE* fpminbin = fopen(clnm, "w+b");
+
+	vmask = std::vector<unsigned int> (m_vlist.size(), 0);
+	for(unsigned int i = 0; i < m_vlist.size(); i++)
+	{
+		if(brmask[vtobrmap[i]] && m_vlist[i].w <= fval)
+			vmask[i] = 1;
+
+		if(vmask[i])
+		{
+			unsigned char val = (m_vlist[i].w - minval)/(maxval - minval)*(255);
+			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
+		}
+		else
+		{
+			unsigned char val = 0;
+			val = 255;
+			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
+		}
+	}
+	fclose(fpminbin);
+
 }

@@ -16,7 +16,7 @@ class Cluster
 	public:
 		Cluster(class Matrix<float, Dynamic, Dynamic> & cords);
 		void GetMembers(unsigned int id, std::vector<unsigned int> & mem);
-		void MakeClusters();
+		std::vector<unsigned int> & GetClusters();
 		~Cluster();
 	private:
 		ANNpointArray datapts;

@@ -291,8 +291,9 @@ void Contours::ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 		vtkstrpts->GetPoint(i,p);
 		verts.push_back(Vertex(p,w));
 	}
-	
-	bd = new BD(verts, 64, 64, 64);
+	int dim[3];
+	vtkstrpts->GetDimensions(dim);
+	bd = new BD(verts, dim[0], dim[1], dim[2]);
 	bd->BuildBD();
 }
 

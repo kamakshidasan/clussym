@@ -197,17 +197,23 @@ void CompMgr::ClusterComps()
 	symcords= V.topRightCorner(csz, trunc);
 	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 	cl = new Cluster(symcords);
-	cl->MakeClusters();
+	std::vector<unsigned int> & cltrs = cl->GetClusters();
+	for(unsigned int i = 0; i < cltrs.size(); i++)
+	{
+		if(cltrs[i])
+			Export(i, cltrs[i]);
+	}
+
 }
 
-void CompMgr::Export(unsigned int cid)
+void CompMgr::Export(unsigned int cid, unsigned int clid)
 {
 	CompNode* c = comps[cid];
 	unsigned int bid = c->bid;
 	std::vector<unsigned int> brmask;
 	bd->SetBrMask(bid, brmask);
 	std::vector<unsigned int> vmask;
-	bd->SetVertMask(cid, bid, vmask, brmask, fvals[c->fnid]);
+	bd->SetVertMask(clid, cid, vmask, brmask, fvals[c->fnid]);
 }
 float CompNode::Vote(CompNode* other)
 {

@@ -1,8 +1,9 @@
 #include "Cluster.hpp"
 #include <stdio.h>
 
-Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords)
+Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows(),0)
 {
+	clusters.push_back(ClusInfo());
 	nPts = cords.rows();
 	if(nPts)
 	{
@@ -18,8 +19,20 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords)
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
 	}
 }
-
-void Cluster::GetCluster(unsigned int id)
+void Cluster::MakeClusters()
+{
+	for(unsigned int i = 0; i < nPts; i++)
+	{
+		if(clidarr[i] == 0)
+		{
+			ClusInfo clinfo;
+			clinfo.id = clusters.size();
+			GetMembers(i, clinfo.mem);
+			clusters.push_back(clinfo);
+		}
+	}
+}
+void Cluster::GetMembers(unsigned int id, std::vector<unsigned int> & mem)
 {
 	unsigned int sz = kdTree->annkFRSearch(datapts[id], 10, 0);
 	printf("For pt %d sphere contains %d\n", id, sz);
@@ -30,6 +43,7 @@ void Cluster::GetCluster(unsigned int id)
 	for (unsigned int j = 0; j < sz; j++) 
 	{
 		std::cout << "\t" << j << "\t" << nnIdx[j] << "\t" << dists[j] << "\n";
+		clidarr[nnIdx[j]] = clusters.size();
 	}
 	delete [] nnIdx;
 	delete [] dists;

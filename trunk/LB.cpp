@@ -1,6 +1,5 @@
 #include <sys/time.h>
 
-#define NDEBUG
 #include <assert.h>
 
 #include <vector>

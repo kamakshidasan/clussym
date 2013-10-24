@@ -42,19 +42,26 @@ struct SymBranch
 class BD
 {
 public:
-	BD(std::vector<Vertex> & verts);
+	BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz);
 	void BuildBD();
 	unsigned int NumBr() { return numbr; };
 	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & ht);
 	void GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
 	SymBranch* GetBranch(unsigned int bid) { return bridsarr[bid]; };
 	void AppendExportMask(unsigned int, std::vector<unsigned int> & mask);
+	bool BrType(unsigned int bid, int type);	
+	void SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask);
+	void SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval);
+	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;
 	std::vector<SymBranch*> bridsarr;
 	SymBranch* symroot;
 	unsigned int numbr;
+	int SIZEX;
+	int SIZEY;
+	int SIZEZ;
 };
 #endif
 

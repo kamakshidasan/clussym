@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <lemon/matching.h>
 
-CompMgr::CompMgr(unsigned int fsz, BD* pbd) : fnmap(fsz), bd(pbd)
+CompMgr::CompMgr(std::vector<float> & fnvals, BD* pbd) : fnmap(fnvals.size()), fvals(fnvals), bd(pbd)
 {
 }
 void CompMgr::AddComp(CompNode* c)
@@ -18,10 +18,12 @@ void CompMgr::AddComp(CompNode* c)
 	{
 		unsigned int compidx = fnmap[c->fnid][i];
 		CompNode* other = comps[compidx];
-		float val = c->Vote(other);
-		c->votes[other->id] = val;
-		printf("Vote(%d %d) = %f\n", c->id, other->id, val);
-
+		if(bd->BrType(c->bid, -1) && bd->BrType(other->bid, -1))
+		{
+			float val = c->Vote(other);
+			c->votes[other->id] = val;
+			printf("Vote(%d %d) = %f\n", c->id, other->id, val);
+		}
 	}
 	fnmap[c->fnid].push_back(c->id);
 }
@@ -120,7 +122,9 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			for(unsigned int i = 0; i < fnmap[fidx].size(); i++)
 			{
 				unsigned int cid = fnmap[fidx][i];
-				SetParent(comps[cid], fidx+1);
+				unsigned int bid = comps[cid]->bid;
+				if(bd->BrType(bid, -1))
+					SetParent(comps[cid], fidx+1);
 			}
 		}
 		if(fidx == 0) continue;
@@ -128,20 +132,23 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 		{	
 			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
+			unsigned int bid1 = comps[cid1]->bid;
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
-				float fval = Match(comps[cid1], comps[cid2], U);
-				U(cid1, cid2) += fval;
-				U(cid2, cid1) += fval;
-				if(U(cid1,cid2) > maxval) 
-					maxval = U(cid1,cid2);
-				std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
+				unsigned int bid2 = comps[cid2]->bid;
+				if(bd->BrType(bid1, -1) && bd->BrType(bid2, -1))
+				{
+					float fval = Match(comps[cid1], comps[cid2], U);
+					U(cid1, cid2) += fval;
+					U(cid2, cid1) += fval;
+					if(fval > maxval) 
+						maxval = fval;
+					std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
+				}
 			}
 			U(cid1,cid1) = 1.0+comps[cid1]->ch.size();
-			//ClearChildren(fnmap[fidx][i]);
 		}
-		//ClearChildren(fnmap[fidx][fidxsz]);
 	}
 }
 void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
@@ -190,15 +197,17 @@ void CompMgr::ClusterComps()
 	symcords= V.topRightCorner(csz, trunc);
 	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 	cl = new Cluster(symcords);
-	for(unsigned int i = 0; i < csz; i++)
-	{
-		Group(i);
-	}
+	cl->MakeClusters();
 }
 
-void CompMgr::Group(unsigned int cid)
+void CompMgr::Export(unsigned int cid)
 {
-	cl->GetCluster(cid);
+	CompNode* c = comps[cid];
+	unsigned int bid = c->bid;
+	std::vector<unsigned int> brmask;
+	bd->SetBrMask(bid, brmask);
+	std::vector<unsigned int> vmask;
+	bd->SetVertMask(cid, bid, vmask, brmask, fvals[c->fnid]);
 }
 float CompNode::Vote(CompNode* other)
 {

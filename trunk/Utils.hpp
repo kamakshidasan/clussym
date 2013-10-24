@@ -5,10 +5,6 @@
 #include <set>
 #include <math.h>
 
-extern int SIZEX;
-extern int SIZEY;
-extern int SIZEZ;
-
 template <class T> inline long Round(T x) 
 {
 	return ((x) >=0 ? (long)((x)+0.5) : (long)((x)-0.5));
@@ -125,7 +121,7 @@ inline void SplitTri(unsigned int tri[], unsigned int edges[][2])
 
 }
 
-unsigned int Index(unsigned int x, unsigned int y, unsigned int z);
+unsigned int Index(unsigned int x, unsigned int y, unsigned int z, int SIZEX, int SIZEY, int SIZEZ);
 
-void DeIndex(unsigned int i, unsigned int & x, unsigned int & y, unsigned int & z);
+void DeIndex(unsigned int i, unsigned int & x, unsigned int & y, unsigned int & z, int SIZEX, int SIZEY, int SIZEZ);
 #endif

@@ -191,7 +191,8 @@ void CompMgr::ClusterComps()
 			trunc = i;
 			break;
 		}
-		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
+		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
+		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[j]*eigs.eigenvectors().col(j).transpose()<<std::endl;
 	}
 
 	symcords= V.topRightCorner(csz, trunc);

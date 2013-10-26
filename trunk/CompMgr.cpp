@@ -34,13 +34,20 @@ void CompMgr::SetParent(CompNode* c, unsigned int pfid)
 	SymBranch* b = bd->GetBranch(bid);
 	while(!done)
 	{
-		boost::unordered_map<unsigned int, unsigned int>::iterator cit;
-		cit = b->comps.find(pfid);
-		if(cit != b->comps.end())
+		if(pfid <= b->topcomp)
 		{
-			done = true;
-			comps[cit->second]->ch.push_back(c);
-			c->par = comps[cit->second];
+			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
+			cit = b->comps.find(pfid);
+			if(cit != b->comps.end())
+			{
+				done = true;
+				comps[cit->second]->ch.push_back(c);
+				c->par = comps[cit->second];
+			}
+			else
+			{
+				pfid++;
+			}
 		}
 		else
 		{

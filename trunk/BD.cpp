@@ -117,14 +117,13 @@ bool FnCmp::operator()(const unsigned int & l, const unsigned int & r)
 	return ((*pverts)[l].w < (*pverts)[r].w);
 }
 
-SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & h)
+SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, 
+		unsigned int & ch, unsigned int & h, std::vector<unsigned int> & sadidx)
 {
 	node->ht = 1;
 	node->ext = b->extremum;
 	node->sad = b->saddle;
-	node->sadw = m_vlist[node->sad].w;
-	node->extw = m_vlist[node->ext].w;
-//	node->cl.push_back(SplitBr (0,node->sad, 0));
+	sadidx.push_back(node->sad);
 	node->orgbr = node;
 	bridsarr[brid] = node;
 	b->data = node;
@@ -139,7 +138,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, u
 		chnode->lev = node->lev+1;
 		node->ch.push_back(chnode);
 		brid++;
-		BuildSymTree(c, chnode, brid, chch, ht);
+		BuildSymTree(c, chnode, brid, chch, ht, sadidx);
 		if(node->ht < chnode->ht+1) node->ht = chnode->ht+1;
 		totch += chch;
 	}
@@ -153,7 +152,7 @@ BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(vert
 	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz)
 {
 }
-void BD::BuildBD()
+void BD::BuildBD(std::vector<unsigned int> & sadidx)
 {
 	size_t nv = m_vlist.size();
 	size_t *ar = new size_t [nv];
@@ -188,7 +187,8 @@ void BD::BuildBD()
 	symroot = new SymBranch;
 	symroot->par = NULL;
 	symroot->lev = 1;
-	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht);
+	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht, sadidx);
+	sadidx.push_back(root->extremum);
 	numbr = brid;
 
 	vtobrmap = std::vector<int>(m_vlist.size(), 0);
@@ -210,7 +210,7 @@ bool BD::BrType(unsigned int bid, int type)
 	unsigned int ext = br->ext;
 	unsigned int sad = br->sad;
 
-	if(type == -1 && (bid == 1 || m_vlist[ext].w <= m_vlist[sad].w))
+	if(type == -1 && (bid == 1 || m_vlist[ext].w > m_vlist[sad].w))
 		return true;
 	else if(type == 1 && (bid == 1 || m_vlist[ext].w > m_vlist[sad].w))
 		return true;

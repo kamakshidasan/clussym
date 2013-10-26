@@ -36,7 +36,7 @@
 #include "Cluster.hpp"
 #include "Contours.hpp"
 #include "CompMgr.hpp"
-
+#include "Sampler.hpp"
 
 /*typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::FT FT;
@@ -231,17 +231,25 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 
 			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			CompNode* c = new CompNode(cid++, bid, fid);
-			SymBranch* b = bd->GetBranch(c->bid);
+			SymBranch* b = bd->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			assert(cit == b->comps.end());
-			b->comps[fid] = c->id;
-			GenCompCords(c, polydata);
-			c->csz = polydata->GetNumberOfPoints();
-			compmgr->AddComp(c);
 			char fn[100];
-			sprintf(fn,"%d.vtk",c->id);
+			if(cit != b->comps.end())
+			{
+				CompNode* c = new CompNode(cid++, bid, fid);
+				b->comps[fid] = c->id;
+				GenCompCords(c, polydata);
+				c->csz = polydata->GetNumberOfPoints();
+				compmgr->AddComp(c);
+				sprintf(fn,"%d.vtk",c->id);
+				std::cout<<"Selecting contour for bid "<<bid<<" at "<<isoval<<std::endl;
+			}
+			else
+			{
+				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
+				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
+			}
 			writer->SetFileName(fn);
 			trifil->SetInput(polydata);
 			writer->SetInputConnection(trifil->GetOutputPort());
@@ -287,7 +295,7 @@ Contours::~Contours()
 }
 
 
-void Contours::ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
+void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 {
 	vtkSmartPointer<vtkDataArray> ps = vtkstrpts->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < vtkstrpts->GetNumberOfPoints(); i++)
@@ -300,7 +308,10 @@ void Contours::ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 	int dim[3];
 	vtkstrpts->GetDimensions(dim);
 	bd = new BD(verts, dim[0], dim[1], dim[2]);
-	bd->BuildBD();
+	std::vector<unsigned int> sadidx;
+	bd->BuildBD(sadidx);
+	Sampler s(bd, sadidx, verts);
+	s.Sample(fvals);
 }
 
 void Contours::ExtractSymmetry()
@@ -309,19 +320,9 @@ void Contours::ExtractSymmetry()
 	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
-	for(unsigned int i = 1; i < 3; i++)
-	{
-		float isoval = range[0] + i*(range[1] - range[0])/5.0;
-		printf("isoval %f\n",isoval);
-		fvals.push_back(isoval);
-	}
+	Preprocess(vtkstrpts);
 
-//	fvals.push_back(-0.024);
-//	fvals.push_back(-0.021);
-	
-	ComputeBD(vtkstrpts);
 	compmgr = new CompMgr(fvals, bd);
-
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 	bidarray->SetName("bids");
 	std::vector<int> & bmap = bd->GetVertMap();

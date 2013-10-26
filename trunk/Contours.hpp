@@ -20,7 +20,7 @@ class Contours
 		~Contours();
 		void ExtractSymmetry();
 	private:
-		void ComputeBD(vtkSmartPointer<vtkStructuredPoints> vtkstrpts);
+		void Preprocess(vtkSmartPointer<vtkStructuredPoints> vtkstrpts);
 		class BD* bd;
 		class CompMgr* compmgr;
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);

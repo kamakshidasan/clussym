@@ -25,9 +25,6 @@ struct SymBranch
 
 	unsigned int ext;
 	unsigned int sad;
-	my_float extw;
-	my_float sadw;
-//	std::vector<SplitBr> cl;
 	unsigned int lev;
 	unsigned int bid;
 	SymBranch* par;
@@ -36,6 +33,7 @@ struct SymBranch
 	unsigned int totch;
 	unsigned int ht;
 	boost::unordered_map<unsigned int, unsigned int> comps;
+	unsigned int topcomp;
 	
 };
 
@@ -43,9 +41,10 @@ class BD
 {
 public:
 	BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz);
-	void BuildBD();
+	void BuildBD(std::vector<unsigned int> & sadidx);
 	unsigned int NumBr() { return numbr; };
-	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, unsigned int & ch, unsigned int & ht);
+	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, 
+			unsigned int & ch, unsigned int & ht, std::vector<unsigned int> & sadidx);
 	void GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
 	SymBranch* GetBranch(unsigned int bid) { return bridsarr[bid]; };
 	void AppendExportMask(unsigned int, std::vector<unsigned int> & mask);

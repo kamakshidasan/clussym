@@ -357,4 +357,3 @@ double LB::Cotangent(double v1[], double v2[], double & area)
 //	printf("v1v2cos %lf v1sqr %lf v2sqr %lf v1v2sin %lf area %lf  cot %lf\n", v1v2cos, v1sqr, v2sqr, v1v2sin, area, cot);
 	return cot;
 }	
-#undef NDEBUG

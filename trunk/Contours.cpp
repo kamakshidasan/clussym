@@ -214,13 +214,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
 
-/*		if(nreg == 1)
+		if(nreg == 1)
 		{
 			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<0<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else*/ if(polydata->GetNumberOfPoints() > 20)
+		else if(polydata->GetNumberOfPoints() > 20)
 		{
 			int bid = FindBranchId(polydata);
 			if(bid == -1) 
@@ -309,9 +309,9 @@ void Contours::ExtractSymmetry()
 	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	vtkstrpts->GetScalarRange(range);
 
-	for(unsigned int i = 1; i < 10; i++)
+	for(unsigned int i = 1; i < 3; i++)
 	{
-		float isoval = range[0] + i*(range[1] - range[0])/10.0;
+		float isoval = range[0] + i*(range[1] - range[0])/5.0;
 		printf("isoval %f\n",isoval);
 		fvals.push_back(isoval);
 	}

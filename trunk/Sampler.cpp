@@ -26,21 +26,32 @@ void Sampler::PickValues(std::vector<float> & isovals)
 void Sampler::Sample(std::vector<float> & isovals)
 {
 	PickValues(isovals);	
+	RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {
-	for(unsigned int i = 1; i < bd->bridsarr.size(); i++)
+	for(unsigned int j = 1; j <= bd->numbr; j++)
 	{
-		SymBranch* b = bd->bridsarr[i];
-		if(i > 1 && (m_vlist[b->ext].w > m_vlist[b->sad].w))
-			continue;
+		SymBranch* b = bd->bridsarr[j];
 		std::vector<unsigned int> canidx;
 		unsigned int n = isovals.size();
-		for(int i = n-1; i <= 0; i++)
+		if(j == 1)
 		{
-			if(b->sad > isovals[i] && b->ext < isovals[i])
+			for(int i = n-1; i >= 0; i--)
 			{
 				canidx.push_back(i);
+			}
+		}
+		else if((m_vlist[b->ext].w > m_vlist[b->sad].w))
+			continue;
+		else
+		{
+			for(int i = n-1; i >= 0; i--)
+			{
+				if(m_vlist[b->sad].w > isovals[i] && m_vlist[b->ext].w < isovals[i])
+				{
+					canidx.push_back(i);
+				}
 			}
 		}
 		unsigned int csz = canidx.size();

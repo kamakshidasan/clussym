@@ -27,8 +27,9 @@ void CompMgr::AddComp(CompNode* c)
 	}
 	fnmap[c->fnid].push_back(c->id);
 }
-void CompMgr::SetParent(CompNode* c, unsigned int pfid)
+void CompMgr::SetParent(CompNode* c, unsigned int ppfid)
 {
+	unsigned int pfid = ppfid;
 	unsigned int bid = c->bid;
 	bool done = false;
 	SymBranch* b = bd->GetBranch(bid);
@@ -38,7 +39,7 @@ void CompMgr::SetParent(CompNode* c, unsigned int pfid)
 		{
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(pfid);
-			if(cit != b->comps.end())
+			if(cit != b->comps.end() && cit->second != -1)
 			{
 				done = true;
 				comps[cit->second]->ch.push_back(c);
@@ -49,10 +50,14 @@ void CompMgr::SetParent(CompNode* c, unsigned int pfid)
 				pfid++;
 			}
 		}
+		else if(b->par)
+		{
+			b = b->par;
+		}
 		else
 		{
-			assert(b->par);
-			b = b->par;
+			done = true;
+			std::cout<<"Parent not found cid,bid,fid "<<c->id<<" "<<bid<<" "<<ppfid<<std::endl;
 		}
 	}
 }
@@ -135,7 +140,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			}
 		}
 		if(fidx == 0) continue;
-		for(unsigned int i = 0; i < fnmap[fidx].size() - 1; i++)
+		for(unsigned int i = 0; i < fnmap[fidx].size(); i++)
 		{	
 			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
@@ -183,8 +188,8 @@ void CompMgr::ClusterComps()
 	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
 	Matrix<float, Dynamic, Dynamic> U = A;
 	UpSweep(U);
-	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
 	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
 	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
 	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
 

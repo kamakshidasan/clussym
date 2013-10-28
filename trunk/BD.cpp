@@ -210,7 +210,7 @@ bool BD::BrType(unsigned int bid, int type)
 	unsigned int ext = br->ext;
 	unsigned int sad = br->sad;
 
-	if(type == -1 && (bid == 1 || m_vlist[ext].w > m_vlist[sad].w))
+	if(type == -1 && (bid == 1 || m_vlist[ext].w <= m_vlist[sad].w))
 		return true;
 	else if(type == 1 && (bid == 1 || m_vlist[ext].w > m_vlist[sad].w))
 		return true;

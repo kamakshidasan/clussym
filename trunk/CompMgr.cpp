@@ -166,6 +166,9 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 {
 	std::vector<CompNode*>::iterator it = comps.begin();
+	unsigned int csz = comps.size();
+	fncords = Matrix<float, Dynamic, 1>::Zero(csz, 1);
+
 	for(; it != comps.end(); it++)
 	{
 		CompNode* c = *it;
@@ -176,6 +179,7 @@ void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 			A(itm->first, c->id) = itm->second;
 		}
 		A(c->id, c->id) = 1.0;
+		fncords(c->id,0) = c->fnid*10;
 	}
 
 }
@@ -191,23 +195,31 @@ void CompMgr::ClusterComps()
 	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
 	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
+	std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
 	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
+	Matrix<float, Dynamic, Dynamic> D = eigs.eigenvalues().asDiagonal();
+	Matrix<float, Dynamic, Dynamic> VD = V*D;
+	std::cout<<"VD matrix:"<<std::endl<<VD<<std::endl;
+
 
 
 	unsigned int trunc = 0;
 	for(unsigned int i = 0; i < csz; i++)
 	{
 		unsigned int j = csz-i-1;
-		if(eigs.eigenvalues()[j] < 0.5)
+		if(eigs.eigenvalues()[j] < 1)
 		{
 			trunc = i;
 			break;
 		}
 		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
-		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[j]*eigs.eigenvectors().col(j).transpose()<<std::endl;
+		std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvalues()[j]*eigs.eigenvectors().col(j).transpose()<<std::endl;
 	}
 
-	symcords= V.topRightCorner(csz, trunc);
+	Matrix<float, Dynamic, Dynamic> eigcords = VD.topRightCorner(csz, trunc);
+	symcords = Matrix<float, Dynamic, Dynamic>(eigcords.rows(), eigcords.cols()+1);
+	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
+	symcords.col(eigcords.cols()) = fncords;
 	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 	cl = new Cluster(symcords);
 	std::vector<unsigned int> & cltrs = cl->GetClusters();
@@ -240,6 +252,6 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-(diff/(anorm+bnorm)));
+	return exp(-(diff/std::min(anorm,bnorm)));
 }
 

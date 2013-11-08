@@ -40,6 +40,7 @@ class CompMgr
 		BD* bd;
 		class Cluster* cl;
 		Matrix<float, Dynamic, Dynamic> symcords;
+		Matrix<float, Dynamic, 1> fncords;
 		std::vector<float> & fvals;
 };
 

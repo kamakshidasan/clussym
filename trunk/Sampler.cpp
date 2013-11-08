@@ -10,9 +10,10 @@ void Sampler::PickValues(std::vector<float> & isovals)
 	unsigned int sz = sadidx.size();
 	float minf = m_vlist[sadidx[0]].w;
 	float maxf = m_vlist[sadidx[sz-1]].w;
-	float curf = minf, nextf, delta = (maxf - minf)/50;
+	float curf = minf, nextf, delta = (maxf - minf)/100;
 	for(unsigned int i = 1; i < sz; i++)
 	{
+//		std::cout<<"Saddle "<<i<<" at "<<curf<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
 		if(nextf - curf > delta)
 		{
@@ -71,7 +72,7 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 				for(unsigned int i = 1; i < csz; i++)
 				{
 					unsigned int cidx = canidx[i];
-					if((*bit)->sad > isovals[cidx])
+					if(m_vlist[(*bit)->sad].w > isovals[cidx])
 					{
 						if(!selarr[canidx[i]])
 						{

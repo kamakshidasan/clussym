@@ -19,6 +19,7 @@
 #include "Utils.hpp"
 
 #include <boost/foreach.hpp>
+#undef NDEBUG
 void LB::GetCotsLensArea(vtkIdType *cpts, vtkPoints *pts, double cot[], double len[], double & a)
 {
 	double xyz[3][3];
@@ -183,13 +184,13 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			double cot[3], len[3], vorarea[3], triarea;
 			GetCotsLensArea(cpts, pts, cot, len, triarea);
 			
-			assert(cot[0] != 0.0 && cot[1] != 0.0 && cot[2] != 0.0);
+			//assert(cot[0] != 0.0 && cot[1] != 0.0 && cot[2] != 0.0);
 			assert(len[0] != 0.0 && len[1] != 0.0 && len[2] != 0.0);
 
 			GetVorArea(cot, len, triarea, vorarea);
 
 			sumtriarea += triarea;
-			assert(fabs(vorarea[0]+vorarea[1]+vorarea[2]-triarea < 0.000001));
+			assert(fabs(vorarea[0]+vorarea[1]+vorarea[2]-triarea < 0.001));
 			ndvorarea[cpts[0]] += vorarea[0];
 			ndvorarea[cpts[1]] += vorarea[1];
 			ndvorarea[cpts[2]] += vorarea[2];
@@ -356,4 +357,4 @@ double LB::Cotangent(double v1[], double v2[], double & area)
 	area = v1v2sin/2;
 //	printf("v1v2cos %lf v1sqr %lf v2sqr %lf v1v2sin %lf area %lf  cot %lf\n", v1v2cos, v1sqr, v2sqr, v1v2sin, area, cot);
 	return cot;
-}	
+}

@@ -71,7 +71,7 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	} 
 
 }*/
-int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
+int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 {
 	vtkSmartPointer<vtkCellArray> cells = contour->GetPolys();
 	cells->InitTraversal();
@@ -99,24 +99,57 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour)
 		double pcoords[3] = {0,0,0}; 
 		double weights[8]; 
 		unsigned int cid = vtkstrpts->FindCell(centre,0,0,0.001,subid,pcoords,weights);
-		//printf("centre (%f %f %f) cid %d\n",centre[0], centre[1], centre[2],cid);
 		assert(cid >= 0);
 		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
 		vtkstrpts->GetCellPoints(cid, ptids);
 		assert(8 == ptids->GetNumberOfIds());
-		bid = bmap[ptids->GetId(0)];
-		bool iddiff = false;
-		for(unsigned int i = 1; i < 8; i++)
+		bid = 0;
+		int inbid = 0, outbid = 0;
+		for(unsigned int i = 0; i < 8; i++)
 		{
-			unsigned int bid1 = bmap[ptids->GetId(i)];
-			if(bid != bid1)
-			{
-				iddiff = true;
+			unsigned int v = ptids->GetId(i);
+			unsigned int bid1 = bmap[v];
+			if(bid == 0)
+				bid = bid1;
+			else if(bid != bid1)
 				bid = -1;
+
+			if(verts[v].w < isoval)
+			{
+				unsigned int inbid1 = bid1;
+				if(inbid == 0)
+					inbid = inbid1;
+				else if(inbid != inbid1)
+					inbid = -1;
+			}
+			if(verts[v].w > isoval)
+			{
+				unsigned int outbid1 = bid1;
+				if(outbid == 0)
+					outbid = outbid1;
+				else if(outbid != outbid1)
+					outbid = -1;
+			}
+
+			if(bid == -1 && inbid == -1 && outbid == -1)
+			{
 				break;
 			}
 		}
-		if(iddiff == false) break;
+		if(bid > 0) 
+			break;
+		else if(inbid > 0 && outbid > 0)
+			continue;
+		else if(inbid > 0)
+		{
+			bid = inbid;
+			break;
+		}
+		else if(outbid > 0)
+		{
+			bid = outbid;
+			break;
+		}
 	}
 	return bid;
 }
@@ -222,28 +255,33 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		}
 		else if(polydata->GetNumberOfPoints() > 20)
 		{
-			int bid = FindBranchId(polydata);
+			char fn[100];
+			int bid = FindBranchId(polydata, isoval);
+			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(bid == -1) 
 			{
+				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
+				writer->SetFileName(fn);
+				trifil->SetInput(polydata);
+				writer->SetInputConnection(trifil->GetOutputPort());
+				writer->Write();
 				std::cout<<"Branch Id is -1!!!"<<std::endl;
 				continue;
 			}
 
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			SymBranch* b = bd->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			char fn[100];
 			if(cit != b->comps.end())
 			{
+				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
 				GenCompCords(c, polydata);
 				c->csz = polydata->GetNumberOfPoints();
 				compmgr->AddComp(c);
 				sprintf(fn,"%d.vtk",c->id);
-				std::cout<<"Selecting contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
 			else
 			{
@@ -254,6 +292,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			trifil->SetInput(polydata);
 			writer->SetInputConnection(trifil->GetOutputPort());
 			writer->Write();
+
+		}
+		else
+		{
+			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<0<<std::endl;
+			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			std::cout<<" Too few points, not processing"<<std::endl;
 
 		}
 	}

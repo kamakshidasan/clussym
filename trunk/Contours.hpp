@@ -26,7 +26,7 @@ class Contours
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);
 		void ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr);
 		void GenerateIsoSpace();
-		int FindBranchId(vtkSmartPointer<vtkPolyData> contour);
+		int FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval);
 		void SetChildComps(CompNode* c, float curf, float prevf);
 		vtkStructuredPointsReader* reader;
 		vtkSmartPointer<vtkAppendPolyData> allcts;

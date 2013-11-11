@@ -137,20 +137,24 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 			}
 		}
 		if(bid > 0) 
-			break;
-		else if(inbid > 0 && outbid > 0)
+			;
+		else if(inbid > 1 && outbid > 1)
 			continue;
-		else if(inbid > 0)
+		else if(inbid > 1)
 		{
 			bid = inbid;
-			break;
 		}
-		else if(outbid > 0)
+		else if(outbid > 1)
 		{
 			bid = outbid;
-			break;
 		}
+				
+		if(bid <= 1)
+			bid = 0;
+		else
+			break;
 	}
+	if(bid < 1 ) bid = 1;
 	return bid;
 }
 void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
@@ -181,7 +185,7 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 	{
 		decimate->SetInputConnection(contour->GetProducerPort());
 		float target = 1 - 2000.0/ntri;
-		if(target > 0.95) target = 0.95;
+//		if(target > 0.95) target = 0.95;
 		decimate->SetTargetReduction(target);
 		decimate->Update();
 		contour = decimate->GetOutput();				
@@ -249,7 +253,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 
 		if(nreg == 1)
 		{
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<0<<std::endl;
+			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
@@ -296,7 +300,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		}
 		else
 		{
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<0<<std::endl;
+			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Too few points, not processing"<<std::endl;
 

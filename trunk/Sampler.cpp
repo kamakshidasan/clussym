@@ -43,16 +43,14 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 				canidx.push_back(i);
 			}
 		}
-		else if((m_vlist[b->ext].w > m_vlist[b->sad].w))
+		else if(m_vlist[b->ext].w > m_vlist[b->sad].w)
 			continue;
 		else
-		{
-			for(int i = n-1; i >= 0; i--)
-			{
-				if(m_vlist[b->sad].w > isovals[i] && m_vlist[b->ext].w < isovals[i])
-				{
-					canidx.push_back(i);
-				}
+		{ 
+		  	for(int i = n-1; i >= 0; i--)
+		  	{
+		  		if(m_vlist[b->sad].w > isovals[i] && m_vlist[b->ext].w < isovals[i])
+		  			canidx.push_back(i);
 			}
 		}
 		unsigned int csz = canidx.size();

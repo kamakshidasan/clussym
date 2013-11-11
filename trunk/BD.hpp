@@ -3,6 +3,9 @@
 
 #include "Elements.hpp"
 #include <boost/unordered_map.hpp>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
 
 class FnCmp
 {
@@ -41,11 +44,13 @@ class BD
 {
 public:
 	BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz);
+	BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid);
 	void BuildBD(std::vector<unsigned int> & sadidx);
 	unsigned int NumBr() { return numbr; };
 	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, 
 			unsigned int & ch, unsigned int & ht, std::vector<unsigned int> & sadidx);
 	void GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
+	void GetTNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype);
 	SymBranch* GetBranch(unsigned int bid) { return bridsarr[bid]; };
 	void AppendExportMask(unsigned int, std::vector<unsigned int> & mask);
 	bool BrType(unsigned int bid, int type);	
@@ -61,6 +66,7 @@ public:
 	int SIZEX;
 	int SIZEY;
 	int SIZEZ;
+	vtkSmartPointer<vtkPolyData> mesh;
 };
 #endif
 

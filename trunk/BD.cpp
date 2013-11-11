@@ -6,7 +6,24 @@ extern "C" {
 }
 #include <string>
 #include <stdio.h>
+#include <vtkExtractEdges.h>
+#include <vtkTriangleFilter.h>
+#include <vtkIdList.h>
 
+void BD::GetTNeighbours(unsigned int id, std::vector<unsigned int> & nbrs, unsigned int ftype)
+{
+	vtkSmartPointer<vtkIdList> cellIdList =	vtkSmartPointer<vtkIdList>::New();
+	mesh->GetPointCells(id, cellIdList);
+	for(vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
+	{
+		vtkSmartPointer<vtkIdList> pointIdList = vtkSmartPointer<vtkIdList>::New();
+		mesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+		if(pointIdList->GetId(0) != id)
+		      nbrs.push_back(pointIdList->GetId(0));
+		else
+		      nbrs.push_back(pointIdList->GetId(1));
+	}
+}
 void BD::GetNeighbours(unsigned int k, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	unsigned int x,y,z;
@@ -101,7 +118,7 @@ size_t neighbours(size_t v, size_t * ar, void* data)
 {
 	BD* bd = (BD*) data;
 	std::vector<unsigned int> nbrs;
-	bd->GetNeighbours(v, nbrs, 0);
+	bd->GetTNeighbours(v, nbrs, 0);
 	for(unsigned int i = 0; i < nbrs.size(); i++)
 		ar[i] = nbrs[i];
 	return nbrs.size();
@@ -148,6 +165,16 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid,
 }
 
 
+
+BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) : m_vlist(verts)
+{
+	vtkSmartPointer<vtkExtractEdges> extractEdges =
+		vtkSmartPointer<vtkExtractEdges>::New();
+	extractEdges->SetInput(tgrid);
+	extractEdges->Update();
+
+	mesh = extractEdges->GetOutput();
+}
 BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(verts), 
 	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz)
 {

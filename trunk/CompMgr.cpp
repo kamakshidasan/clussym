@@ -145,6 +145,8 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
 			unsigned int bid1 = comps[cid1]->bid;
+			float norm = 1.0 + comps[cid1]->ch.size();
+
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
@@ -152,14 +154,14 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 				if(bd->BrType(bid1, -1) && bd->BrType(bid2, -1))
 				{
 					float fval = Match(comps[cid1], comps[cid2], U);
-					U(cid1, cid2) += fval;
-					U(cid2, cid1) += fval;
+					U(cid1, cid2) = (U(cid1, cid2) + fval)/norm;
+					U(cid2, cid1) = (U(cid2, cid1) + fval)/norm;
 					if(fval > maxval) 
 						maxval = fval;
 					std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
 				}
 			}
-			U(cid1,cid1) = 1.0+comps[cid1]->ch.size();
+			U(cid1,cid1) = 1.0;
 		}
 	}
 }

@@ -190,7 +190,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			GetVorArea(cot, len, triarea, vorarea);
 
 			sumtriarea += triarea;
-			assert(fabs(vorarea[0]+vorarea[1]+vorarea[2]-triarea < 0.001));
+			//assert(fabs(vorarea[0]+vorarea[1]+vorarea[2]-triarea < 0.001));
 			ndvorarea[cpts[0]] += vorarea[0];
 			ndvorarea[cpts[1]] += vorarea[1];
 			ndvorarea[cpts[2]] += vorarea[2];

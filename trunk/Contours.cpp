@@ -24,6 +24,7 @@
 #include <vtkSelectionNode.h>
 #include <vtkExtractSelection.h>
 #include <vtkInformation.h>
+#include <vtkDataSetTriangleFilter.h>
 
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Point_with_normal_3.h>
@@ -77,7 +78,7 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 	cells->InitTraversal();
 	vtkIdType* cellpts;
 	vtkIdType  numpts;
-	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
+	//vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	std::vector<int> & bmap = bd->GetVertMap();
 	int bid = -1;
 	while(cells->GetNextCell(numpts, cellpts))
@@ -98,14 +99,16 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		int subid; 
 		double pcoords[3] = {0,0,0}; 
 		double weights[8]; 
-		unsigned int cid = vtkstrpts->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+		unsigned int cid = tgrid->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+		//unsigned int cid = vtkstrpts->FindCell(centre,0,0,0.001,subid,pcoords,weights);
 		assert(cid >= 0);
 		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
-		vtkstrpts->GetCellPoints(cid, ptids);
-		assert(8 == ptids->GetNumberOfIds());
+		//vtkstrpts->GetCellPoints(cid, ptids);
+		tgrid->GetCellPoints(cid, ptids);
+		assert(4 == ptids->GetNumberOfIds());
 		bid = 0;
 		int inbid = 0, outbid = 0;
-		for(unsigned int i = 0; i < 8; i++)
+		for(unsigned int i = 0; i < 4; i++)
 		{
 			unsigned int v = ptids->GetId(i);
 			unsigned int bid1 = bmap[v];
@@ -311,7 +314,8 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 void Contours::GenerateIsoSpace()
 {
 	vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
-	ctr->SetInputConnection(reader->GetOutputPort());
+	ctr->SetInput(tgrid);
+	//ctr->SetInputConnection(reader->GetOutputPort());
 	ctr->ComputeNormalsOff();
 	ctr->ComputeGradientsOff();
 	ctr->ComputeScalarsOff();
@@ -331,32 +335,38 @@ void Contours::GenerateIsoSpace()
 Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours)
 			: allcts(allcontours), cid(0)
 {
-	reader = vtkStructuredPointsReader::New();
+	vtkSmartPointer<vtkStructuredPointsReader> reader = vtkStructuredPointsReader::New();
 	reader->SetFileName(fname);
 	reader->Update();
 	trifil = vtkSmartPointer<vtkTriangleFilter>::New();
 	writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+
+
+	vtkSmartPointer<vtkDataSetTriangleFilter> vtktet = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
+	vtktet->SetInputConnection(reader->GetOutputPort());
+	tgrid = vtktet->GetOutput();
+	tgrid->Update();
 }
 
 Contours::~Contours()
 {
-	reader->Delete();
 }
 
 
-void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
+void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid)
 {
-	vtkSmartPointer<vtkDataArray> ps = vtkstrpts->GetPointData()->GetScalars();
-	for(unsigned int i = 0; i < vtkstrpts->GetNumberOfPoints(); i++)
+	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
+	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
 		double p[3];
 		double w = ps->GetComponent(i,0);
-		vtkstrpts->GetPoint(i,p);
+		tgrid->GetPoint(i,p);
 		verts.push_back(Vertex(p,w));
 	}
 	int dim[3];
-	vtkstrpts->GetDimensions(dim);
-	bd = new BD(verts, dim[0], dim[1], dim[2]);
+	/*vtkstrpts->GetDimensions(dim);
+	bd = new BD(verts, dim[0], dim[1], dim[2]);*/
+	bd = new BD(verts, tgrid);
 	std::vector<unsigned int> sadidx;
 	bd->BuildBD(sadidx);
 	Sampler s(bd, sadidx, verts);
@@ -366,24 +376,28 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> vtkstrpts)
 void Contours::ExtractSymmetry()
 {
 	double range[2];
-	vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
-	vtkstrpts->GetScalarRange(range);
+	tgrid->GetScalarRange(range);
 
-	Preprocess(vtkstrpts);
+	Preprocess(tgrid);
 
 	compmgr = new CompMgr(fvals, bd);
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 	bidarray->SetName("bids");
 	std::vector<int> & bmap = bd->GetVertMap();
 	bidarray->SetArray(&bmap[0], bmap.size(), 1);
-	vtkstrpts->GetPointData()->AddArray(bidarray);
-	vtkstrpts->Update();
+	tgrid->GetPointData()->AddArray(bidarray);
+	tgrid->Update();
 
 	vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
 		vtkSmartPointer<vtkStructuredPointsWriter>::New();
-	strpwriter->SetInput(vtkstrpts);
-	strpwriter->SetFileName("t.vtk");
-	strpwriter->Update();
+	vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
+		vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+	//strpwriter->SetInput(vtkstrpts);
+	//strpwriter->SetFileName("t.vtk");
+	//strpwriter->Update();
+	ugwriter->SetInput(tgrid);
+	ugwriter->SetFileName("u.vtk");
+	ugwriter->Update();
 
 	GenerateIsoSpace();
 }

@@ -135,12 +135,11 @@ bool FnCmp::operator()(const unsigned int & l, const unsigned int & r)
 }
 
 SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, 
-		unsigned int & ch, unsigned int & h, std::vector<unsigned int> & sadidx)
+		unsigned int & ch, unsigned int & h)
 {
 	node->ht = 1;
 	node->ext = b->extremum;
 	node->sad = b->saddle;
-	sadidx.push_back(node->sad);
 	node->orgbr = node;
 	bridsarr[brid] = node;
 	b->data = node;
@@ -155,7 +154,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid,
 		chnode->lev = node->lev+1;
 		node->ch.push_back(chnode);
 		brid++;
-		BuildSymTree(c, chnode, brid, chch, ht, sadidx);
+		BuildSymTree(c, chnode, brid, chch, ht);
 		if(node->ht < chnode->ht+1) node->ht = chnode->ht+1;
 		totch += chch;
 	}
@@ -178,6 +177,19 @@ BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) 
 BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(verts), 
 	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz)
 {
+}
+
+void BD::UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx)
+{
+
+	std::list<SymBranch*>::iterator bit = b->ch.begin();
+	b->csz = b->sz;
+	for(; bit != b->ch.end(); bit++)
+	{
+		UpdateSymTree(*bit, sadidx);
+		b->csz += (*bit)->csz;
+	}
+	if(b->csz > 120) sadidx.push_back(b->sad);
 }
 void BD::BuildBD(std::vector<unsigned int> & sadidx)
 {
@@ -214,15 +226,19 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx)
 	symroot = new SymBranch;
 	symroot->par = NULL;
 	symroot->lev = 1;
-	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht, sadidx);
+	SymBranch* node = BuildSymTree(root, symroot,brid, symroot->totch, symroot->ht);
 	sadidx.push_back(root->extremum);
 	numbr = brid;
 
 	vtobrmap = std::vector<int>(m_vlist.size(), 0);
 	for(unsigned int i = 0; i < m_vlist.size(); i++)
 	{
-		vtobrmap[i] = ((SymBranch*)brvertmap[i]->data)->bid;
+		SymBranch* br = (SymBranch*)brvertmap[i]->data;
+		vtobrmap[i] = br->bid;
+		br->sz++;
 	}
+
+	UpdateSymTree(symroot, sadidx);
 
        	ct_cleanup( ctx );
 }

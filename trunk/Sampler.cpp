@@ -1,6 +1,7 @@
 #include "Sampler.hpp"
 #include "BD.hpp"
 #include <iostream>
+
 Sampler::Sampler(BD* pbd, std::vector<unsigned int> & sidx, std::vector<Vertex> & vlist)
 	: bd(pbd), sadidx(sidx), m_vlist(vlist)
 {}
@@ -8,8 +9,8 @@ void Sampler::PickValues(std::vector<float> & isovals)
 {
 	std::sort(sadidx.begin(), sadidx.end(), FnCmp(&m_vlist));
 	unsigned int sz = sadidx.size();
-	float minf = m_vlist[sadidx[0]].w;
-	float maxf = m_vlist[sadidx[sz-1]].w;
+	float maxf = m_vlist[bd->bridsarr[1]->ext].w;
+	float minf = m_vlist[bd->bridsarr[1]->sad].w;
 	float curf = minf, nextf, delta = (maxf - minf)/100;
 	for(unsigned int i = 1; i < sz; i++)
 	{
@@ -31,6 +32,8 @@ void Sampler::Sample(std::vector<float> & isovals)
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {
+	float max = m_vlist[bd->bridsarr[1]->ext].w;
+	float min = m_vlist[bd->bridsarr[1]->sad].w;
 	for(unsigned int j = 1; j <= bd->numbr; j++)
 	{
 		SymBranch* b = bd->bridsarr[j];
@@ -70,7 +73,9 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 				for(unsigned int i = 1; i < csz; i++)
 				{
 					unsigned int cidx = canidx[i];
-					if(m_vlist[(*bit)->sad].w > isovals[cidx])
+					unsigned int pcidx = canidx[i-1];
+					if((m_vlist[(*bit)->sad].w > isovals[cidx] && m_vlist[(*bit)->sad].w < isovals[pcidx])
+					&& (*bit)->csz > fsz)
 					{
 						if(!selarr[canidx[i]])
 						{

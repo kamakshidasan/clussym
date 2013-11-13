@@ -39,6 +39,7 @@
 #include "CompMgr.hpp"
 #include "Sampler.hpp"
 
+
 /*typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::FT FT;
 typedef Kernel::Point_3 Point;
@@ -112,12 +113,17 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		{
 			unsigned int v = ptids->GetId(i);
 			unsigned int bid1 = bmap[v];
-			if(bid == 0)
-				bid = bid1;
-			else if(bid != bid1)
-				bid = -1;
-
-			if(verts[v].w < isoval)
+//			if(verts[v].w < isoval)
+			{
+				if(bid == 0)
+					bid = bid1;
+				else if(bid != bid1)
+				{
+					bid = -1;
+					break;
+				}
+			}
+			/*if(verts[v].w < isoval)
 			{
 				unsigned int inbid1 = bid1;
 				if(inbid == 0)
@@ -137,11 +143,11 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 			if(bid == -1 && inbid == -1 && outbid == -1)
 			{
 				break;
-			}
+			}*/
 		}
-		if(bid > 0) 
-			;
-		else if(inbid > 1 && outbid > 1)
+		if(bid > 1) 
+			break;
+		/*else if(inbid > 1 && outbid > 1)
 			continue;
 		else if(inbid > 1)
 		{
@@ -155,7 +161,7 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		if(bid <= 1)
 			bid = 0;
 		else
-			break;
+			break;*/
 	}
 	if(bid < 1 ) bid = 1;
 	return bid;
@@ -260,7 +266,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else if(polydata->GetNumberOfPoints() > 20)
+		else if(polydata->GetNumberOfPoints() > fsz)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval);
@@ -295,6 +301,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
 				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
+			std::cout<<" ext "<<verts[bd->bridsarr[bid]->ext].w<<" sad "<<verts[bd->bridsarr[bid]->sad].w<<std::endl;
 			writer->SetFileName(fn);
 			trifil->SetInput(polydata);
 			writer->SetInputConnection(trifil->GetOutputPort());

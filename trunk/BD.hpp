@@ -7,6 +7,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
+extern unsigned int fsz;
 class FnCmp
 {
 	public:

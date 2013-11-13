@@ -20,9 +20,12 @@ void CompMgr::AddComp(CompNode* c)
 		CompNode* other = comps[compidx];
 		if(bd->BrType(c->bid, -1) && bd->BrType(other->bid, -1))
 		{
-			float val = c->Vote(other);
-			c->votes[other->id] = val;
-			printf("Vote(%d %d) = %f\n", c->id, other->id, val);
+			float orgval = c->Vote(other);
+			float val = 0.0;
+			//if(orgval > 0.98) val = 1.0;
+			//else val = 0.0;
+			c->votes[other->id] = orgval;
+			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
 		}
 	}
 	fnmap[c->fnid].push_back(c->id);

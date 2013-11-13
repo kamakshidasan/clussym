@@ -10,6 +10,7 @@ extern "C" {
 #include <vtkTriangleFilter.h>
 #include <vtkIdList.h>
 
+unsigned int fsz = 40;
 void BD::GetTNeighbours(unsigned int id, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	vtkSmartPointer<vtkIdList> cellIdList =	vtkSmartPointer<vtkIdList>::New();
@@ -189,7 +190,7 @@ void BD::UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx)
 		UpdateSymTree(*bit, sadidx);
 		b->csz += (*bit)->csz;
 	}
-	if(b->csz > 120) sadidx.push_back(b->sad);
+	if(b->csz > fsz) sadidx.push_back(b->sad);
 }
 void BD::BuildBD(std::vector<unsigned int> & sadidx)
 {

@@ -19,9 +19,9 @@ class Contours
 	public:
 		Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours);
 		~Contours();
-		void ExtractSymmetry();
+		void ExtractSymmetry(unsigned int inv);
 	private:
-		void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid);
+		void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv);
 		class BD* bd;
 		class CompMgr* compmgr;
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);

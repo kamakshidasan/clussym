@@ -228,12 +228,13 @@ void CompMgr::ClusterComps()
 	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 	cl = new Cluster(symcords);
 	std::vector<unsigned int> & cltrs = cl->GetClusters();
+	/*
 	for(unsigned int i = 0; i < cltrs.size(); i++)
 	{
 		if(cltrs[i])
 			Export(i, cltrs[i]);
 	}
-
+	*/
 }
 
 void CompMgr::Export(unsigned int cid, unsigned int clid)
@@ -257,6 +258,6 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-(diff/std::min(anorm,bnorm)));
+	return exp(-(10*diff/std::min(anorm,bnorm)));
 }
 

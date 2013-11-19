@@ -1,0 +1,4 @@
+#dir ../../../Downloads/vtk/VTK5.10.1/Graphics
+#b vtkCleanPolyData.cxx:236
+#b LB.cpp:194
+r ../../data/emd_1189.vtk > out

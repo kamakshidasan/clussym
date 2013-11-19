@@ -81,8 +81,8 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 	vtkIdType  numpts;
 	//vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
 	std::vector<int> & bmap = bd->GetVertMap();
-	int bid = -1;
-	while(cells->GetNextCell(numpts, cellpts))
+	int bid = -1, ret1 = 0;
+	if(cells->GetNextCell(numpts, cellpts))
 	{
 		double centre[3], a[3], b[3], c[3];
 
@@ -113,15 +113,66 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		{
 			unsigned int v = ptids->GetId(i);
 			unsigned int bid1 = bmap[v];
-//			if(verts[v].w < isoval)
+			unsigned int done = 0;
+			while(!done)
 			{
-				if(bid == 0)
-					bid = bid1;
-				else if(bid != bid1)
+				if(bid1 == 1) done = 1;
+				else
 				{
-					bid = -1;
-					break;
+					unsigned int sad = bd->bridsarr[bid1]->sad;
+					unsigned int ext = bd->bridsarr[bid1]->ext;
+					if(verts[sad].w > verts[ext].w)
+					{
+						if(isoval >= verts[ext].w && isoval <= verts[sad].w)
+							done = 1;
+						else
+							bid1 = bd->bridsarr[bid1]->par->bid;
+					}
+					else
+					{
+						if(isoval <= verts[ext].w && isoval >= verts[sad].w)
+							done = 1;
+						else
+							bid1 = bd->bridsarr[bid1]->par->bid;
+					}
+
 				}
+			}
+
+			if(bid1 != 1)
+			{
+				unsigned int sad = bd->bridsarr[bid1]->sad;
+				unsigned int ext = bd->bridsarr[bid1]->ext;
+				if(verts[sad].w > verts[ext].w)
+				{
+					if(verts[v].w <= isoval && verts[sad].w >= isoval)
+					{
+						if(bid == 0)
+							bid = bid1;
+						else if(bid != bid1)
+						{
+							bid = -1;
+							//break;
+						}
+					}
+				}
+				else 
+				{
+					if(verts[v].w >= isoval && verts[sad].w <= isoval)
+					{
+						if(bid == 0)
+							bid = bid1;
+						else if(bid != bid1)
+						{
+							bid = -1;
+							//break;
+						}
+					}
+				}
+			}
+			else
+			{
+				ret1 = 1;
 			}
 			/*if(verts[v].w < isoval)
 			{
@@ -145,8 +196,8 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 				break;
 			}*/
 		}
-		if(bid > 1) 
-			break;
+		//if(bid > 1) 
+		//	break;
 		/*else if(inbid > 1 && outbid > 1)
 			continue;
 		else if(inbid > 1)
@@ -163,7 +214,9 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		else
 			break;*/
 	}
-	if(bid < 1 ) bid = 1;
+	if(bid < 1 ) 
+		if(ret1) bid = 1;
+		else bid = -1;
 	return bid;
 }
 void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
@@ -280,14 +333,15 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				std::cout<<"Branch Id is -1!!!"<<std::endl;
+				assert(0);
 				continue;
 			}
-
 			SymBranch* b = bd->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
 			if(cit != b->comps.end())
 			{
+				assert(cit->second == -1);
 				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
@@ -360,13 +414,18 @@ Contours::~Contours()
 }
 
 
-void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid)
+void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv)
 {
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
 		double p[3];
 		double w = ps->GetComponent(i,0);
+		if(inv)
+		{
+			w = -w;
+			ps->SetComponent(i,0, w);
+		}
 		tgrid->GetPoint(i,p);
 		verts.push_back(Vertex(p,w));
 	}
@@ -380,12 +439,12 @@ void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid)
 	s.Sample(fvals);
 }
 
-void Contours::ExtractSymmetry()
+void Contours::ExtractSymmetry(unsigned int inv)
 {
 	double range[2];
 	tgrid->GetScalarRange(range);
 
-	Preprocess(tgrid);
+	Preprocess(tgrid, inv);
 
 	compmgr = new CompMgr(fvals, bd);
 	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();

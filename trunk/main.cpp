@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-	if (argc < 2)
+	if (argc < 3)
 	{
 		std::cerr << "Usage: " << argv[0] 
 			<< " InputFile(.vtk)"<< std::endl;
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkAppendPolyData> allcontours = vtkSmartPointer<vtkAppendPolyData>::New();
 	Contours ct(argv[1], allcontours);
 
-	ct.ExtractSymmetry();
+	ct.ExtractSymmetry(atoi(argv[2]));
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();

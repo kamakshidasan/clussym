@@ -64,7 +64,7 @@ void CompMgr::SetParent(CompNode* c, unsigned int ppfid)
 		}
 	}
 }
-float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic> & A)
+float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<float, Dynamic, Dynamic> & A)
 {
 	typedef lemon::ListGraph LGraph;
 	typedef LGraph::Edge LEdge;
@@ -77,6 +77,7 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic>
 	LNodeMap ndmap(g);
 	LEdgeMap edmap(g);
 
+
 	std::list<CompNode*>::iterator it1 = c1->ch.begin();
 	std::list<CompNode*>::iterator it2 = c2->ch.begin();
 
@@ -86,13 +87,13 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic>
 	std::cout<<"Children of "<<c1->id<<" ";
 	for(; it1 != c1->ch.end(); it1++)
 	{
-		std::cout<<(*it1)->id<<" ";
+		std::cout<<(*it1)->id<<" "<<"("<<(*it1)->csz<<")";
 	}
 	std::cout<<std::endl;
 	std::cout<<"Children of "<<c2->id<<" ";
 	for(; it2 != c2->ch.end(); it2++)
 	{
-		std::cout<<(*it2)->id<<" ";
+		std::cout<<(*it2)->id<<" "<<"("<<(*it2)->csz<<")";
 	}
 	std::cout<<std::endl;
 
@@ -103,19 +104,24 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic>
 		unsigned int id1 = (*it1)->id;
 		ndmap[n1] = id1;
 		it2 = c2->ch.begin();
+		unsigned int csz1 = comps[id1]->csz;
+		norm += csz1;
 		for(; it2 != c2->ch.end(); it2++)
 		{
 			unsigned int id2 = (*it2)->id;
+			unsigned int csz2 = comps[id2]->csz;
 			if(create)
 			{
 				LNode n2 = g.addNode();
 				ndmap[n2] = id2;
 				nodes[id2] = n2;
+				norm +=csz2;
 			}
 			LNode n2 = nodes[id2];
 			LEdge e = g.addEdge(n1,n2);
-			edmap[e] = A(ndmap[n1],ndmap[n2]);
-			std::cout<<"Edge "<<id1<<" "<<id2<<" wt:"<< edmap[e]<<std::endl;
+			edmap[e] = (csz1+csz2)*A(id1,id2);
+			std::cout<<"Edge "<<id1<<" "<<id2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
+				A(id1,id2)<<" = "<<edmap[e]<<std::endl;
 		}
 		create = false;
 	}
@@ -148,17 +154,20 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
 			unsigned int bid1 = comps[cid1]->bid;
-			float norm = 1.0 + comps[cid1]->ch.size();
+			unsigned int csz1 = comps[cid1]->csz;
+			unsigned int norm = csz1;
 
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
 				unsigned int bid2 = comps[cid2]->bid;
+				unsigned int csz2 = comps[cid2]->csz;
+				norm += csz2;
 				if(bd->BrType(bid1, -1) && bd->BrType(bid2, -1))
 				{
-					float fval = Match(comps[cid1], comps[cid2], U);
-					U(cid1, cid2) = (U(cid1, cid2) + fval)/norm;
-					U(cid2, cid1) = (U(cid2, cid1) + fval)/norm;
+					float fval = Match(comps[cid1], comps[cid2], norm, U);
+					U(cid1, cid2) = ((csz1+csz2)*U(cid1, cid2) + fval)/norm;
+					U(cid2, cid1) = ((csz1+csz2)*U(cid2, cid1) + fval)/norm;
 					if(fval > maxval) 
 						maxval = fval;
 					std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;

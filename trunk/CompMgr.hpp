@@ -31,7 +31,7 @@ class CompMgr
 		void ClusterComps();
 		void Export(unsigned int clid, unsigned int cid);
 	private:
-		float Match(CompNode* c1, CompNode* c2, Matrix<float, Dynamic, Dynamic> & A);
+		float Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<float, Dynamic, Dynamic> & A);
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);
 		void SetParent(CompNode* c, unsigned int pfid);
 		void BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A);

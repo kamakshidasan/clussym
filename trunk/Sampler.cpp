@@ -74,15 +74,14 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 				{
 					unsigned int cidx = canidx[i];
 					unsigned int pcidx = canidx[i-1];
-					if((m_vlist[(*bit)->sad].w > isovals[cidx] && m_vlist[(*bit)->sad].w < isovals[pcidx])
-					&& (*bit)->csz > fsz)
+					if((m_vlist[(*bit)->sad].w >= isovals[cidx] && m_vlist[(*bit)->sad].w < isovals[pcidx]))
 					{
-						if(!selarr[canidx[i]])
+						if(selarr[canidx[i]] < fsz && selarr[canidx[i]]+(*bit)->csz >= fsz)
 						{
 							selcnt++;
-							selarr[cidx] = 1;
 							b->comps[cidx] = -1;
 						}
+						selarr[canidx[i]] += (*bit)->csz;
 						break;	
 					}
 				}

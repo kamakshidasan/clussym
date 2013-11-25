@@ -35,6 +35,7 @@ class CompMgr
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);
 		void SetParent(CompNode* c, unsigned int pfid);
 		void BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A);
+		void FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynamic, Dynamic> & U);
 		std::vector<CompNode*> comps;
 		std::vector<std::vector<unsigned int> > fnmap;
 		BD* bd;

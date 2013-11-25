@@ -197,17 +197,28 @@ void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 	}
 
 }
-
+void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynamic, Dynamic> & U)
+{
+	Matrix<float, Dynamic, 1> d = U.rowwise().sum();
+	unsigned int rows = d.rows();
+	for(unsigned int i = 0; i < rows; i++)
+		d(i) = 1.0/d(i);
+	Matrix<float, Dynamic, Dynamic> I = Matrix<float, Dynamic, Dynamic>::Identity(rows, rows);
+	Lrw = I - d.asDiagonal()*U;
+}
 void CompMgr::ClusterComps()
 {
 	unsigned int csz = comps.size();
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
+	Matrix<float, Dynamic, Dynamic> Lrw = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A);
 	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
 	Matrix<float, Dynamic, Dynamic> U = A;
 	UpSweep(U);
 	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
-	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(U);
+	FormLrw(Lrw, U);
+	std::cout<<"Lrw matrix:"<<std::endl<<Lrw<<std::endl;
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(Lrw);
 	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
 	std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
 	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();

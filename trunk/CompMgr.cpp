@@ -83,7 +83,8 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 
 	boost::unordered_map<unsigned int, LNode> nodes;
 	bool create = true;
-
+	
+	std::cout<<"Size contribution before matching "<<norm<<std::endl;
 	std::cout<<"Children of "<<c1->id<<" ";
 	for(; it1 != c1->ch.end(); it1++)
 	{
@@ -93,7 +94,7 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 	std::cout<<"Children of "<<c2->id<<" ";
 	for(; it2 != c2->ch.end(); it2++)
 	{
-		std::cout<<(*it2)->id<<" "<<"("<<(*it2)->csz<<")";
+		std::cout<<(*it2)->id<<"("<<(*it2)->csz<<")"<<" ";
 	}
 	std::cout<<std::endl;
 
@@ -129,7 +130,7 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 	lemon::MaxWeightedMatching<LGraph,LEdgeMap> mwm(g, edmap);
       	mwm.run();
 	float tot = mwm.matchingWeight();
-	std::cout<<"Matching "<<tot<<std::endl;
+	std::cout<<"Matching "<<tot<<" Size "<<norm<<std::endl;
 	return tot;
 }
 
@@ -156,22 +157,27 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			unsigned int bid1 = comps[cid1]->bid;
 			unsigned int csz1 = comps[cid1]->csz;
 			unsigned int norm = csz1;
+			std::cout<<"size  of "<<cid1<<" "<<csz1<<std::endl;
 
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
 				unsigned int bid2 = comps[cid2]->bid;
 				unsigned int csz2 = comps[cid2]->csz;
+				std::cout<<"size  of "<<cid2<<" "<<csz2<<std::endl;
 				norm += csz2;
 				if(bd->BrType(bid1, -1) && bd->BrType(bid2, -1))
 				{
 					float fval = Match(comps[cid1], comps[cid2], norm, U);
+					std::cout<<"Par Edge "<<cid1<<" "<<cid2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
+						U(cid1,cid2)<<" = "<<(csz1+csz2)*U(cid1, cid2)<<std::endl;
 					U(cid1, cid2) = ((csz1+csz2)*U(cid1, cid2) + fval)/norm;
 					U(cid2, cid1) = ((csz1+csz2)*U(cid2, cid1) + fval)/norm;
 					if(fval > maxval) 
 						maxval = fval;
 					std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
 				}
+				norm = csz1;
 			}
 			U(cid1,cid1) = 1.0;
 		}

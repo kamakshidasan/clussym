@@ -14,6 +14,7 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows()
 		{
 			for(unsigned int d = 0; d < dim; d++)
 				datapts[i][d] = cords(i,d);
+			std::cout<<"Cord "<<i<<" : "<<std::endl<<cords.row(i)<<std::endl;
 		}
 
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
@@ -35,11 +36,11 @@ std::vector<unsigned int> & Cluster::GetClusters()
 }
 void Cluster::GetMembers(unsigned int id, std::vector<unsigned int> & mem)
 {
-	unsigned int sz = kdTree->annkFRSearch(datapts[id], 0.1, 0);
+	unsigned int sz = kdTree->annkFRSearch(datapts[id], 0.001, 0);
 	printf("For pt %d sphere contains %d\n", id, sz);
 	ANNidxArray nnIdx = new ANNidx[sz];						// allocate near neigh indices
 	ANNdistArray dists = new ANNdist[sz];						// allocate near neighbor dists
-	kdTree->annkFRSearch(datapts[id], 0.1, sz, nnIdx, dists);
+	kdTree->annkFRSearch(datapts[id], 0.001, sz, nnIdx, dists);
 
 	for (unsigned int j = 0; j < sz; j++) 
 	{

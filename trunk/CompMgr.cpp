@@ -207,10 +207,16 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 {
 	Matrix<float, Dynamic, 1> d = U.rowwise().sum();
 	unsigned int rows = d.rows();
+	std::cout<<"Rows sum :"<<std::endl<<d<<std::endl;
 	for(unsigned int i = 0; i < rows; i++)
+		//d(i) = 1.0/sqrt(d(i));
 		d(i) = 1.0/d(i);
+	Matrix<float, Dynamic, Dynamic> D = d.asDiagonal();
+	std::cout<<"Inv Rows sum Matrix:"<<std::endl<<D<<std::endl;
 	Matrix<float, Dynamic, Dynamic> I = Matrix<float, Dynamic, Dynamic>::Identity(rows, rows);
-	Lrw = I - d.asDiagonal()*U;
+//	Lrw = I - D*U*D;
+	Lrw = I - D*U;
+//	Lrw = D - U;
 }
 void CompMgr::ClusterComps()
 {
@@ -229,25 +235,26 @@ void CompMgr::ClusterComps()
 	std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
 	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
 	Matrix<float, Dynamic, Dynamic> D = eigs.eigenvalues().asDiagonal();
-	Matrix<float, Dynamic, Dynamic> VD = V*D;
+	Matrix<float, Dynamic, Dynamic> VD = V;
 	std::cout<<"VD matrix:"<<std::endl<<VD<<std::endl;
 
 
 
-	unsigned int trunc = 0;
-	for(unsigned int i = 0; i < csz; i++)
+	unsigned int trunc = csz;
+	float diff = 0;
+	for(unsigned int i = 1; i < csz; i++)
 	{
-		unsigned int j = csz-i-1;
-		if(eigs.eigenvalues()[j] < 1)
+		if(eigs.eigenvalues()[i] - eigs.eigenvalues()[i-1] > diff)
 		{
+			diff = eigs.eigenvalues()[i] - eigs.eigenvalues()[i-1];
 			trunc = i;
-			break;
+
 		}
 		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
-		std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvalues()[j]*eigs.eigenvectors().col(j).transpose()<<std::endl;
+		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
 	}
 
-	Matrix<float, Dynamic, Dynamic> eigcords = VD.topRightCorner(csz, trunc);
+	Matrix<float, Dynamic, Dynamic> eigcords = VD.topLeftCorner(csz, trunc);
 	symcords = Matrix<float, Dynamic, Dynamic>(eigcords.rows(), eigcords.cols()+1);
 	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
 	symcords.col(eigcords.cols()) = fncords;

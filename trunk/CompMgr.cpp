@@ -6,11 +6,12 @@
 #include <stdio.h>
 #include <lemon/matching.h>
 
-CompMgr::CompMgr(std::vector<float> & fnvals, BD* pbd) : fnmap(fnvals.size()), fvals(fnvals), bd(pbd)
+CompMgr::CompMgr(std::vector<float> & fnvals, std::vector<BD*> & pbd) : fnmap(fnvals.size()), fvals(fnvals), bd(pbd)
 {
 }
 void CompMgr::AddComp(CompNode* c)
 {
+	unsigned int did = c->did;
 	assert(c->id == comps.size());
 	comps.push_back(c);
 	unsigned int sz = fnmap[c->fnid].size();
@@ -18,7 +19,7 @@ void CompMgr::AddComp(CompNode* c)
 	{
 		unsigned int compidx = fnmap[c->fnid][i];
 		CompNode* other = comps[compidx];
-		if(bd->BrType(c->bid, -1) && bd->BrType(other->bid, -1))
+		if(bd[did]->BrType(c->bid, -1) && bd[did]->BrType(other->bid, -1))
 		{
 			float orgval = c->Vote(other);
 			float val = 0.0;
@@ -32,10 +33,11 @@ void CompMgr::AddComp(CompNode* c)
 }
 void CompMgr::SetParent(CompNode* c, unsigned int ppfid)
 {
+	unsigned int did = c->did;
 	unsigned int pfid = ppfid;
 	unsigned int bid = c->bid;
 	bool done = false;
-	SymBranch* b = bd->GetBranch(bid);
+	SymBranch* b = bd[did]->GetBranch(bid);
 	while(!done)
 	{
 		if(pfid <= b->topcomp)
@@ -145,7 +147,8 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			{
 				unsigned int cid = fnmap[fidx][i];
 				unsigned int bid = comps[cid]->bid;
-				if(bd->BrType(bid, -1))
+				unsigned int did = comps[cid]->did;
+				if(bd[did]->BrType(bid, -1))
 					SetParent(comps[cid], fidx+1);
 			}
 		}
@@ -155,6 +158,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			float maxval = 0;
 			unsigned int cid1 = fnmap[fidx][i];
 			unsigned int bid1 = comps[cid1]->bid;
+			unsigned int did1 = comps[cid1]->did;
 			unsigned int csz1 = comps[cid1]->csz;
 			unsigned int norm = csz1;
 			std::cout<<"size  of "<<cid1<<" "<<csz1<<std::endl;
@@ -163,10 +167,11 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			{
 				unsigned int cid2 = fnmap[fidx][j];
 				unsigned int bid2 = comps[cid2]->bid;
+				unsigned int did2 = comps[cid2]->did;
 				unsigned int csz2 = comps[cid2]->csz;
 				std::cout<<"size  of "<<cid2<<" "<<csz2<<std::endl;
 				norm += csz2;
-				if(bd->BrType(bid1, -1) && bd->BrType(bid2, -1))
+				if(bd[did1]->BrType(bid1, -1) && bd[did2]->BrType(bid2, -1))
 				{
 					float fval = Match(comps[cid1], comps[cid2], norm, U);
 					std::cout<<"Par Edge "<<cid1<<" "<<cid2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
@@ -275,9 +280,11 @@ void CompMgr::Export(unsigned int cid, unsigned int clid)
 	CompNode* c = comps[cid];
 	unsigned int bid = c->bid;
 	std::vector<unsigned int> brmask;
-	bd->SetBrMask(bid, brmask);
+	/*
+	bd[did]->SetBrMask(bid, brmask);
 	std::vector<unsigned int> vmask;
-	bd->SetVertMask(clid, cid, vmask, brmask, fvals[c->fnid]);
+	bd[did]->SetVertMask(clid, cid, vmask, brmask, fvals[c->fnid]);
+	*/
 }
 float CompNode::Vote(CompNode* other)
 {

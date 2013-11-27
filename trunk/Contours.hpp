@@ -17,22 +17,22 @@
 class Contours
 {
 	public:
-		Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours);
+		Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours);
 		~Contours();
-		void ExtractSymmetry(unsigned int inv);
+		void ExtractSymmetry(unsigned int inv, unsigned int dcnt);
 	private:
-		void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv);
-		class BD* bd;
+		void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did);
+		std::vector<class BD*> bd;
 		class CompMgr* compmgr;
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);
-		void ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr);
-		void GenerateIsoSpace();
-		int FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval);
+		void ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr, unsigned int did);
+		void GenerateIsoSpace(unsigned int did);
+		int FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval, unsigned int did);
 		void SetChildComps(CompNode* c, float curf, float prevf);
 		//vtkStructuredPointsReader* reader;
-		vtkSmartPointer<vtkUnstructuredGrid> tgrid;
+		std::vector<vtkSmartPointer<vtkUnstructuredGrid> > tgrid;
 		vtkSmartPointer<vtkAppendPolyData> allcts;
-		std::vector<Vertex> verts;
+		std::vector<std::vector<Vertex> > verts;
 		boost::unordered_map<unsigned int, CompNode*> topcomps;
 		unsigned int cid;
 		std::vector<float> fvals;

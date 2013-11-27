@@ -13,14 +13,14 @@ int main(int argc, char* argv[])
 	if (argc < 3)
 	{
 		std::cerr << "Usage: " << argv[0] 
-			<< " InputFile(.vtk)"<< std::endl;
+			<< " InputFile(.vtk) 0/1 (min/max)"<< std::endl;
 		return EXIT_FAILURE;
 	}
 
 	vtkSmartPointer<vtkAppendPolyData> allcontours = vtkSmartPointer<vtkAppendPolyData>::New();
-	Contours ct(argv[1], allcontours);
+	Contours ct(argv[1], argv[3], allcontours);
 
-	ct.ExtractSymmetry(atoi(argv[2]));
+	ct.ExtractSymmetry(atoi(argv[2]), argc - 3);
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();

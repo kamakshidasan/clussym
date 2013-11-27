@@ -17,6 +17,7 @@ struct CompNode
 	unsigned int bid;
 	std::vector<float> cords;
 	unsigned int fnid;
+	unsigned int did;
 	unsigned int csz;
 	std::list<CompNode*> ch;
 	boost::unordered_map<unsigned int, float> votes;
@@ -26,7 +27,7 @@ using namespace Eigen;
 class CompMgr
 {
 	public:
-		CompMgr(std::vector<float> & fnvals, class BD* pbd);
+		CompMgr(std::vector<float> & fnvals, std::vector<class BD*> & pbd);
 		void AddComp(CompNode* c);
 		void ClusterComps();
 		void Export(unsigned int clid, unsigned int cid);
@@ -38,7 +39,7 @@ class CompMgr
 		void FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynamic, Dynamic> & U);
 		std::vector<CompNode*> comps;
 		std::vector<std::vector<unsigned int> > fnmap;
-		BD* bd;
+		std::vector<BD*> & bd;
 		class Cluster* cl;
 		Matrix<float, Dynamic, Dynamic> symcords;
 		Matrix<float, Dynamic, 1> fncords;

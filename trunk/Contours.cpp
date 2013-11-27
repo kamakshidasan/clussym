@@ -73,14 +73,14 @@ void vtktoPointList(PointList & pl, vtkPolyData* mesh)
 	} 
 
 }*/
-int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
+int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval, unsigned int did)
 {
 	vtkSmartPointer<vtkCellArray> cells = contour->GetPolys();
 	cells->InitTraversal();
 	vtkIdType* cellpts;
 	vtkIdType  numpts;
 	//vtkSmartPointer<vtkStructuredPoints> vtkstrpts = reader->GetOutput();
-	std::vector<int> & bmap = bd->GetVertMap();
+	std::vector<int> & bmap = bd[did]->GetVertMap();
 	int bid = -1, ret1 = 0;
 	if(cells->GetNextCell(numpts, cellpts))
 	{
@@ -100,12 +100,12 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 		int subid; 
 		double pcoords[3] = {0,0,0}; 
 		double weights[8]; 
-		unsigned int cid = tgrid->FindCell(centre,0,0,0.001,subid,pcoords,weights);
+		unsigned int cid = tgrid[did]->FindCell(centre,0,0,0.001,subid,pcoords,weights);
 		//unsigned int cid = vtkstrpts->FindCell(centre,0,0,0.001,subid,pcoords,weights);
 		assert(cid >= 0);
 		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
 		//vtkstrpts->GetCellPoints(cid, ptids);
-		tgrid->GetCellPoints(cid, ptids);
+		tgrid[did]->GetCellPoints(cid, ptids);
 		assert(4 == ptids->GetNumberOfIds());
 		bid = 0;
 		int inbid = 0, outbid = 0;
@@ -119,21 +119,21 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 				if(bid1 == 1) done = 1;
 				else
 				{
-					unsigned int sad = bd->bridsarr[bid1]->sad;
-					unsigned int ext = bd->bridsarr[bid1]->ext;
-					if(verts[sad].w > verts[ext].w)
+					unsigned int sad = bd[did]->bridsarr[bid1]->sad;
+					unsigned int ext = bd[did]->bridsarr[bid1]->ext;
+					if(verts[did][sad].w > verts[did][ext].w)
 					{
-						if(isoval >= verts[ext].w && isoval <= verts[sad].w)
+						if(isoval >= verts[did][ext].w && isoval <= verts[did][sad].w)
 							done = 1;
 						else
-							bid1 = bd->bridsarr[bid1]->par->bid;
+							bid1 = bd[did]->bridsarr[bid1]->par->bid;
 					}
 					else
 					{
-						if(isoval <= verts[ext].w && isoval >= verts[sad].w)
+						if(isoval <= verts[did][ext].w && isoval >= verts[did][sad].w)
 							done = 1;
 						else
-							bid1 = bd->bridsarr[bid1]->par->bid;
+							bid1 = bd[did]->bridsarr[bid1]->par->bid;
 					}
 
 				}
@@ -141,11 +141,11 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 
 			if(bid1 != 1)
 			{
-				unsigned int sad = bd->bridsarr[bid1]->sad;
-				unsigned int ext = bd->bridsarr[bid1]->ext;
-				if(verts[sad].w > verts[ext].w)
+				unsigned int sad = bd[did]->bridsarr[bid1]->sad;
+				unsigned int ext = bd[did]->bridsarr[bid1]->ext;
+				if(verts[did][sad].w > verts[did][ext].w)
 				{
-					if(verts[v].w <= isoval && verts[sad].w >= isoval)
+					if(verts[did][v].w <= isoval && verts[did][sad].w >= isoval)
 					{
 						if(bid == 0)
 							bid = bid1;
@@ -158,7 +158,7 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval)
 				}
 				else 
 				{
-					if(verts[v].w >= isoval && verts[sad].w <= isoval)
+					if(verts[did][v].w >= isoval && verts[did][sad].w <= isoval)
 					{
 						if(bid == 0)
 							bid = bid1;
@@ -265,7 +265,8 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 void Contours::SetChildComps(CompNode* c, float curf, float prevf)
 {
-	SymBranch* b = bd->GetBranch(c->bid);
+	unsigned int did = c->did;
+	SymBranch* b = bd[did]->GetBranch(c->bid);
 	boost::unordered_map<unsigned int, CompNode*>::iterator cit;
 	cit = topcomps.find(c->bid);
 	if(cit != topcomps.end())
@@ -277,7 +278,7 @@ void Contours::SetChildComps(CompNode* c, float curf, float prevf)
 	std::list<SymBranch*>::iterator bit = b->ch.begin();
 	for(; bit != b->ch.end(); bit++)
 	{
-		float sadw = verts[(*bit)->sad].w ;
+		float sadw = verts[did][(*bit)->sad].w ;
 		if(sadw >= prevf && sadw < curf)
 		{
 			cit = topcomps.find((*bit)->bid);
@@ -291,7 +292,7 @@ void Contours::SetChildComps(CompNode* c, float curf, float prevf)
 
 }
 
-void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr)
+void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPointer<vtkContourFilter> ctr, unsigned int did)
 {
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 	vtkSmartPointer<vtkCleanPolyData> cleanpolydata = vtkSmartPointer<vtkCleanPolyData>::New();
@@ -322,7 +323,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		else if(polydata->GetNumberOfPoints() > fsz)
 		{
 			char fn[100];
-			int bid = FindBranchId(polydata, isoval);
+			int bid = FindBranchId(polydata, isoval, did);
 			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(bid == -1) 
@@ -336,7 +337,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				assert(0);
 				continue;
 			}
-			SymBranch* b = bd->GetBranch(bid);
+			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
 			if(cit != b->comps.end())
@@ -347,6 +348,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				b->comps[fid] = c->id;
 				GenCompCords(c, polydata);
 				c->csz = polydata->GetNumberOfPoints();
+				c->did = did;
 				compmgr->AddComp(c);
 				sprintf(fn,"%d.vtk",c->id);
 			}
@@ -355,7 +357,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
 				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
-			std::cout<<" ext "<<verts[bd->bridsarr[bid]->ext].w<<" sad "<<verts[bd->bridsarr[bid]->sad].w<<std::endl;
+			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 			writer->SetFileName(fn);
 			trifil->SetInput(polydata);
 			writer->SetInputConnection(trifil->GetOutputPort());
@@ -372,10 +374,10 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 	}
 }
 
-void Contours::GenerateIsoSpace()
+void Contours::GenerateIsoSpace(unsigned int did)
 {
 	vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
-	ctr->SetInput(tgrid);
+	ctr->SetInput(tgrid[did]);
 	//ctr->SetInputConnection(reader->GetOutputPort());
 	ctr->ComputeNormalsOff();
 	ctr->ComputeGradientsOff();
@@ -387,17 +389,17 @@ void Contours::GenerateIsoSpace()
 	{
 		ctr->SetValue(0, fvals[i]);
 		ctr->Update();
-		ProcessIsoSurface(i, prev, ctr);
+		ProcessIsoSurface(i, prev, ctr, did);
 		prev = i;
 	}
 	compmgr->ClusterComps();
 }
 
-Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcontours)
+Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours)
 			: allcts(allcontours), cid(0)
 {
 	vtkSmartPointer<vtkStructuredPointsReader> reader = vtkStructuredPointsReader::New();
-	reader->SetFileName(fname);
+	reader->SetFileName(fname1);
 	reader->Update();
 	trifil = vtkSmartPointer<vtkTriangleFilter>::New();
 	writer = vtkSmartPointer<vtkPolyDataWriter>::New();
@@ -405,8 +407,18 @@ Contours::Contours(const char* fname, vtkSmartPointer<vtkAppendPolyData> allcont
 
 	vtkSmartPointer<vtkDataSetTriangleFilter> vtktet = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
 	vtktet->SetInputConnection(reader->GetOutputPort());
-	tgrid = vtktet->GetOutput();
-	tgrid->Update();
+	tgrid.push_back(vtktet->GetOutput());
+	tgrid[0]->Update();
+
+	if(fname2)
+	{
+		reader->SetFileName(fname2);
+		reader->Update();
+		vtktet->SetInputConnection(reader->GetOutputPort());
+		tgrid.push_back(vtktet->GetOutput());
+		tgrid[1]->Update();
+
+	}
 }
 
 Contours::~Contours()
@@ -414,7 +426,7 @@ Contours::~Contours()
 }
 
 
-void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv)
+void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
 {
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
@@ -427,44 +439,47 @@ void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned i
 			ps->SetComponent(i,0, w);
 		}
 		tgrid->GetPoint(i,p);
-		verts.push_back(Vertex(p,w));
+		verts[did].push_back(Vertex(p,w));
 	}
 	int dim[3];
 	/*vtkstrpts->GetDimensions(dim);
 	bd = new BD(verts, dim[0], dim[1], dim[2]);*/
-	bd = new BD(verts, tgrid);
+	bd.push_back(new BD(verts[did], tgrid));
 	std::vector<unsigned int> sadidx;
-	bd->BuildBD(sadidx);
-	Sampler s(bd, sadidx, verts);
+	bd[did]->BuildBD(sadidx);
+	Sampler s(bd[did], sadidx, verts[did]);
 	s.Sample(fvals);
 }
 
-void Contours::ExtractSymmetry(unsigned int inv)
+void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 {
-	double range[2];
-	tgrid->GetScalarRange(range);
-
-	Preprocess(tgrid, inv);
-
 	compmgr = new CompMgr(fvals, bd);
-	vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
-	bidarray->SetName("bids");
-	std::vector<int> & bmap = bd->GetVertMap();
-	bidarray->SetArray(&bmap[0], bmap.size(), 1);
-	tgrid->GetPointData()->AddArray(bidarray);
-	tgrid->Update();
+	for(unsigned int did = 0; did < dcnt; did++)
+	{
+		Preprocess(tgrid[did], inv, did);
 
-	vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
-		vtkSmartPointer<vtkStructuredPointsWriter>::New();
-	vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
-		vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-	//strpwriter->SetInput(vtkstrpts);
-	//strpwriter->SetFileName("t.vtk");
-	//strpwriter->Update();
-	ugwriter->SetInput(tgrid);
-	ugwriter->SetFileName("u.vtk");
-	ugwriter->Update();
+		vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
+		bidarray->SetName("bids");
+		std::vector<int> & bmap = bd[did]->GetVertMap();
+		bidarray->SetArray(&bmap[0], bmap.size(), 1);
+		tgrid[did]->GetPointData()->AddArray(bidarray);
+		tgrid[did]->Update();
 
-	GenerateIsoSpace();
+		vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
+			vtkSmartPointer<vtkStructuredPointsWriter>::New();
+		vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
+			vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+		//strpwriter->SetInput(vtkstrpts);
+		//strpwriter->SetFileName("t.vtk");
+		//strpwriter->Update();
+		ugwriter->SetInput(tgrid[did]);
+		if(did == 0)
+			ugwriter->SetFileName("u1.vtk");
+		else
+			ugwriter->SetFileName("u2.vtk");
+		ugwriter->Update();
+
+		GenerateIsoSpace(did);
+	}
 }
 

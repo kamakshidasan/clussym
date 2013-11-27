@@ -392,7 +392,6 @@ void Contours::GenerateIsoSpace(unsigned int did)
 		ProcessIsoSurface(i, prev, ctr, did);
 		prev = i;
 	}
-	compmgr->ClusterComps();
 }
 
 Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours)
@@ -429,6 +428,7 @@ Contours::~Contours()
 void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
 {
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
+	verts.push_back(std::vector<Vertex>());
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
 		double p[3];
@@ -447,17 +447,21 @@ void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned i
 	bd.push_back(new BD(verts[did], tgrid));
 	std::vector<unsigned int> sadidx;
 	bd[did]->BuildBD(sadidx);
-	Sampler s(bd[did], sadidx, verts[did]);
-	s.Sample(fvals);
+	if(did == 0)
+	{
+		Sampler s(bd[did], sadidx, verts[did]);
+		s.Sample(fvals);
+	}
 }
 
 void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 {
-	compmgr = new CompMgr(fvals, bd);
+	compmgr = new CompMgr(bd);
 	for(unsigned int did = 0; did < dcnt; did++)
 	{
 		Preprocess(tgrid[did], inv, did);
-
+		if(did == 0)
+			compmgr->Init(fvals);
 		vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
 		bidarray->SetName("bids");
 		std::vector<int> & bmap = bd[did]->GetVertMap();
@@ -481,5 +485,6 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 
 		GenerateIsoSpace(did);
 	}
+	compmgr->ClusterComps();
 }
 

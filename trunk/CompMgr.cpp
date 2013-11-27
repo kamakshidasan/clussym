@@ -6,8 +6,13 @@
 #include <stdio.h>
 #include <lemon/matching.h>
 
-CompMgr::CompMgr(std::vector<float> & fnvals, std::vector<BD*> & pbd) : fnmap(fnvals.size()), fvals(fnvals), bd(pbd)
+CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd)
 {
+}
+void CompMgr::Init(std::vector<float> & fnvals)
+{
+	fvals = fnvals;
+	fnmap = std::vector<std::vector<unsigned int> > (fnvals.size());
 }
 void CompMgr::AddComp(CompNode* c)
 {

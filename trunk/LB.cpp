@@ -299,10 +299,10 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 
 	printf("Eigen Values :\n");
-	for(unsigned int i = 1; i <= 10; i++)
+	for(unsigned int i = 0; i < 10; i++)
 	{
-		cords.push_back(1.0/(eigs.eigenvalues()[i]));
-		printf("%lf ", cords[i-1]);
+		cords.push_back(1.0/(eigs.eigenvalues()[i+1]));
+		printf("%f ", cords[i]);
 	}
 	printf("\n");
 //	std::cout<<"Eigen EigenVals: "<<eigs.eigenvalues().transpose()<<std::endl;

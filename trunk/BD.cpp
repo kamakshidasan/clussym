@@ -119,7 +119,8 @@ size_t neighbours(size_t v, size_t * ar, void* data)
 {
 	BD* bd = (BD*) data;
 	std::vector<unsigned int> nbrs;
-	bd->GetTNeighbours(v, nbrs, 0);
+	//bd->GetTNeighbours(v, nbrs, 0);
+	bd->GetNeighbours(v, nbrs, 0);
 	for(unsigned int i = 0; i < nbrs.size(); i++)
 		ar[i] = nbrs[i];
 	return nbrs.size();

@@ -4,6 +4,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkStructuredPoints.h>
 #include "Elements.hpp"
 #include "CompMgr.hpp"
 #include <vector>
@@ -21,7 +22,8 @@ class Contours
 		~Contours();
 		void ExtractSymmetry(unsigned int inv, unsigned int dcnt);
 	private:
-		void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did);
+		//void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did);
+		void Preprocess(vtkSmartPointer<vtkStructuredPoints> tgrid, unsigned int inv, unsigned int did);
 		std::vector<class BD*> bd;
 		class CompMgr* compmgr;
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);
@@ -29,8 +31,8 @@ class Contours
 		void GenerateIsoSpace(unsigned int did);
 		int FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval, unsigned int did);
 		void SetChildComps(CompNode* c, float curf, float prevf);
-		//vtkStructuredPointsReader* reader;
-		std::vector<vtkSmartPointer<vtkUnstructuredGrid> > tgrid;
+		//std::vector<vtkSmartPointer<vtkUnstructuredGrid> > tgrid;
+		std::vector<vtkSmartPointer<vtkStructuredPoints> > tgrid;
 		vtkSmartPointer<vtkAppendPolyData> allcts;
 		std::vector<std::vector<Vertex> > verts;
 		boost::unordered_map<unsigned int, CompNode*> topcomps;

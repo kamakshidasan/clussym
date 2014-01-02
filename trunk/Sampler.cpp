@@ -11,7 +11,7 @@ void Sampler::PickValues(std::vector<float> & isovals)
 	unsigned int sz = sadidx.size();
 	float maxf = m_vlist[bd->bridsarr[1]->ext].w;
 	float minf = m_vlist[bd->bridsarr[1]->sad].w;
-	float curf = minf, nextf, delta = (maxf - minf)/50;
+	float curf = minf, nextf, delta = (maxf - minf)/20;
 	for(unsigned int i = 1; i < sz; i++)
 	{
 //		std::cout<<"Saddle "<<i<<" at "<<curf<<std::endl;
@@ -88,4 +88,18 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 			}
 		}
 	}
+}
+void Sampler::PropogateValues(std::vector<float> & fvals, float min, float max)
+{
+	std::vector<float> isovals;
+	float curmax = m_vlist[bd->bridsarr[1]->ext].w;
+	float curmin = m_vlist[bd->bridsarr[1]->sad].w;
+
+	for(unsigned int i = 0; i < fvals.size(); i++)
+	{
+		float f = (fvals[i] - min)*(curmax-curmin)/(max - min) + curmin;
+		isovals.push_back(f);
+	}
+	fvals = isovals;
+	RestrictSamples(isovals);
 }

@@ -9,6 +9,7 @@ class Sampler
 	public:
 		Sampler(class BD* pbd, std::vector<unsigned int> & sidx, std::vector<Vertex> & vlist);
 		void Sample(std::vector<float> & isovals);
+		void PropogateValues(std::vector<float> & fvals, float min, float max);
 	private:
 		void PickValues(std::vector<float> & isovals);
 		void RestrictSamples(std::vector<float> & isovals);

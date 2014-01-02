@@ -405,9 +405,10 @@ Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAp
 	writer = vtkSmartPointer<vtkPolyDataWriter>::New();
 
 
-	vtkSmartPointer<vtkDataSetTriangleFilter> vtktet1 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
-	vtktet1->SetInputConnection(reader1->GetOutputPort());
-	tgrid.push_back(vtktet1->GetOutput());
+	//vtkSmartPointer<vtkDataSetTriangleFilter> vtktet1 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
+	//vtktet1->SetInputConnection(reader1->GetOutputPort());
+	//tgrid.push_back(vtktet1->GetOutput());
+	tgrid.push_back(reader1->GetOutput());
 	tgrid[0]->Update();
 
 	if(fname2)
@@ -415,9 +416,10 @@ Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAp
 		vtkSmartPointer<vtkStructuredPointsReader> reader2 = vtkStructuredPointsReader::New();
 		reader2->SetFileName(fname2);
 		reader2->Update();
-		vtkSmartPointer<vtkDataSetTriangleFilter> vtktet2 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
-		vtktet2->SetInputConnection(reader2->GetOutputPort());
-		tgrid.push_back(vtktet2->GetOutput());
+		//vtkSmartPointer<vtkDataSetTriangleFilter> vtktet2 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
+		//vtktet2->SetInputConnection(reader2->GetOutputPort());
+		//tgrid.push_back(vtktet2->GetOutput());
+		tgrid.push_back(reader2->GetOutput());
 		tgrid[1]->Update();
 
 	}
@@ -428,7 +430,8 @@ Contours::~Contours()
 }
 
 
-void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
+//void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
+void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> tgrid, unsigned int inv, unsigned int did)
 {
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
@@ -444,9 +447,9 @@ void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned i
 		verts[did].push_back(Vertex(p,w));
 	}
 	int dim[3];
-	/*vtkstrpts->GetDimensions(dim);
-	bd = new BD(verts, dim[0], dim[1], dim[2]);*/
-	bd.push_back(new BD(verts[did], tgrid));
+	tgrid->GetDimensions(dim);
+	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
+	//bd.push_back(BD(verts[did], tgrid));
 	std::vector<unsigned int> sadidx;
 	bd[did]->BuildBD(sadidx);
 	Sampler s(bd[did], sadidx, verts[did]);
@@ -482,17 +485,19 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 
 		vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
 			vtkSmartPointer<vtkStructuredPointsWriter>::New();
-		vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
-			vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-		//strpwriter->SetInput(vtkstrpts);
+		//vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
+		//	vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+		strpwriter->SetInput(tgrid[did]);
 		//strpwriter->SetFileName("t.vtk");
-		//strpwriter->Update();
-		ugwriter->SetInput(tgrid[did]);
+		strpwriter->Update();
+		//ugwriter->SetInput(tgrid[did]);
 		if(did == 0)
-			ugwriter->SetFileName("u1.vtk");
+			//ugwriter->SetFileName("u1.vtk");
+			strpwriter->SetFileName("u1.vtk");
 		else
-			ugwriter->SetFileName("u2.vtk");
-		ugwriter->Update();
+			//ugwriter->SetFileName("u2.vtk");
+			strpwriter->SetFileName("u2.vtk");
+		strpwriter->Update();
 
 		GenerateIsoSpace(did);
 	}

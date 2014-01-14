@@ -128,17 +128,17 @@
 %}
 \teaser{
 	\centering
-%	\subfigure
+	\subfigure
 	{
-	%	\includegraphics[scale=.295]{figures/1654-full.png}
+		\includegraphics[scale=.295]{figures/1654-full.png}
 	}
-%	\subfigure
+	\subfigure
 	{
-	%	\includegraphics[scale=.295]{figures/1654-seeds.png}
+		\includegraphics[scale=.295]{figures/1654-seeds.png}
 	}
-%	\subfigure
+	\subfigure
 	{
-	%	\includegraphics[scale=.295]{figures/1654-sym.png}
+		\includegraphics[scale=.295]{figures/1654-sym.png}
 	}
 	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
 	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
@@ -183,22 +183,51 @@ Many scientific experiments and simulations generate scalar field data and
 they often contain symmetric or repeating patterns. In many disciplines, 
 symmetry plays an important role in studying the underlying scientific phenomena. 
 For example, in crystallography, symmetry information is used to determine 
-the structure of a crystal. In engineering and manufacturing, symmetry plays 
-an important role in ensuring structural and cost efficiencies. Symmetry is a 
+the structure of a crystal. In product design, symmetry is important to ensure
+functional efficiency and optimal manufacturing cost. Symmetry is a 
 useful cue in bilogoy for determining growth and development of organs. Since 
 the study of symmetric features is of great interest in scientific data 
 analysis, the problem of detecting symmetry in scalar fields has received 
 considerable attention among researchers in the recent past.
 
-Automatic detection of symmetry in scalar fields is a challenging problem and the quest for a widely applicable, efficient, and robust method for symmetry detection has remained largely unanswered. Though symmetry detection in scalar fields is a relatively new area of research, the problem of detecting symmetry in shapes has been well studied in the geometry processing community. These studies have established that clustering based analysis show superior performance in robust
-identification of symmetry. Although some of the methods that use clustering for detecting symmetry in shapes have been extended to scalar fields also, these methods operate by determining symmetry transformations through aggregation of local symmetry of sample points of the domain. Since sample points in a scalar field capture information at a microscale granularity,  these methods face difficulties in extracting and representing symmetric regions and are inefficient.
+Automatic detection of symmetry in scalar fields is a challenging problem and 
+the quest for a widely applicable, efficient, and robust method for symmetry 
+detection has remained largely unanswered. Though symmetry detection in scalar
+fields is a relatively new area of research, the problem of detecting symmetry
+in shapes has been well studied in the geometry processing community.
+These studies have established that clustering based analysis show superior
+performance in robust identification of symmetry. Although some of the methods
+that use clustering for detecting symmetry in shapes have been extended to
+scalar fields also, these methods operate by determining symmetry
+transformations through aggregation of local symmetry of sample points of the
+domain. Since sample points in a scalar field capture information at a
+microscale granularity, these methods face difficulties in extracting and
+representing symmetric regions and are also computationally inefficient.
 
-In this work, we propose a novel symmetry detection method based on the idea of clustering contours. We believe that contours capture information about a scalar field at a macroscale as opposed to points of the domain and hence they are a more meaningful entity for performing a clustering based analysis for symmetry detection. Geometry 
-%Symmetry information in scalar fields
-%has been used to improve transfer function design, exploration of isosurfaces, selection of cross-section
-%planes and view directions, and visualization of features through dual rendering~\cite{ThomN11,HongS08}.
-%We believe that as better techniques for robust detection of symmetry in scalar fields emerge,
-%many more applications of symmetry detection will be explored in the future.
+In this work, we propose a novel symmetry detection method based on the idea of
+clustering contours. We believe that contours capture information about a
+scalar field at a macroscale as opposed to points of the domain and hence they
+are a more meaningful entity for performing a clustering based analysis for
+symmetry detection. Existing methods that use clustering for detecting symmetry
+in scalar fields are based on determining symmetry transformations which is 
+computationally expensive. Our method, on the other hand, maps contours as
+points in a descriptor space such that similar contours lie in close proximity
+to each other.  Thus, the distance between points in the descriptor space 
+captures similarity relationship between the contours and clusters in the 
+descriptor space can be used to determine symmetric regions as illustrated in
+Figure~\ref{teaser}. 
+
+The main contributions of this paper are the following:
+\begin{itemize}
+\item Modelling the problem of symmetry detection in scalar fields
+as a clustering problem in a descriptor space.
+\end{itemize}
+Symmetry information in scalar fields
+has been used for transfer function design, exploration of isosurfaces, selection of cross-section
+planes and view directions, linked selection and editing, query driven exploration
+and visualization of features through dual rendering~\cite{}.
+We believe that as better techniques for robust detection of symmetry in scalar fields emerge,
+many more applications of symmetry detection will be explored in the future.
 
 
 %Computational efficiency is achieved by using a topological data structure called extremum graphs,

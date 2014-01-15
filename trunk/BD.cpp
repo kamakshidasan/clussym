@@ -10,7 +10,7 @@ extern "C" {
 #include <vtkTriangleFilter.h>
 #include <vtkIdList.h>
 
-unsigned int fsz = 37;
+unsigned int fsz = 50;
 void BD::GetTNeighbours(unsigned int id, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	vtkSmartPointer<vtkIdList> cellIdList =	vtkSmartPointer<vtkIdList>::New();
@@ -119,7 +119,8 @@ size_t neighbours(size_t v, size_t * ar, void* data)
 {
 	BD* bd = (BD*) data;
 	std::vector<unsigned int> nbrs;
-	bd->GetTNeighbours(v, nbrs, 0);
+	//bd->GetTNeighbours(v, nbrs, 0);
+	bd->GetNeighbours(v, nbrs, 0);
 	for(unsigned int i = 0; i < nbrs.size(); i++)
 		ar[i] = nbrs[i];
 	return nbrs.size();

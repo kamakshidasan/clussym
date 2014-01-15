@@ -25,7 +25,8 @@
 #include <vtkExtractSelection.h>
 #include <vtkInformation.h>
 #include <vtkDataSetTriangleFilter.h>
-
+#include <vtkImageGaussianSmooth.h>
+#include <vtkImageToStructuredPoints.h>
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Point_with_normal_3.h>
 //#include "Remesh.hpp"
@@ -39,6 +40,7 @@
 #include "CompMgr.hpp"
 #include "Sampler.hpp"
 
+#include <sys/time.h>
 
 /*typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::FT FT;
@@ -106,10 +108,10 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval, u
 		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
 		//vtkstrpts->GetCellPoints(cid, ptids);
 		tgrid[did]->GetCellPoints(cid, ptids);
-		assert(4 == ptids->GetNumberOfIds());
+		assert(8 == ptids->GetNumberOfIds());
 		bid = 0;
 		int inbid = 0, outbid = 0;
-		for(unsigned int i = 0; i < 4; i++)
+		for(unsigned int i = 0; i < 8; i++)
 		{
 			unsigned int v = ptids->GetId(i);
 			unsigned int bid1 = bmap[v];
@@ -316,7 +318,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 
 		if(nreg == 1)
 		{
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
@@ -324,7 +326,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(bid == -1) 
 			{
@@ -334,15 +336,15 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 				std::cout<<"Branch Id is -1!!!"<<std::endl;
-				assert(0);
+				//assert(0);
 				continue;
 			}
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			if(cit != b->comps.end())
+			if(cit != b->comps.end() && cit->second == -1)
 			{
-				assert(cit->second == -1);
+				
 				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
@@ -350,7 +352,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				c->csz = polydata->GetNumberOfPoints();
 				c->did = did;
 				compmgr->AddComp(c);
-				sprintf(fn,"%d.vtk",c->id);
+				sprintf(fn,"%d-%d.vtk",c->did, c->id);
 			}
 			else
 			{
@@ -366,7 +368,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		}
 		else
 		{
-			std::cout<<" fnid "<<fid<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Too few points, not processing"<<std::endl;
 
@@ -397,24 +399,28 @@ void Contours::GenerateIsoSpace(unsigned int did)
 Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours)
 			: allcts(allcontours), cid(0)
 {
-	vtkSmartPointer<vtkStructuredPointsReader> reader = vtkStructuredPointsReader::New();
-	reader->SetFileName(fname1);
-	reader->Update();
+	vtkSmartPointer<vtkStructuredPointsReader> reader1 = vtkStructuredPointsReader::New();
+	reader1->SetFileName(fname1);
+	reader1->Update();
 	trifil = vtkSmartPointer<vtkTriangleFilter>::New();
 	writer = vtkSmartPointer<vtkPolyDataWriter>::New();
 
 
-	vtkSmartPointer<vtkDataSetTriangleFilter> vtktet = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
-	vtktet->SetInputConnection(reader->GetOutputPort());
-	tgrid.push_back(vtktet->GetOutput());
+	//vtkSmartPointer<vtkDataSetTriangleFilter> vtktet1 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
+	//vtktet1->SetInputConnection(reader1->GetOutputPort());
+	//tgrid.push_back(vtktet1->GetOutput());
+	tgrid.push_back(reader1->GetOutput());
 	tgrid[0]->Update();
 
 	if(fname2)
 	{
-		reader->SetFileName(fname2);
-		reader->Update();
-		vtktet->SetInputConnection(reader->GetOutputPort());
-		tgrid.push_back(vtktet->GetOutput());
+		vtkSmartPointer<vtkStructuredPointsReader> reader2 = vtkStructuredPointsReader::New();
+		reader2->SetFileName(fname2);
+		reader2->Update();
+		//vtkSmartPointer<vtkDataSetTriangleFilter> vtktet2 = vtkSmartPointer<vtkDataSetTriangleFilter>::New();
+		//vtktet2->SetInputConnection(reader2->GetOutputPort());
+		//tgrid.push_back(vtktet2->GetOutput());
+		tgrid.push_back(reader2->GetOutput());
 		tgrid[1]->Update();
 
 	}
@@ -425,10 +431,23 @@ Contours::~Contours()
 }
 
 
-void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
+//void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
+void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did)
 {
+	vtkSmartPointer<vtkImageGaussianSmooth> gaussianSmoother =
+		vtkSmartPointer<vtkImageGaussianSmooth>::New();
+
+	gaussianSmoother->SetInput(tgrid);
+	gaussianSmoother->SetStandardDeviations(1,1,1);
+	gaussianSmoother->Update();
+	vtkSmartPointer<vtkImageData> img = gaussianSmoother->GetOutput();
+	vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
+	     vtkSmartPointer<vtkImageToStructuredPoints>::New();
+	i2sp->SetInput(img);
+	i2sp->Update();
+	tgrid = i2sp->GetStructuredPointsOutput();
+
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
-	verts.push_back(std::vector<Vertex>());
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
 		double p[3];
@@ -442,21 +461,30 @@ void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned i
 		verts[did].push_back(Vertex(p,w));
 	}
 	int dim[3];
-	/*vtkstrpts->GetDimensions(dim);
-	bd = new BD(verts, dim[0], dim[1], dim[2]);*/
-	bd.push_back(new BD(verts[did], tgrid));
+	tgrid->GetDimensions(dim);
+	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
+	//bd.push_back(BD(verts[did], tgrid));
 	std::vector<unsigned int> sadidx;
 	bd[did]->BuildBD(sadidx);
+	Sampler s(bd[did], sadidx, verts[did]);
 	if(did == 0)
 	{
-		Sampler s(bd[did], sadidx, verts[did]);
 		s.Sample(fvals);
+	}
+	else
+	{
+		float max = verts[0][bd[0]->bridsarr[1]->ext].w;
+		float min = verts[0][bd[0]->bridsarr[1]->sad].w;
+		s.PropogateValues(fvals, min, max);
 	}
 }
 
 void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 {
+	struct timeval timeval_start, timeval_end;
+	gettimeofday(&timeval_start, NULL);
 	compmgr = new CompMgr(bd);
+	verts = std::vector<std::vector<Vertex> >(dcnt);
 	for(unsigned int did = 0; did < dcnt; did++)
 	{
 		Preprocess(tgrid[did], inv, did);
@@ -468,23 +496,27 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 		bidarray->SetArray(&bmap[0], bmap.size(), 1);
 		tgrid[did]->GetPointData()->AddArray(bidarray);
 		tgrid[did]->Update();
-
+		
 		vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
 			vtkSmartPointer<vtkStructuredPointsWriter>::New();
-		vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
-			vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-		//strpwriter->SetInput(vtkstrpts);
-		//strpwriter->SetFileName("t.vtk");
-		//strpwriter->Update();
-		ugwriter->SetInput(tgrid[did]);
+		//vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
+		//	vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+		strpwriter->SetInput(tgrid[did]);
+		//ugwriter->SetInput(tgrid[did]);
 		if(did == 0)
-			ugwriter->SetFileName("u1.vtk");
+			//ugwriter->SetFileName("u1.vtk");
+			strpwriter->SetFileName("u1.vtk");
 		else
-			ugwriter->SetFileName("u2.vtk");
-		ugwriter->Update();
-
+			//ugwriter->SetFileName("u2.vtk");
+			strpwriter->SetFileName("u2.vtk");
+		strpwriter->Update();
 		GenerateIsoSpace(did);
 	}
 	compmgr->ClusterComps();
+	gettimeofday(&timeval_end, NULL);
+	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
+	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
+	printf("Time: %f Groups %d Branches %d\n", time_end - time_start,0,0);
+	fflush(stdout);
 }
 

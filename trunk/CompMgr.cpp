@@ -16,7 +16,7 @@ void CompMgr::Init(std::vector<float> & fnvals)
 }
 void CompMgr::AddComp(CompNode* c)
 {
-	unsigned int did = c->did;
+	unsigned int did1 = c->did;
 	assert(c->id == comps.size());
 	comps.push_back(c);
 	unsigned int sz = fnmap[c->fnid].size();
@@ -24,7 +24,8 @@ void CompMgr::AddComp(CompNode* c)
 	{
 		unsigned int compidx = fnmap[c->fnid][i];
 		CompNode* other = comps[compidx];
-		if(bd[did]->BrType(c->bid, -1) && bd[did]->BrType(other->bid, -1))
+		unsigned int did2 = other->did;
+		if(bd[did1]->BrType(c->bid, -1) && bd[did2]->BrType(other->bid, -1))
 		{
 			float orgval = c->Vote(other);
 			float val = 0.0;
@@ -236,7 +237,7 @@ void CompMgr::ClusterComps()
 	BuildSimMatrix(A);
 	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
 	Matrix<float, Dynamic, Dynamic> U = A;
-	UpSweep(U);
+	//UpSweep(U);
 	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
 	FormLrw(Lrw, U);
 	std::cout<<"Lrw matrix:"<<std::endl<<Lrw<<std::endl;
@@ -263,7 +264,6 @@ void CompMgr::ClusterComps()
 		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
 		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
 	}
-
 	Matrix<float, Dynamic, Dynamic> eigcords = VD.topLeftCorner(csz, trunc);
 	symcords = Matrix<float, Dynamic, Dynamic>(eigcords.rows(), eigcords.cols()+1);
 	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
@@ -303,6 +303,9 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-(10*diff/std::min(anorm,bnorm)));
+	return exp(-(1*diff/std::min(anorm,bnorm)));
+	
+	
+	
 }
 

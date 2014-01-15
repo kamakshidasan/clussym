@@ -153,7 +153,7 @@ void LB::GetVorArea(double cot[3], double len[3], double triarea, double vorarea
 
 		}
 	}
-
+//	assert(vorarea[0] > 0.0 && vorarea[1] > 0.0 && vorarea[2] > 0.0);
 	//printf("VorArea %f %f %f\n", vorarea[0], vorarea[1], vorarea[2]);
 }
 
@@ -188,6 +188,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			assert(len[0] != 0.0 && len[1] != 0.0 && len[2] != 0.0);
 
 			GetVorArea(cot, len, triarea, vorarea);
+			if(triarea == 0.0) continue;
 
 			sumtriarea += triarea;
 			//assert(fabs(vorarea[0]+vorarea[1]+vorarea[2]-triarea < 0.001));
@@ -195,7 +196,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			ndvorarea[cpts[1]] += vorarea[1];
 			ndvorarea[cpts[2]] += vorarea[2];
 	
-			//printf("VorArea for (%d %d %d) %f %f %f\n", cpts[0], cpts[1], cpts[2], ndvorarea[cpts[0]], ndvorarea[cpts[1]], ndvorarea[cpts[2]]);
+//			printf("VorArea for (%ld %ld %ld) %f %f %f\n", cpts[0], cpts[1], cpts[2], ndvorarea[cpts[0]], ndvorarea[cpts[1]], ndvorarea[cpts[2]]);
 
 			A(cpts[0], cpts[1]) -= cot[2];//2;
 			A(cpts[1], cpts[0]) -= cot[2];//2;
@@ -286,7 +287,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			A(i.first.node[1], i.first.node[0]) /= 2*sqrt(ndvorarea[i.first.node[1]]*ndvorarea[i.first.node[0]]);
 //		aij = A(i.first.node[0], i.first.node[1]);
 //		aji = A(i.first.node[1], i.first.node[0]);
-		assert(fabs(A(i.first.node[0], i.first.node[1]) - A(i.first.node[1], i.first.node[0])) < 0.000001);
+		//assert(fabs(A(i.first.node[0], i.first.node[1]) - A(i.first.node[1], i.first.node[0])) < 0.000001);
 	}
 	//assert(nnzcnt == nnz);
 //	std::cout<< A <<std::endl;

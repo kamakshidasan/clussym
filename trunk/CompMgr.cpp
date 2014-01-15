@@ -303,7 +303,8 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-(0.1*diff/std::min(anorm,bnorm)));
+	return exp(-(1*diff/std::min(anorm,bnorm)));
+	
 	
 	
 }

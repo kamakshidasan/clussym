@@ -25,7 +25,8 @@
 #include <vtkExtractSelection.h>
 #include <vtkInformation.h>
 #include <vtkDataSetTriangleFilter.h>
-
+#include <vtkImageGaussianSmooth.h>
+#include <vtkImageToStructuredPoints.h>
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Point_with_normal_3.h>
 //#include "Remesh.hpp"
@@ -107,10 +108,10 @@ int Contours::FindBranchId(vtkSmartPointer<vtkPolyData> contour, float isoval, u
 		vtkSmartPointer<vtkIdList> ptids = vtkSmartPointer<vtkIdList>::New();
 		//vtkstrpts->GetCellPoints(cid, ptids);
 		tgrid[did]->GetCellPoints(cid, ptids);
-		assert(4 == ptids->GetNumberOfIds());
+		assert(8 == ptids->GetNumberOfIds());
 		bid = 0;
 		int inbid = 0, outbid = 0;
-		for(unsigned int i = 0; i < 4; i++)
+		for(unsigned int i = 0; i < 8; i++)
 		{
 			unsigned int v = ptids->GetId(i);
 			unsigned int bid1 = bmap[v];
@@ -431,8 +432,21 @@ Contours::~Contours()
 
 
 //void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
-void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> tgrid, unsigned int inv, unsigned int did)
+void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did)
 {
+	vtkSmartPointer<vtkImageGaussianSmooth> gaussianSmoother =
+		vtkSmartPointer<vtkImageGaussianSmooth>::New();
+
+	gaussianSmoother->SetInput(tgrid);
+	gaussianSmoother->SetStandardDeviations(1,1,1);
+	gaussianSmoother->Update();
+	vtkSmartPointer<vtkImageData> img = gaussianSmoother->GetOutput();
+	vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
+	     vtkSmartPointer<vtkImageToStructuredPoints>::New();
+	i2sp->SetInput(img);
+	i2sp->Update();
+	tgrid = i2sp->GetStructuredPointsOutput();
+
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
@@ -482,14 +496,12 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 		bidarray->SetArray(&bmap[0], bmap.size(), 1);
 		tgrid[did]->GetPointData()->AddArray(bidarray);
 		tgrid[did]->Update();
-
+		
 		vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
 			vtkSmartPointer<vtkStructuredPointsWriter>::New();
 		//vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
 		//	vtkSmartPointer<vtkUnstructuredGridWriter>::New();
 		strpwriter->SetInput(tgrid[did]);
-		//strpwriter->SetFileName("t.vtk");
-		strpwriter->Update();
 		//ugwriter->SetInput(tgrid[did]);
 		if(did == 0)
 			//ugwriter->SetFileName("u1.vtk");
@@ -498,7 +510,6 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 			//ugwriter->SetFileName("u2.vtk");
 			strpwriter->SetFileName("u2.vtk");
 		strpwriter->Update();
-
 		GenerateIsoSpace(did);
 	}
 	compmgr->ClusterComps();

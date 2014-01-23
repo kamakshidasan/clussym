@@ -240,21 +240,49 @@ and visualization of features through dual rendering~\cite{}.
 We believe that as better techniques for robust detection of symmetry in scalar fields emerge,
 many more applications of symmetry detection will be explored in the future.
 
+\section{Related Work}
+Existing symmetry detection methods in scalar fields can be broadly classified into two
+categories, namely, gemoetry based methods and topology based methods. We briefly review
+these methods in this section.
+\subsection{Geometry based approaches}
+Several methods have been proposed in the literature for detecting
+symmetry in shapes and these methods are described in a survery paper by
+Mitra~et~al.~\cite{}. Some of these methods~\cite{} have been applied to scalar fields~\cite{},
+however they struggle to address the challenges in extending geometric methods to scalar fields.
+Scalar field datasets are typically large in size and hence symmetry detection is computationally costly.
+Geometric methods typically consider geometric information derived from a small region in isolation 
+for symmetry detection. This makes it difficult to infer importance of 
+features in a scalar field and hence these methods perform poorly in handling noisy scalar fields.  
+Moreover, the scalar values are assumed to be continuous over the domain by interpolating the values at 
+the discrete set of points. Since the symmetric counterpart for a given point may be an interpolated 
+point, it is important to consider scalar values of the interpolated points.
 
-%Computational efficiency is achieved by using a topological data structure called extremum graphs,
-%which provide a compact representation of the scalar field. An abstract representation of the extremum
-%graph does not explicitly capture the geometry of the scalar field. 
-%Hence, we augment the extremum graph with geometric information and this results in a geometry-aware
-%symmetry detection method. 
-%Scalar field datasets are typically
-%large in size and often noisy. Even though a scalar field is represented
-%using a discrete set of points, it is often assumed to be 
-%continuous over the domain after interpolating the discrete set of scalar values.
-%Hence, for a given point, its symmetric counterpart may be an interpolated point.
-%Therefore, it is important to consider scalar values of the interpolated points
-%unlike the case of geometric methods 
-%which typically consider only the given discrete set of points for symmetry detection.
-%However, it is still natural to consider extensions of geometric techniques to scalar fields.
+Hong and Shen~\cite{} propose a method to detect global reflective symmetry by identifying planes
+of reflections that minimize the difference between the scalar value at a point and its
+reflection. This method is computationally inefficient and cannot be easily extended to detect 
+other types of symmetry. Kerber~et~al.~\cite{} build a graph from crease line features in a dataset
+and use graph matching to detect symmetry. Since only a small subset of features in scalar field datasets
+contain crease lines, this method is not very useful in practice. Masood~et~al.\cite{} detect
+symmetry by identify symmetry transformations as clusters in the space of all transformations
+by aggregating local symmetry transformations of pairs of points in the domain. This method relies
+on local signatures of the grid points for determining symmetry transformations and as a result
+several parameters need to be tweaked at various stages of the symmetry detection pipeline
+to limit the adverse effects of variations in the local signatures and interpolation errors.  
+Moreover, the transformation space is often cluttered with a lot of spurious transformations 
+and introduces artifacts in the extraction of symmetric regions from the point set. 
+
+The above methods compute geometric transformations between candidate pairs for identifying
+symmetry and is computationally costly. Moreover, these methods being purely driven by local geometric 
+information, do not incorporate any notion of importance of a feature and require every candidate pair 
+to be equally important in their analysis. Our method, on the other hand, uses topological
+information derived from the contour tree to infer importance of a feature and this allows the
+design of a ``feature size sensitive" algorithm from symmetry detection.
+\subsection{Topology based methods}
+Thomas and Natarajan~\cite{} propose topology based methods for symmetry detection and these methods 
+are computationally efficient because they operate on graph representations of the scalar field
+like the contour tree and the extremum graph. The contour tree based method 
+
+
 %\noindent{\textbf{Advantages over contour tree.}} Our method has significant advantages over 
 %the symmetry detection method proposed recently by Thomas and Natarajan, which is 
 %based on detecting similar subtrees of the branch decomposition representation of 

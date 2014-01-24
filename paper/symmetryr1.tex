@@ -278,9 +278,12 @@ to be equally important in their analysis. Our method, on the other hand, uses t
 information derived from the contour tree to infer importance of a feature and this allows the
 design of a ``feature size sensitive" algorithm from symmetry detection.
 \subsection{Topology based methods}
-Thomas and Natarajan~\cite{} propose topology based methods for symmetry detection and these methods 
+Thomas and Natarajan propose topology based methods for symmetry detection and these methods 
 are computationally efficient because they operate on graph representations of the scalar field
-like the contour tree and the extremum graph. The contour tree based method 
+like the contour tree~\cite{} and the extremum graph~\cite{}. The contour tree based method 
+assumes that the subtrees of the contour tree corresponding to symmetric regions are structurally
+similar and detect symmetry by evaluating structural similarity between the subtrees using a scoring
+function.
 
 
 %\noindent{\textbf{Advantages over contour tree.}} Our method has significant advantages over 

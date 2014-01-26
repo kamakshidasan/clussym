@@ -282,8 +282,27 @@ Thomas and Natarajan propose topology based methods for symmetry detection and t
 are computationally efficient because they operate on graph representations of the scalar field
 like the contour tree~\cite{} and the extremum graph~\cite{}. The contour tree based method 
 assumes that the subtrees of the contour tree corresponding to symmetric regions are structurally
-similar and detect symmetry by evaluating structural similarity between the subtrees using a scoring
-function.
+similar and detect symmetry by evaluating structural similarity between the subtrees using a 
+similarity score. This method can detect symmetry at multiple scales but cannot handle
+noise in scalar fields that destroy the repeating structure of the subtrees. To address
+this issue, the extremum graph based method selects a set of extrema called seed set and 
+estimates distances robustly through a graph traversal procedure. A carefully chosen distance 
+threshold is used to disconnect the graph and classify the seeds into different groups called 
+super-seeds. A region growing procedure is then used to identify the symmetric region 
+corresponding to each super-seed. This procedure makes a strong assumption that the symmetric regions
+can be identified purely from the proximity relationship between the seeds. Hence,
+it relies heavily on a meaningful selection of seed set which involves significant effort 
+and understanding about the symmetry of the domain and also requires several thresholds
+to be set.
+
+The above two methods being topological in nature do not ensure that the regions detected by
+them are indeed geometrically symmetric and this is a major shortcoming of these methods.
+Since our method is geometric in nature, it ensures that the regions detected are symmetric.
+Moreover, by utilizing the power of contour tree as a topological abstraction that represents
+the contours of a scalar field, our method offers significant advantage over existing geometry
+based symmetry detection methods. The contour tree provides metadata information about the contours
+and allows integration of topological information in geometric processing and results in smarter
+processing of the contours.
 
 
 %\noindent{\textbf{Advantages over contour tree.}} Our method has significant advantages over 

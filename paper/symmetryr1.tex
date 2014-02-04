@@ -173,12 +173,9 @@
 %% ``\begin{document}'' command. It prepares and prints the title block.
 
 %% the only exception to this rule is the \firstsection command
-\firstsection{Introduction}
-
-\maketitle
-
-
 %-------------------------------------------------------------------------
+\firstsection{Introduction}
+\maketitle
 Many scientific experiments and simulations generate scalar field data and 
 they often contain symmetric or repeating patterns. In many disciplines, 
 symmetry plays an important role in studying the underlying scientific phenomena. 
@@ -239,7 +236,6 @@ planes and view directions, linked selection and editing, query driven explorati
 and visualization of features through dual rendering~\cite{}.
 We believe that as better techniques for robust detection of symmetry in scalar fields emerge,
 many more applications of symmetry detection will be explored in the future.
-
 \section{Related Work}
 Existing symmetry detection methods in scalar fields can be broadly classified into two
 categories, namely, gemoetry based methods and topology based methods. We briefly review
@@ -303,35 +299,40 @@ the contours of a scalar field, our method offers significant advantage over exi
 based symmetry detection methods. The contour tree provides metadata information about the contours
 and allows integration of topological information in geometric processing and results in smarter
 processing of the contours.
+\section{Definitions}
+Consider a \emph{scalar field}, $f : \mathbb{M}  \rightarrow \mathbb{R}$, defined on a 
+simply connected domain $\mathbb{M}$. The preimage of $f$ for a given value $u \in \mathbb{R}$, 
+$f^{-1}(u)$, is called a \emph{level set} of $f$. A level set may have multiple components
+and each component is called a \emph{contour}. The \emph{contour tree} is a topological 
+data structure that captures the change in the connectivity of the level sets during a 
+sweep of $f$. Consider the following equivalence relation defined on points in $\mathbb{M}$: $x,y 
+\in \mathbb{M}$ are equivalent if they belong to the same contour. The contour
+tree is the quotient space induced by this relation. 
 
+Subdomains $\mathbb{M}_1, \mathbb{M}_2 \subseteq \mathbb{M}$ are said to be \emph{symmetric} 
+if there is a transformation $T$ such that ${\mathbb{M}_2=T(\mathbb{M}_1)}$ and 
+${f(x)=f(T(x))}$ for all $x \in \mathbb{M}_1$. If $c_1$ and $c_2$ are contours that belong to 
+$\mathbb{M}_1$ and $\mathbb{M}_2$ respectively, it is easy to see that if $\mathbb{M}_1$ and 
+$\mathbb{M}_2$ are symmetric then $c_1$ and $c_2$ are also symmetric. We make use of this property
+and detect symmetric subdomains by identifying symmetry of the contours belonging to
+the subdomains. The above definition of symmetry requires computation of the symmetry 
+transformation $T$ which is a costly operation. Let $\mathbb{C}$ be the set of all contours. 
+Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
+where $T$ is any transformation. In other words, $g$ is a function that maps each
+contour to a point in a high dimensional space such that a contour and any symmetric
+copy of it is mapped to the same point. We call this high dimensional space
+\emph{descriptor space}. Thus, if $c_1$ and $c_2$ are perfectly symmetric
+the distance between them in the descriptor space is zero, i.e., 
+$\lVert g(c_1)-g(c_2) \rVert = 0$. 
 
-%\noindent{\textbf{Advantages over contour tree.}} Our method has significant advantages over 
-%the symmetry detection method proposed recently by Thomas and Natarajan, which is 
-%based on detecting similar subtrees of the branch decomposition representation of 
-%the contour tree~\cite{ThomN11}. Since branches corresponding to noise in the data can destroy 
-%the similarity of the subtrees, their method requires the removal of such branches. For this purpose, 
-%the branch decomposition is simplified by removing low persistence branches under the assumption that 
-%only low amplitude noise exists in the data. Though our method also simplifies the extremum graph for 
-%computational efficiency, in contrast to the assumption made by the contour tree based method, we do not necessarily
-%require that the noise is removed through the simplification step. As described above, the presence of noise does not 
-%affect the distance calculation and hence our method can handle noise of larger amplitude in the data.
-%Moreover, our method incorporates geometric information for more effective symmetry detection and also uses a region 
-%growing procedure to identify the largest symmetric 
-%region. In comparison, the method by Thomas and Natarajan ignores geometric information and does not necessarily
-%identify the largest symmetric region.
-%In Fig.~\ref{extterrain}, depending on the noise in the data, the branches corresponding to the noisy hills
-%can merge with the branches corresponding to the mountains in an arbitrary manner.
-%The violet and the blue subtrees in Fig.~\ref{terrain-bd} 
-%show the branch decomposition representation of the symmetric regions in Fig.~\ref{extterrain}.
-%Note that the two subtrees are quite different and hence the subtree matching method cannot
-%identify the symmetric regions.
-%We illustrate this further with a real-world dataset in Section~\ref{resanddis}.
-%In this section, we first present an overview of the proposed method by describing the
-%different stages in the symmetry detection pipeline. Next, we describe the core of the pipeline, 
-%namely traversal of the augmented extremum graph and formation of super-seeds. \subsection{Overview}
-%of detecting symmetry in scalar fields and we believe that several more applications will be
-%explored in the future, not only for visualization, but also for specific domains
-%that can exploit symmetry information.
+In practice, scalar field datasets do not exhibit perfect symmetry and therefore
+it is important to detect symmetry in an approximate sense. If contours $c_1$ and 
+$c_2$ deviate from perfect symmetry, then $c_1$ and $c_2$ will not be mapped
+to the same point in the descriptor space and the distance between
+them in the descriptor space, $\lVert g(c_1)-g(c_2) \rVert$ will be indicative
+of the deviation from perfect symmetry. We say that $c_2$ is \emph{$\epsilon$-symmetric} 
+with respect to $c_1$ if the distance of $c_2$ from $c_1$ in the descriptor 
+space is less than $\epsilon$, i.e., $\lVert g(c_1)-g(c_2) \rVert < \epsilon$.
 
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer

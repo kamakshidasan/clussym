@@ -57,9 +57,9 @@ public:
 	SymBranch* GetBranch(unsigned int bid) { return bridsarr[bid]; };
 	void AppendExportMask(unsigned int, std::vector<unsigned int> & mask);
 	bool BrType(unsigned int bid, int type);	
-	void SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask);
+	void SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fval);
 	void SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval);
-	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask);
+	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float fval);
 	void UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;

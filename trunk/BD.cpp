@@ -265,7 +265,7 @@ bool BD::BrType(unsigned int bid, int type)
 void BD::AppendExportMask(unsigned int, std::vector<unsigned int> & mask)
 {
 }
-void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask)
+void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float fval)
 {
 
 	brmask[br->bid] = 1;
@@ -273,20 +273,21 @@ void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask)
 	std::list<SymBranch*>::iterator bit = br->ch.begin();
 	for(; bit != br->ch.end(); bit++)
 	{
-		MaskBranches(*bit, brmask);
+		if(m_vlist[(*bit)->sad].w < fval)
+			MaskBranches(*bit, brmask, fval);
 	}
 
 }
-void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask)
+void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fval)
 {
 	brmask = std::vector<unsigned int> (bridsarr.size(), 0);
 	SymBranch* br = bridsarr[bid];
-	MaskBranches(br, brmask);
+	MaskBranches(br, brmask, fval);
 }
 void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
 {
-	const float minval = m_vlist[symroot->ext].w;
-	const float maxval = m_vlist[symroot->sad].w;
+	const float minval = m_vlist[symroot->sad].w;
+	const float maxval = m_vlist[symroot->ext].w;
 	char clnm[50];
 	sprintf(clnm, "%d-%d.raw",clid, cid);
 	FILE* fpminbin = fopen(clnm, "w+b");

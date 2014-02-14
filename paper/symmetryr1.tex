@@ -68,7 +68,7 @@
 %\preprinttext{To appear in an IEEE VGTC sponsored conference.}
 
 %% Paper title.
-\title{Detecting Symmetry in Scalar Fields Using\\Augmented Extremum Graphs}
+\title{Symmetry Detection in Scalar Fields by Clustering Contours}
 
 
 %% This is how authors are specified in the journal style
@@ -98,26 +98,15 @@
 %}
 
 %other entries to be set up for journal
-\shortauthortitle{Biv \MakeLowercase{\textit{et al.}}: Detecting Symmetry in Scalar Fields Using Augmented Extremum Graphs}
+\shortauthortitle{Biv \MakeLowercase{\textit{et al.}}: }
 %\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
 
 %% Abstract section.
-\abstract{Visualizing symmetric patterns in the data often helps the domain scientists make important observations 
-	and gain insights about the underlying experiment. Detecting symmetry in scalar fields is a nascent area of
-	research and existing methods that detect symmetry are either not robust in the presence of noise or 
-	computationally costly. We propose a data structure called the augmented extremum graph 
-	and use it to design a novel symmetry detection method based on robust estimation of distances.
-	The augmented extremum graph captures both topological and geometric information of the scalar field
-	and enables robust and computationally efficient detection of symmetry.
-	We apply the proposed method to detect symmetries in cryo-electron microscopy datasets and the
-	experiments demonstrate that the algorithm is capable of detecting symmetry even in the presence of significant noise.
-	We describe novel applications that use the detected symmetry to enhance visualization of scalar field data and 
-	facilitate their exploration.
-} % end of abstract
+\abstract{} % end of abstract
 
 %% Keywords that describe your work. Will show as 'Index Terms' in journal
 %% please capitalize first letter and insert punctuation after last keyword
-\keywords{Scalar field visualization, extremum graph, Morse decomposition, symmetry detection, data exploration.}
+\keywords{}
 
 %% ACM Computing Classification System (CCS). 
 %% See <http://www.acm.org/class/1998/> for details.
@@ -126,28 +115,28 @@
 %\CCScatlist{ % not used in journal version
 %	\CCScat{Computer Graphics}{I.3.6}{Computer Graphics}{Methodology and Techniques}
 %}
-\teaser{
-	\centering
-	\subfigure
-	{
-		\includegraphics[scale=.295]{figures/1654-full.png}
-	}
-	\subfigure
-	{
-		\includegraphics[scale=.295]{figures/1654-seeds.png}
-	}
-	\subfigure
-	{
-		\includegraphics[scale=.295]{figures/1654-sym.png}
-	}
-	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
-	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
-	shows symmetry and noise in the data. (center)~A set of seed cells is chosen as source vertices for traversing
-	the augmented extremum graph of the data. During the traversal, the seed cells merge together to form four
-	symmetric super-seeds. Seed cells that belong to a common super-seed are shown with the same color.
-	(right)~The initial estimate of symmetry is expanded in a region growing stage to identify the symmetric regions.
-	A symmetry-aware transfer function highlights the 4-fold rotational symmetry detected in the Rubisco complex.}
-}
+%%\teaser{
+%%	\centering
+%%	\subfigure
+%%	{
+%%		\includegraphics[scale=.295]{figures/1654-full.png}
+%%	}
+%%	\subfigure
+%%	{
+%%		\includegraphics[scale=.295]{figures/1654-seeds.png}
+%%	}
+%%	\subfigure
+%%	{
+%%		\includegraphics[scale=.295]{figures/1654-sym.png}
+%%	}
+%%	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
+%%	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
+%%	shows symmetry and noise in the data. (center)~A set of seed cells is chosen as source vertices for traversing
+%%	the augmented extremum graph of the data. During the traversal, the seed cells merge together to form four
+%%	symmetric super-seeds. Seed cells that belong to a common super-seed are shown with the same color.
+%%	(right)~The initial estimate of symmetry is expanded in a region growing stage to identify the symmetric regions.
+%%	A symmetry-aware transfer function highlights the 4-fold rotational symmetry detected in the Rubisco complex.}
+%%}
 
 %% Uncomment below to include a teaser figure.
 %%  \teaser{

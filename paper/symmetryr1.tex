@@ -322,7 +322,72 @@ them in the descriptor space, $\lVert g(c_1)-g(c_2) \rVert$ will be indicative
 of the deviation from perfect symmetry. We say that $c_2$ is \emph{$\epsilon$-symmetric} 
 with respect to $c_1$ if the distance of $c_2$ from $c_1$ in the descriptor 
 space is less than $\epsilon$, i.e., $\lVert g(c_1)-g(c_2) \rVert < \epsilon$.
+\section{Symmetry Detection via Contour Clustering}
+Methods based on clustering~\cite{} have shown superior performance in detecting
+symmetry in shapes. However, directly extending these methods to scalar fields
+is not easy. In this section, we describe a novel symmetry detection method
+based on clustering contours of the scalar field.
+\subsection{Overview}
+The main steps of our symmetry detection pipeline is shown in Fig.~\ref{}.
+Given a scalar field as input, we generate a set of contours. For each contour
+thus generated, a descriptor is computed. The descriptor for each contour
+can be considered to be a point in a high dimensional space called the
+descriptor space. The descriptor space is a transformation invariant space,
+i.e., it reverses the effect of geometric transformation on contours and maps
+symmetric contours to the same point in the descriptor space in the case of perfect
+symmetry. Imperfections in symmetry results in imperfections in the mapping.
+Since contours with similar shape have similar descriptors,
+the points in the descriptor space corresponding to approximately symmetric 
+contours will lie in close proximity to each other. Thus symmetric contours
+can be detected by identifying clusters in the descriptor space. The volumetric
+region enclosed by the contours in a cluster is then reported as
+symmetric regions.
+\subsection{Contour Generation}
+Symmetric regions are detected by our method by identifying symmetry of the contours 
+belonging to these regions. Hence, each region should be represented 
+by a contour belonging to it. The obvious method of generating contours from isovalues
+sampled uniformly from the range of the function values of the scalar field has several
+drawbacks. A coarse uniform sampling may result in no contours getting generated from
+a region and thus fail to detect it as a symmetric region while a fine sampling will lead
+to multiple contours getting generated from the same region and hence result in redundant
+computations. Ideally, each symmetric region should require only a single representative
+contour belonging to the region to be processed.
+The contour tree is a powerful tool that captures information about contours and we leverage
+information obtained from the contour tree for optimal generation of contours. Each arc of
+the contour tree represents a family of contours that are topologically equivalent. These
+contours are nested one inside the other and each contour is typically a scaled version
+of the contour nested inside it. Hence, to capture the geometry of the family
+of contours corresponding to an arc of the contour tree, it is necessary to select only one
+contour from each arc of the contour tree.
 
+Selecting a representative contour from each arc of the contour tree ensures that no regions
+are missed in the subsequent symmetry analysis. However, for noisy scalar fields, a large
+number of arcs of the contour tree may correspond to noise. Selecting a contour from each
+arc of the contour tree will result in significant amount of computational time spent in
+processing these noisy contours and will lead to poor performance. To overcome this problem,
+we generate a contour from from an arc of the contour tree only if the volume of the largest
+contour associated with the arc is above a user defined threshold. This volume approximated
+as the number of vertices of the domain enclosed by the contour. Since each arc of the contour
+tree can be associated with the set of vertices of the domain that comprise the subvolume 
+corresponding to the arc, this estimation of the volume can be done efficiently.
+In the absence of the metadata information provided by the contour tree all contours would
+have had to be treated as equally important and it would neither have been possible to ensure
+that that each region had a representative contour nor suppress generation of
+multiple contours from the same region or contours from noisy regions.
+\subsection{Contour Representation in Descriptor Space}
+Designing shape descriptors for shape matching is a well studied area in the 
+geometry processing community. Shape matching is typically performed for pairs
+of shapes by comparing the corresponding descriptors. As opposed to an approach based
+on pairwise comparisons, a clustering based approach is more suited for symmetry
+detection since it requires identification of a collection of similar regions.
+In our method, each region is represented by a contour belonging to the region and symmetric
+regions are detected by identifying symmetry of the representative contours. The descriptor
+space is a space in which contours are represented as points in a transformation invariant
+manner and hence symmetric contours are mapped to points that lie in close proximity to
+each other. As a result, symmetric contours can be easily identified as clusters in the descriptor
+space.
+
+One of the major advantages of our method is the flexibility it offers in mapping 
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

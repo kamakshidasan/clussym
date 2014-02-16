@@ -387,7 +387,15 @@ manner and hence symmetric contours are mapped to points that lie in close proxi
 each other. As a result, symmetric contours can be easily identified as clusters in the descriptor
 space.
 
-One of the major advantages of our method is the flexibility it offers in mapping 
+One of the major advantages of our method is that it can be used as a generic framework
+for detecting similar regions in a scalar field. The notion of similarity is subjective
+and varies from application to application and our method offers flexibility in choosing
+the right descriptor for an application. Thus, if an application is interested in identifying
+similarity only with respect to rotation, a rotation invariant descriptor may be used.
+The only prerequisite on the descriptor is that it should be discriminative, i.e., contours
+which are similar should be mapped to points that are nearby in the descriptor space while
+contours that differ from each other should be mapped to far away points.
+
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

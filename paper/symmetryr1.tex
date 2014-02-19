@@ -395,7 +395,41 @@ similarity only with respect to rotation, a rotation invariant descriptor may be
 The only prerequisite on the descriptor is that it should be discriminative, i.e., contours
 which are similar should be mapped to points that are nearby in the descriptor space while
 contours that differ from each other should be mapped to far away points.
+\subsection{Contour Clustering and Region Extraction}
+As described earlier, a set of contours can be mapped to points in a high
+dimensional descriptor space and clusters in this space can be used to identify
+symmetric contours. Strictly speaking, such a mapping of contours to points in the
+descriptor space is not a prerquisite for clustering. A symmetry correspondence
+graph can be constructed from a set of contours by representing each contour
+as a node in the graph and inserting an edge between two nodes if the corresponding
+contours are symmetric. It is easy to see that contours that are symmetric form
+a clique under this representation and these cliques can be identified to detect
+symmetric contours. Thus, given a function that assigns a similarity correspondence
+between a pair of contours, the contours can be classified into clusters independent
+of the actual definition of similarity which may be application dependent. For symmetry
+detection, distance between points in the descriptor space may be used to assign
+correspondence between pairs of contours. Alternatively, any standart clustering
+method may be used to detect clusters in the descriptor space since the points 
+corresponding to symmetric contours lie in close proximity to each other.
 
+Given a set of contours identified to be symmetric, the arc in the contour tree 
+corresponding to each of the contour can be determined and the region of the domain
+enclosed by the largest contour of the arc can be extracted as the symmetric region.
+Although this works well in practice, it is possible that an application needs to
+consider the symmetry relationship of all the contours in a region to be incorporated 
+in the symmetry detection algorithm. This presents a challenge in directly using 
+clusters in the descriptor space for detecting symmetric region. Note  that the 
+cluster in the descriptor space corresponding to a set of symmetric contours may 
+not contain points corresponding to contours nested within the symmetric contours. 
+This is because the descriptor space is not continuous with respect to the evolution 
+of the shape of a contour during a level set sweep. For example, the contours shown in
+blue in Fig.~\ref{} merge during the level set sweep and the shape of the contours 
+after the merge is shown in green. Note that the shape of the contour after the merge 
+is considerably different from the shape of the individual contours before the merge. 
+As a result, the distance between points in the descriptor space corresponding to 
+isosurface components just before and after a merge can be significantly high.
+
+To address this issue, 
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

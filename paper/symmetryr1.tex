@@ -115,28 +115,28 @@
 %\CCScatlist{ % not used in journal version
 %	\CCScat{Computer Graphics}{I.3.6}{Computer Graphics}{Methodology and Techniques}
 %}
-%%\teaser{
-%%	\centering
-%%	\subfigure
-%%	{
-%%		\includegraphics[scale=.295]{figures/1654-full.png}
-%%	}
-%%	\subfigure
-%%	{
-%%		\includegraphics[scale=.295]{figures/1654-seeds.png}
-%%	}
-%%	\subfigure
-%%	{
-%%		\includegraphics[scale=.295]{figures/1654-sym.png}
-%%	}
-%%	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
-%%	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
-%%	shows symmetry and noise in the data. (center)~A set of seed cells is chosen as source vertices for traversing
-%%	the augmented extremum graph of the data. During the traversal, the seed cells merge together to form four
-%%	symmetric super-seeds. Seed cells that belong to a common super-seed are shown with the same color.
-%%	(right)~The initial estimate of symmetry is expanded in a region growing stage to identify the symmetric regions.
-%%	A symmetry-aware transfer function highlights the 4-fold rotational symmetry detected in the Rubisco complex.}
-%%}
+\teaser{
+	\centering
+	\subfigure
+	{
+		\includegraphics[scale=.33]{figures/1897-full.png}
+	}
+	\subfigure
+	{
+		\scalebox{.33}{\input{xfig/desspace.pdf_t}}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=.33]{figures/1897-sym.png}
+	}
+	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
+	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
+	shows symmetry and noise in the data. (center)~A set of seed cells is chosen as source vertices for traversing
+	the augmented extremum graph of the data. During the traversal, the seed cells merge together to form four
+	symmetric super-seeds. Seed cells that belong to a common super-seed are shown with the same color.
+	(right)~The initial estimate of symmetry is expanded in a region growing stage to identify the symmetric regions.
+	A symmetry-aware transfer function highlights the 4-fold rotational symmetry detected in the Rubisco complex.}
+}
 
 %% Uncomment below to include a teaser figure.
 %%  \teaser{
@@ -169,12 +169,12 @@ Many scientific experiments and simulations generate scalar field data and
 they often contain symmetric or repeating patterns. In many disciplines, 
 symmetry plays an important role in studying the underlying scientific phenomena. 
 For example, in crystallography, symmetry information is used to determine 
-the structure of a crystal. In product design, symmetry is important to ensure
-functional efficiency and optimal manufacturing cost. Symmetry is a 
-useful cue in bilogoy for determining growth and development of organs. Since 
+the structure of a crystal~\cite{som07}. In product design, symmetry is important 
+to ensure functional efficiency and optimal manufacturing cost~\cite{booth02}. Symmetry is a 
+useful cue in biology for determining growth and development of organs~\cite{stev06}. Since 
 the study of symmetric features is of great interest in scientific data 
 analysis, the problem of detecting symmetry in scalar fields has received 
-considerable attention among researchers in the recent past.
+considerable attention among researchers in the recent past~\cite{ThomN11,HongS08,KerbWKS11,ThomN13,MasoodTN13}.
 
 Automatic detection of symmetry in scalar fields is a challenging problem and 
 the quest for a widely applicable, efficient, and robust method for symmetry 
@@ -747,7 +747,7 @@ To address this issue,
 %
 %%-------------------------------------------------------------------------
 %
-%\bibliographystyle{eg-alpha}
+\bibliographystyle{abbrv}
 \acknowledgments{
 This work was supported by a grant from Department of Science and
 Technology, India (SR/S3/EECE/0086/2012) and by the Robert Bosch
@@ -755,7 +755,6 @@ Centre for Cyber Physical Systems, Indian Institute of Science. Travel
 was supported by IBM travel grant.
 Volume rendered images
 used in the paper were generated using Voreen (www.voreen.org).}
-\bibliographystyle{abbrv}
 \bibliography{db}
 %
 %\bibliography{egbibsample}

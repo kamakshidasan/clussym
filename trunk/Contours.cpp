@@ -316,13 +316,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
 
-		/*if(nreg == 1)
+		if(nreg == 1)
 		{
 			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
-		}*/
-		if(polydata->GetNumberOfPoints() > fsz)
+		}
+		else if(polydata->GetNumberOfPoints() > fsz)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
@@ -342,8 +342,8 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			//if(cit != b->comps.end() && cit->second == -1)
-			if(cit == b->comps.end())// && cit->second == -1)
+			if(cit != b->comps.end() && cit->second == -1)
+			//if(cit == b->comps.end())// && cit->second == -1)
 			{
 				
 				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;

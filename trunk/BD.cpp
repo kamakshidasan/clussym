@@ -167,7 +167,7 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid,
 
 
 
-BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) : m_vlist(verts)
+BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) : m_vlist(verts), first(1)
 {
 	vtkSmartPointer<vtkExtractEdges> extractEdges =
 		vtkSmartPointer<vtkExtractEdges>::New();
@@ -278,10 +278,24 @@ void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float f
 	}
 
 }
-void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fval)
+void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fisoval)
 {
 	brmask = std::vector<unsigned int> (bridsarr.size(), 0);
 	SymBranch* br = bridsarr[bid];
+	SymBranch* root = bridsarr[1];
+	float fval = m_vlist[br->sad].w;
+	float totper = m_vlist[root->ext].w - m_vlist[root->sad].w;
+	std::list<SymBranch*>::iterator bit = br->ch.begin();
+	for(; bit != br->ch.end(); bit++)
+	{
+		unsigned int chsad = (*bit)->sad;
+		float fchval = m_vlist[chsad].w;
+		if(fchval > fisoval && fchval < fval)
+		{
+			float per = (fchval - m_vlist[(*bit)->ext].w)/totper;
+			if(fabs(per) > 0.01) fval = fchval;
+		}
+	}
 	MaskBranches(br, brmask, fval);
 }
 void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
@@ -292,13 +306,48 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 	sprintf(clnm, "%d-%d.raw",clid, cid);
 	FILE* fpminbin = fopen(clnm, "w+b");
 
-	vmask = std::vector<unsigned int> (m_vlist.size(), 0);
+	std::vector<unsigned int> umask = std::vector<unsigned int> (m_vlist.size(), 0);
+	if(first)
+	{
+		umask = std::vector<unsigned int> (m_vlist.size(), 1);
+		first = 0;
+	}
+	else
+	{
+		vmask = std::vector<unsigned int> (m_vlist.size(), 0);
+		for(unsigned int i = 0; i < m_vlist.size(); i++)
+		{
+			if(brmask[vtobrmap[i]] && m_vlist[i].w <= fval)
+			{
+				vmask[i] = 1;
+				umask[i] = 1;
+			}
+			if(vmask[i] == 1)
+			{
+				unsigned int x,y,z,k;
+				DeIndex(i,x,y,z, SIZEX,SIZEY,SIZEZ);
+				for(unsigned int xi = x - 1; xi <= x +1; xi++)
+				{
+					for(unsigned int yi = y - 1; yi <= y+1; yi++)
+					{
+						for(unsigned int zi = z - 1; zi <= z+1; zi++)
+						{
+
+							if(xi >= 0 && xi < SIZEX && yi >= 0 && yi < SIZEY && zi >= 0 && zi < SIZEZ)
+							{
+								unsigned int k = Index(xi,yi,zi,SIZEX,SIZEY,SIZEZ);
+								umask[k] = 1;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	for(unsigned int i = 0; i < m_vlist.size(); i++)
 	{
-		if(brmask[vtobrmap[i]] && m_vlist[i].w <= fval)
-			vmask[i] = 1;
-
-		if(vmask[i])
+		if(umask[i])
 		{
 			unsigned char val = (m_vlist[i].w - minval)/(maxval - minval)*(255);
 			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
@@ -309,6 +358,8 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 			val = 255;
 			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
 		}
+
+
 	}
 	fclose(fpminbin);
 

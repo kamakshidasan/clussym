@@ -28,7 +28,7 @@ void Sampler::PickValues(std::vector<float> & isovals)
 void Sampler::Sample(std::vector<float> & isovals)
 {
 	PickValues(isovals);	
-	//RestrictSamples(isovals);
+	RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {
@@ -101,5 +101,5 @@ void Sampler::PropogateValues(std::vector<float> & fvals, float min, float max)
 		isovals.push_back(f);
 	}
 	fvals = isovals;
-	//RestrictSamples(isovals);
+	RestrictSamples(isovals);
 }

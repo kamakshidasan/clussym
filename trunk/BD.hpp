@@ -70,6 +70,7 @@ public:
 	int SIZEX;
 	int SIZEY;
 	int SIZEZ;
+	unsigned int first;
 	vtkSmartPointer<vtkPolyData> mesh;
 };
 #endif

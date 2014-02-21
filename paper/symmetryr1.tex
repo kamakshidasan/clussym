@@ -117,25 +117,26 @@
 %}
 \teaser{
 	\centering
-	\subfigure
+	\subfigure[]
 	{
 		\includegraphics[scale=.33]{figures/1897-full.png}
 	}
-	\subfigure
+	\subfigure[]
 	{
 		\scalebox{.33}{\input{xfig/desspace.pdf_t}}
 	}
-	\subfigure
+	\subfigure[]
 	{
 		\includegraphics[scale=.33]{figures/1897-sym.png}
 	}
-	\caption{\label{teaser}Robust scalar field symmetry identification algorithm detects symmetry even in the presence of significant noise
-	in the electron microscopy data of the Rubisco RbcL8-RbcX2-8 complex (EMDB 1654). (left)~Volume rendering 
-	shows symmetry and noise in the data. (center)~A set of seed cells is chosen as source vertices for traversing
-	the augmented extremum graph of the data. During the traversal, the seed cells merge together to form four
-	symmetric super-seeds. Seed cells that belong to a common super-seed are shown with the same color.
-	(right)~The initial estimate of symmetry is expanded in a region growing stage to identify the symmetric regions.
-	A symmetry-aware transfer function highlights the 4-fold rotational symmetry detected in the Rubisco complex.}
+	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the electron microscopy 
+	data of AMP-activated kinase (EMDB-1897). (a)~Volume rendering of the data shows different symmetric patterns
+	which exhibit 3-fold rotational symmetry. (b)~Contours belonging to symmetric regions are also symmetric and these
+	contours can be represented as points in a high dimensional descriptor space (shown in 2D for illustration) using
+	a suitable shape descriptor. Since similar contours have similar descriptors, points corresponding to symmetric contours 
+	form a cluster in the descriptor space and can be easily identified.  Three such clusters detected are shown in orange, 
+	blue, and pink. (c)~Symmetric regions in the volume corresponding to the symmetric contours are extracted and three 
+	different symmetric regions are highlighted in orange, blue, and pink corresponding to the three clusters of contours.}
 }
 
 %% Uncomment below to include a teaser figure.
@@ -178,10 +179,10 @@ considerable attention among researchers in the recent past~\cite{ThomN11,HongS0
 
 Automatic detection of symmetry in scalar fields is a challenging problem and 
 the quest for a widely applicable, efficient, and robust method for symmetry 
-detection has remained largely unanswered. Though symmetry detection in scalar
+detection is ongoing. Though symmetry detection in scalar
 fields is a relatively new area of research, the problem of detecting symmetry
 in shapes has been well studied in the geometry processing community.
-These studies have established that clustering based analysis show superior
+These studies have established that clustering based analysis result in superior
 performance in robust identification of symmetry. Although some of the methods
 that use clustering for detecting symmetry in shapes have been extended to
 scalar fields also, these methods operate by determining symmetry

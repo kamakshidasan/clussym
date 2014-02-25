@@ -131,12 +131,13 @@
 	}
 	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the electron microscopy 
 	data of AMP-activated kinase (EMDB-1897). (a)~Volume rendering of the data shows different symmetric patterns
-	which exhibit 3-fold rotational symmetry. (b)~Contours belonging to symmetric regions are also symmetric. Contours 
+	that exhibit 3-fold rotational symmetry. (b)~Contours 
 	are represented as points in a high dimensional descriptor space (shown in 2D for illustration) using
-	a suitable shape descriptor. Since similar contours have similar descriptors, points corresponding to symmetric contours 
-	form a cluster in the descriptor space and can be easily identified.  Three such clusters detected are shown in orange, 
-	blue, and pink. (c)~Symmetric regions in the volume corresponding to the symmetric contours are extracted and three 
-	different symmetric regions are highlighted in orange, blue, and pink corresponding to the three clusters of contours.}
+	a suitable shape descriptor. Contours belonging to symmetric regions are also symmetric and have similar descriptors.
+	Hence, symmetric contours form a cluster in the descriptor space and can be easily identified.  
+	Three such clusters detected are shown in orange, blue, and pink. (c)~Symmetric regions in the volume 
+	corresponding to the symmetric contours are extracted and three different symmetric regions are highlighted 
+	in orange, blue, and pink corresponding to the three clusters.}
 }
 
 %% Uncomment below to include a teaser figure.
@@ -183,30 +184,29 @@ detection is ongoing. Though symmetry detection in scalar
 fields is a relatively new area of research, the problem of detecting symmetry
 in shapes has been well studied in the geometry processing community.
 These studies have established that clustering based analyses result in superior
-performance in robust identification of symmetry. Although some of the methods
+performance in robust identification of symmetry. Some of the methods
 that use clustering for detecting symmetry in shapes have been extended to
-scalar fields also, these methods operate by determining symmetry
+scalar fields. These methods operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
-domain. Scalar field datasets are typically represented using discrete samples
-of scalar values on a discrete set of points that represent the domain under 
+domain. Scalar field datasets are typically represented using scalar values 
+assigned to a discrete set of sample points that represent the domain under 
 consideration. However, the domain and the scalar values are assumed to be continuous by
 interpolating the values at the sample points. Therefore, the sample points in a scalar 
-field capture the lowest level of information whereas scientists are more interested
-in higher level information for studying the underlying physical phenomena
-obtained through feature extraction methods like segmentation and isosurface extraction. 
-Hence, symmetry detection methods based on local information available at the sample points
-face considerable difficulty in representing and extracting meaningful symmetric 
-regions. Moreover, these methods are computationally expensive since the number
-of point samples in scalar field datasets is typically orders of magnitude
+field capture the lowest level of information. In practice, scientists are more interested
+in higher level features, extracted through methods like segmentation and isosurface extraction,
+for studying the underlying physical phenomena. Hence, symmetry detection methods based on 
+local information available at the sample points face considerable difficulty in representing 
+and extracting meaningful symmetric regions. Moreover, these methods are computationally 
+expensive since the number of sample points in scalar field datasets is typically orders of magnitude
 higher than that in geometric shape datasets.
 
-Though it is clear from the methods proposed in the geometry processing community
-that a clustering based analysis offers significant advantages to symmetry detection,
-we believe that unlike shapes, low-level information derived per sample point of the 
+Though it is clear from methods proposed in the geometry processing community
+that a clustering based analysis offers significant advantages for symmetry detection,
+we believe that unlike shapes, low-level information available at the sample points of the 
 domain is not suited for detecting symmetry in scalar fields. In this work, we propose 
 a novel symmetry detection method based on the idea of clustering contours. Isocontours 
 are extensively used in studying scalar field datasets and contours capture information 
-about a scalar field at a macroscale as opposed to points of the domain and hence they
+about a scalar field at a macroscale as opposed to sample points of the domain. Therefore, they
 are more suitable for a clustering based analysis. It is easy to see that contours
 belonging to regions with similar scalar field distribution are symmetric. Using an appropriate
 shape descriptor, our method maps contours as points in the space of descriptors 
@@ -248,11 +248,11 @@ We believe that as better techniques for robust detection of symmetry in scalar 
 many more applications of symmetry detection will emerge.
 \section{Related Work}
 Existing symmetry detection methods in scalar fields can be broadly classified into two
-categories, namely, gemoetry based methods and topology based methods. We briefly review
+categories, namely, geometry based methods and topology based methods. We briefly review
 these methods in this section.
 \subsection{Geometry based approaches}
 Several methods have been proposed in the literature for detecting
-symmetry in shapes and these methods are described in a survery paper by
+symmetry in shapes and these methods are described in a survey paper by
 Mitra~et~al.~\cite{MitPWC2012}. Some of these methods~\cite{Mitra06,KazhdanCDFR03,BokBWSS09} have 
 been applied to scalar fields~\cite{MasoodTN13,HongS08,kerbWKS11}, however they struggle to address 
 the challenges in extending geometric methods to scalar fields.
@@ -458,11 +458,11 @@ similarity only with respect to rotation, a rotation invariant descriptor may be
 The only prerequisite on the descriptor is that it should be discriminative, i.e., contours
 which are similar should be mapped to points that are nearby in the descriptor space while
 contours that differ from each other should be mapped to far away points.
-\subsection{Contour Clustering and Region Extraction}
+\subsection{Contour Clustering}
 As described earlier, a set of contours can be mapped to points in a high
 dimensional descriptor space and clusters in this space can be used to identify
 symmetric contours. Strictly speaking, such a mapping of contours to points in the
-descriptor space is not a prerquisite for clustering. A symmetry correspondence
+descriptor space is not a prerequisite for clustering. A symmetry correspondence
 graph can be constructed from a set of contours by representing each contour
 as a node in the graph and inserting an edge between two nodes if the corresponding
 contours are symmetric. It is easy to see that contours that are symmetric form
@@ -471,9 +471,7 @@ symmetric contours. Thus, given a function that assigns a similarity corresponde
 between a pair of contours, the contours can be classified into clusters independent
 of the actual definition of similarity which may be application dependent. For symmetry
 detection, distance between points in the descriptor space may be used to assign
-correspondence between pairs of contours. Alternatively, any standart clustering
-method may be used to detect clusters in the descriptor space since the points 
-corresponding to symmetric contours lie in close proximity to each other.
+correspondence between pairs of contours. 
 
 Given a set of contours identified to be symmetric, the arc in the contour tree 
 corresponding to each of the contour can be determined and the region of the domain
@@ -492,7 +490,25 @@ is considerably different from the shape of the individual contours before the m
 As a result, the distance between points in the descriptor space corresponding to 
 isosurface components just before and after a merge can be significantly high.
 
-To address this issue, 
+\begin{figure}[h]
+\scalebox{.2}{\input{xfig/bip.pdf_t}}
+\end{figure}
+To address this issue, we incorporate the correspondence between the children contours 
+(contours before merging) while calculating the correspondence between a given pair
+of parent contours (contours after merging). Let $p$ and $q$ be two parent contours
+with children contours ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$ respectively. 
+Assume that the correspondence between any two
+children contours ${c_i}^p$ and ${c_j}^q$ is known - for contours with children,
+the procedure below can be applied bottom up to determine their correspondence
+while for contours that do not have children, the correspondence can be directly 
+determined from the descriptor space. To calculate the correspondence 
+between $p$ and $q$, first the contribution from the children contours 
+is determined. We construct a complete bipartite graph where nodes in the first
+and second partitions are ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$ 
+respectively. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
+with the correspondence between ${c_i}^p$ and ${c_j}^q$. The maximum weight
+matching can then be computed and gives the correspondence between the children
+contours.
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

@@ -543,25 +543,35 @@ before merge is totally different different from the shape of each contour after
 Therefore the points corresponding to the contours before and after the merge may not be
 part of the same cluster. 
 \begin{figure}[h]
-\scalebox{.2}{\input{xfig/bip.pdf_t}}
+\centering
+\scalebox{.15}{\input{xfig/bip.pdf_t}}
+\caption{\label{bip}Maximum weight matching is used to determine the contribution of children
+	contours towards the correspondence score between the parent contours $p$ and $q$. The
+	first and second partitions of the bipartite graph represents the children contours of $p$
+	and $q$ respectively. Each edge is weighted with the correspondence score between the
+	contours represented by the end points of the edge.}
 \end{figure}
 
 To address this issue, we incorporate the correspondence score between the children contours 
 (contours before merging) while calculating the correspondence score between a given pair
 of parent contours (contours after merging). Let $p$ and $q$ be two parent contours
 with children contours ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$ respectively. 
-Assume that the correspondence between any two
+Assume that the correspondence score between any two
 children contours ${c_i}^p$ and ${c_j}^q$ is known - for contours with children,
 the procedure below can be applied bottom up to determine their correspondence
-while for contours that do not have children, the correspondence can be directly 
-determined from the descriptor space. To calculate the correspondence 
+while for contours that do not have children, the correspondence score can be directly 
+determined from the descriptor space. To calculate the correspondence score
 between $p$ and $q$, first the contribution from the children contours 
-is determined. We construct a complete bipartite graph where nodes in the first
+is determined. We construct a bipartite graph where nodes in the first
 and second partitions are ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$ 
-respectively. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
-with the correspondence between ${c_i}^p$ and ${c_j}^q$. The maximum weight
-matching can then be computed and gives the correspondence between the children
-contours.
+respectively, see Figure~\ref{bip}. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
+with the correspondence score between ${c_i}^p$ and ${c_j}^q$. The maximum weight
+matching can then be computed and gives the correspondence score between the children
+contours. The correspondence score between the contours $p$ and $q$ obtained
+directly from the descriptor space is added to the maximum weight matching score
+with appropriate normalization and used as the cumulative
+correspondence score between $p$ and $q$. See Section~\ref{clust} for 
+the details of the normalization scheme we use.
 \section{Implementation}
 In the previous section, we described the generic details of our symmetry
 detection algorithm. In this section, we elaborate on the details of our 
@@ -635,7 +645,19 @@ In our experiments we set $\alpha$ to 1\% of the range of the function values.
 %then a contour is generated at the isovalue $w$ from the arc $lm$.
 %
 \subsection{Shape Descriptor}
-
+As described, the choice of shape descriptor depends on the kind of similarity
+analysis required by an application. For symmetry detection, we use the 
+Laplace-Beltrami spectra as the shape descriptor. The descriptor has been used for 
+shape matching and retrieval and is robust in the 
+presence of noise, deformations in shape, and differences in the underlying 
+triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}. 
+Although it is possible that two different shapes may have the same spectra,
+it is very rare in practice~\cite{reuter2006laplace} and is quite discriminative
+with high precision and recall ratios~\cite{lian2013}. We use the popular cotangent
+weighted scheme for computing the Laplace-Beltrami spectra~\cite{PinkallP93}.
+Computation of the Laplace-Beltrami spectra on large meshes is costly and therefore
+we simplify the contour meshes so that the number of vertices in the mesh is around 2000.
+\subsection{Clustering}\label{clust}
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

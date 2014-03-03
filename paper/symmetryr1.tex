@@ -656,8 +656,35 @@ it is very rare in practice~\cite{reuter2006laplace} and is quite discriminative
 with high precision and recall ratios~\cite{lian2013}. We use the popular cotangent
 weighted scheme for computing the Laplace-Beltrami spectra~\cite{PinkallP93}.
 Computation of the Laplace-Beltrami spectra on large meshes is costly and therefore
-we simplify the contour meshes so that the number of vertices in the mesh is around 2000.
+we simplify the contour meshes so that the number of vertices in the mesh is around 1000.
 \subsection{Clustering}\label{clust}
+The distance between the points in the descriptor space is used to assign 
+a correspondence score between the contours they represent. Let $c_i$
+and $c_j$ be two contours that belong to the same level set and $d$ be
+the distance between their descriptors. The ideal metric for computing
+distances in the descriptor space may be determined using methods like
+metric learning~\cite{Kulis13}, however, we use
+Euclidean distances since it has yielded good results with shape 
+retrieval~\cite{reuter2006laplace,lian2013}. We build a symmetry
+correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
+matrix denotes the correspondence score between the contours $c_i$
+and $c_j$.
+$$s_{ij} = 
+\begin{cases}
+	e^{-\frac{d^2}{\sigma}} & \text{if $c_i$ and $c_j$ belong to the same level set}\\
+	0 & \text{otherwise}
+\end{cases}
+$$
+Here, $\sigma$ is a user defined parameter that controls the quality of symmetry detected
+where higher values tolerate larger deviations in symmetry. We use spectral clustering
+to identify clusters of symmetric contours from $\mathrm{S}$. As described by 
+Lipman~et~al.~\cite{Lip10}, spectral clustering is well suited for identifying
+cliques in the symmetry correspondence graph and clusters of symmetric
+contours can be detected from their spectral coordinates. Any standard clustering
+method may be used to detect the clusters. We observe that the clusters
+are well separated in the spectral domain and for a given contour, we identify
+the set of contours symmetric to it with a simple nearest neighbour search.
+
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

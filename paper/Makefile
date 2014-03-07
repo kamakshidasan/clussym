@@ -14,7 +14,7 @@ TEX = pdflatex
 # three lines after the rule.  Delete .bbl dependency if not using
 # BibTeX references.
 # idea from http://ctan.unsw.edu.au/help/uk-tex-faq/Makefile
-PNGS=$(wildcard figures/*.png)
+#PNGS=$(wildcard figures/*.png)
 FIGS=$(wildcard xfig/*.fig)
 PDFS=$(wildcard figures/*.pdf)
 FIGPDFS=$(FIGS:.fig=.pdf)
@@ -23,7 +23,7 @@ FIGPDFS=$(FIGS:.fig=.pdf)
 	fig2dev -L pdftex $< $@; \
 	fig2dev -L pdftex_t -p $*.pdf $*.fig $*.pdf_t
 
-$(latexfile).pdf : $(PDFS) $(FIGPDFS) $(PNGS)  $(latexfile).tex $(latexfile).bbl
+$(latexfile).pdf : $(PDFS) $(FIGPDFS) $(PNGS) $(latexfile).tex $(latexfile).bbl
 		while ($(TEX) $(latexfile) ; \
 				grep -iq "Rerun to" $(latexfile).log ) do true ; \
 					done

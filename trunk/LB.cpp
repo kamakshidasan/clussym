@@ -185,7 +185,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 			GetCotsLensArea(cpts, pts, cot, len, triarea);
 			
 			//assert(cot[0] != 0.0 && cot[1] != 0.0 && cot[2] != 0.0);
-			assert(len[0] != 0.0 && len[1] != 0.0 && len[2] != 0.0);
+			//assert(len[0] != 0.0 && len[1] != 0.0 && len[2] != 0.0);
 
 			GetVorArea(cot, len, triarea, vorarea);
 			if(triarea == 0.0) continue;
@@ -302,6 +302,7 @@ void LB::GetEigen(vtkPolyData* mesh, std::vector<float> & cords)
 	printf("Eigen Values :\n");
 	for(unsigned int i = 0; i < 10; i++)
 	{
+		//cords.push_back(1.0*(eigs.eigenvalues()[1])/(eigs.eigenvalues()[i+1]));
 		cords.push_back(1.0/(eigs.eigenvalues()[i+1]));
 		printf("%f ", cords[i]);
 	}

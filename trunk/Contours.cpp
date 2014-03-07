@@ -1,16 +1,19 @@
 #include <vtkStructuredPointsWriter.h>
 #include <vtkStructuredPoints.h>
 #include <vtkUnstructuredGridWriter.h>
+#include <vtkUnstructuredGridReader.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkMarchingCubes.h>
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataReader.h>
 #include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPLYWriter.h>
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkDelaunay2D.h>
 #include <vtkDecimatePro.h>
+#include <vtkGeometryFilter.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
@@ -337,13 +340,14 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				writer->Write();
 				std::cout<<"Branch Id is -1!!!"<<std::endl;
 				//assert(0);
+				//bid = 1;
 				continue;
 			}
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
 			if(cit != b->comps.end() && cit->second == -1)
-			//if(cit == b->comps.end())// && cit->second == -1)
+			//if(cit == b->comps.end())
 			{
 				
 				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
@@ -435,7 +439,7 @@ Contours::~Contours()
 //void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
 void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did)
 {
-	vtkSmartPointer<vtkImageGaussianSmooth> gaussianSmoother =
+	/*vtkSmartPointer<vtkImageGaussianSmooth> gaussianSmoother =
 		vtkSmartPointer<vtkImageGaussianSmooth>::New();
 
 	gaussianSmoother->SetInput(tgrid);
@@ -447,7 +451,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	i2sp->SetInput(img);
 	i2sp->Update();
 	tgrid = i2sp->GetStructuredPointsOutput();
-
+	*/
 	vtkSmartPointer<vtkDataArray> ps = tgrid->GetPointData()->GetScalars();
 	for(unsigned int i = 0; i < tgrid->GetNumberOfPoints(); i++)
 	{
@@ -464,7 +468,6 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	int dim[3];
 	tgrid->GetDimensions(dim);
 	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
-	//bd.push_back(BD(verts[did], tgrid));
 	std::vector<unsigned int> sadidx;
 	bd[did]->BuildBD(sadidx);
 	Sampler s(bd[did], sadidx, verts[did]);
@@ -482,6 +485,42 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 
 void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 {
+	/*vtkSmartPointer<vtkUnstructuredGridReader> prdr1 = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+	vtkSmartPointer<vtkUnstructuredGridReader> prdr2 = vtkSmartPointer<vtkUnstructuredGridReader>::New();
+	vtkSmartPointer<vtkPolyData> pd1 = vtkSmartPointer<vtkPolyData>::New();
+	vtkSmartPointer<vtkPolyData> pd2 = vtkSmartPointer<vtkPolyData>::New();
+	prdr1->SetFileName("elcup.vtk");
+//	prdr1->SetFileName("isacup.vtk");
+	prdr1->Update();
+	prdr2->Update();
+
+	vtkGeometryFilter * geometryFilter =  vtkGeometryFilter::New(); 
+	geometryFilter->SetInput(prdr1->GetOutput()); 
+	geometryFilter->Update(); 
+
+	pd1= geometryFilter->GetOutput(); 
+	std::cout << "Output has " << pd1->GetNumberOfPoints() << " points." << std::endl; 
+
+	vtkSmartPointer<vtkTriangleFilter> trifil = vtkSmartPointer<vtkTriangleFilter>::New();
+	trifil->SetInput(pd1);
+	trifil->Update();
+	pd2 = trifil->GetOutput();
+
+	std::cout << "Output has " << pd2->GetNumberOfPoints() << " points." << std::endl; 
+	vtkSmartPointer<vtkQuadricDecimation> decimate = vtkSmartPointer<vtkQuadricDecimation>::New();
+	decimate->SetInputConnection(pd2->GetProducerPort());
+		float target = 0.1;
+		decimate->SetTargetReduction(target);
+		decimate->Update();
+		pd2 = decimate->GetOutput();				
+		std::cout <<"After decimate "<<pd2->GetNumberOfCells()
+			<<" "<<pd2->GetNumberOfPolys()
+			<<" "<<pd2->GetNumberOfPoints()<<std::endl;
+	std::vector<float> c1;
+	std::vector<float> c2;
+	LB lb1;
+	lb1.GetEigen(pd2, c1);
+	exit(0);*/
 	struct timeval timeval_start, timeval_end;
 	gettimeofday(&timeval_start, NULL);
 	compmgr = new CompMgr(bd);

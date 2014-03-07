@@ -210,7 +210,7 @@ void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 			A(itm->first, c->id) = itm->second;
 		}
 		A(c->id, c->id) = 1.0;
-		fncords(c->id,0) = c->fnid*10;
+		fncords(c->id,0) = 0;//c->fnid*10;
 	}
 
 }

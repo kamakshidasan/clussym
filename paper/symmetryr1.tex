@@ -102,7 +102,21 @@
 %\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
 
 %% Abstract section.
-\abstract{} % end of abstract
+\abstract{The complex nature of volumetric data often limits the scope of direct exploration
+of features in the data. Isocontours are quite popular in analysing the characteristics
+of scalar field data due to its simpler presentation and assists users in segmenting
+important features in the data via the contour tree. In this paper, we present a novel representation 
+of contours in a scalar field with the aim of studying the similarity relationship between the 
+contours. The representation maps contours as points in a high dimensional transformation invariant 
+descriptor space. We leverage the power of this representation to design a clustering based algorithm for 
+detecting symmetric regions in a scalar field. Symmetry detection is a challenging problem because it demands
+both segmentation of the data and identification of transformation invariant segments.
+While the former task can be addressed using topological analysis of scalar fields,
+the latter requires geometry based solutions. Our approach combines the two by utilizing the contour
+tree for segmenting the data and the descriptor space for identifying transformation invariance.
+We show the effectiveness of our method in designing applications like query driven exploration using
+contours and asymmetry visualization.
+} % end of abstract
 
 %% Keywords that describe your work. Will show as 'Index Terms' in journal
 %% please capitalize first letter and insert punctuation after last keyword
@@ -685,7 +699,6 @@ contours can be detected from their spectral coordinates. Any standard clusterin
 method may be used to detect the clusters. We observe that the clusters
 are well separated in the spectral domain and for a given contour, we identify
 the set of contours symmetric to it with a simple nearest neighbour search.
-\section{Results}
 \section{Applications}
 \subsection{Query Driven Exploration Using Contours}
 As the size and complexity of data generated through imaging and simulations
@@ -802,7 +815,28 @@ Also, as opposed to the query contour, a significant portion
 of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane makes landfall.
 The volumetric region of the domain extracted in each case is shown in yellow in the context of the rest
 of the volume in Figure~\ref{volisa12}-~\ref{volisa48}.
+\subsection{Asymmetry Visualization}
+Asymmetry in scalar fields often reveals crucial characteristics of the underlying
+physical phenomena. For example, asymmetry between the mammogram images
+of the left and the right breasts is an indicator of cancer~\cite{tahmoush2007improved}.
+Therefore, the study of asymmetry plays a vital role in understanding the characteristics of
+symmetric regions in scalar fields. 
 
+Given a set of contours $c_1,\dots,c_n$ marked as symmetric
+by our algorithm, we determine asymmetry of a contour $c_k$, $1 \leq k \leq n$, with
+respect to the set of remaining contours $S = \{c_1, \dots, c_{k-1}, c_{k+1}, \dots, c_n\}$.
+For this, we first determine the symmetry transformation that maps each $c_i \in S$ onto
+$c_k$ using ICP (iterated closest point) procedure and the respective transformation is applied
+to $c_i$ so that each contour in $S$ is spatially aligned with $c_k$. These spatially
+aligned meshes in $S$ are then glued together to generate a single mesh, say $c_sum$, with 
+respect to which asymmetry of $c_k$ is determined using the Metro tool~\cite{CigRS98}. The tool
+evaluates the distance from the vertices of $c_k$ to the mesh $c_sum$ by computing for each 
+vertex $c_k$ the closest point in $c_sum$. If the distance for a vertex is high, it means that there
+was no point corresponding to it in the rest of the contours which is an indication of asymmetry.
+The distance at each vertex is stored as a scalar field of $c_k$ and the procedure is repeated
+for each contour. The asymmetry in the contours can then be located by visualizing the scalar fields
+as shown in Figure~\ref{asym}.
+\section{Discussion}
 
 \section{Conclusion}
 %All text with the exception of the abstract must be in a two-column format.

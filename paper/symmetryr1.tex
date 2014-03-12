@@ -700,18 +700,18 @@ method may be used to detect the clusters. We observe that the clusters
 are well separated in the spectral domain and for a given contour, we identify
 the set of contours symmetric to it with a simple nearest neighbour search.
 \section{Applications}
+It is easy to see that our method can be used to demonstrate the existing
+applications of identifying symmetry in scalar fields reported earlier
+in the literature. In this section, we describe two new applications
+for improving exploration and visualization of scalar fields.
 \subsection{Query Driven Exploration Using Contours}
 As the size and complexity of data generated through imaging and simulations
 grows, newer paradigms for effective exploration and interaction with
 the data are required. Query driven exploration is one such paradigm that
 facilitates navigation through complex data and is gaining popularity in recent
-years~\cite{BeyerAKLPH13,LiuJH13}. Symmetry information computed from a dataset can be used for query
-driven exploration of data~\cite{ThomN13,MasoodTN13}. A region of interest that is segmented from 
-the domain is used as the query and symmetry information is used to identify
-other regions similar to the query region. Segmentation of the domain into regions of interest
-is often a challenge. Instead, selecting a contour from a region of interest is significantly
-more easy. We demonstrate that our method can be used to explore datasets using a contour as
-the query object.
+years~\cite{BeyerAKLPH13,LiuJH13}. Symmetry regions in a dataset facilitate query
+driven exploration of the data~\cite{ThomN13,MasoodTN13}. A region of interest that is segmented from 
+the domain is used as the query region and symmetry information is used to identify
 \begin{figure*}[t]
 \begin{minipage}{\textwidth}
 	\centering
@@ -746,7 +746,7 @@ the query object.
 	\subfigure[]
 	{
 		\includegraphics[scale=0.12]{figures/isa24.png}
-		\label{conisa12}
+		\label{conisa24}
 	}
 	\subfigure[]
 	{
@@ -769,7 +769,7 @@ the query object.
 	\subfigure[]
 	{
 		\includegraphics[scale=0.09]{figures/isabel24.png}
-		\label{volisa12}
+		\label{volisa24}
 	}
 	\subfigure[]
 	{
@@ -782,7 +782,19 @@ the query object.
 		\label{volisa48}
 	}
 \end{minipage}
+\caption{Query driven exploration using contours. (a)~Volume rendering of the first time step of 
+Isabel dataset shows low pressure region in red. Querying with (b)~a~synthetically generated 
+half-ellipsoid finds (c)~an isocontour with similar shape from the low pressure region. (d)~The low
+pressure region extracted is shown in yellow. (e)-(h)~Isocontours from the low pressure region of the
+first time step isused as the query and detects isocontours from time steps 12, 24, 36, and 48. 
+Note that even though the contours contain noise, they are identified correctly due to the robustness of
+our method. (i)-(l)~The corresponding volumetric region identified is show in yellow.}
 \end{figure*}
+other regions similar to the query. To drive exploration using regions of the domain as query, the domain 
+needs to be segmented and this is often a challenge. Instead, it is significantly more easy to visualize the
+evolution of contours during a level set sweep and select a contour of interest. 
+We demonstrate that our method can be used to explore datasets using a contour as the query object.
+
 A simulation of the hurricane Isabel, which struck the west Atlantic in 2003, was performed
 on a 500$\times$500$\times$100 grid over 48 time steps. Figure~\ref{volisa1} shows a volume rendering
 of the first time step where the scalar field used is pressure and the low pressure region
@@ -804,40 +816,72 @@ We demonstrate querying with
 a synthetic shape to establish the power of the descriptor space as a geometry based representation 
 of the scalar field, but we concede that using a synthetic shape as query object may not be always 
 possible. What is more useful is to select one of the contours from a region of interest as the query
-object and query for similar regions. It is straightforward to see that this approach may be used
+object. It is straightforward to see that this approach may be used
 to navigate through regions of interest within the same dataset similar to earlier approaches~\cite{ThomN13,MasoodTN13}.
 What is more interesting is that the same approach can be extended to search through multiple datasets.
-By using the contour from the first time step shown in Figure~\ref{conisa1} as the query object, we search through 
+By using the contour, shown in Figure~\ref{conisa1}, from the first time step  as the query object, we search through 
 the rest of the time steps and the contours detected as a result of executing the query on four different 
-steps is shown in Figure~\ref{conisa12}-~\ref{conisa48}. The robustness of our method can be seen by observing
-that these contours show variations in their shape and has considerable amount of noise. 
+steps is shown in Figure~\ref{conisa12}-~\ref{conisa48}. Observe that
+the contours show variations in their shape and has considerable amount of noise. 
 Also, as opposed to the query contour, a significant portion
 of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane makes landfall.
+Even with these challenges, the query is successful and emphasizes the robustness of our method.
 The volumetric region of the domain extracted in each case is shown in yellow in the context of the rest
 of the volume in Figure~\ref{volisa12}-~\ref{volisa48}.
 \subsection{Asymmetry Visualization}
 Asymmetry in scalar fields often reveals crucial characteristics of the underlying
-physical phenomena. For example, asymmetry between the mammogram images
-of the left and the right breasts is an indicator of cancer~\cite{tahmoush2007improved}.
-Therefore, the study of asymmetry plays a vital role in understanding the characteristics of
-symmetric regions in scalar fields. 
+physical phenomena. For example, asymmetry between 
+the left and the right breasts in the mammogram images is an indicator of breast 
+cancer~\cite{tahmoush2007improved}. Therefore, the study of asymmetry plays a vital role 
+in understanding the characteristics of symmetric regions in scalar fields. 
+\begin{figure*}[t]
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/asymvol.png}
+		\label{asymvol}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/asymctrs.png}
+		\label{asymctrs}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/asymalign.png}
+		\label{asymalign}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/asym.png}
+		\label{asym}
+	}
+	\caption{Asymmetry visualization. (a)~Volume rendering of a cryo-EM dataset (EMDB-1134) 
+	depicts two symmetric regions. (b)~Two symmetric contours extracted by our algorithm is shown
+in maroon and orange. The tip of the long club-like portion of the contours at the top and bottom is asymmetric.
+(c)~The top contour is aligned with the bottom contour and a distance field is computed. (d)~Asymmetric regions
+in the contours can be distinguished from the dark red regions in the visualization of the distance field.}
+\end{figure*}
 
-Given a set of contours $c_1,\dots,c_n$ marked as symmetric
-by our algorithm, we determine asymmetry of a contour $c_k$, $1 \leq k \leq n$, with
+Given a set of contours $c_1,\dots,c_n$, marked as symmetric
+by our algorithm, we determine asymmetry of contour $c_k$, $1 \leq k \leq n$, with
 respect to the set of remaining contours $S = \{c_1, \dots, c_{k-1}, c_{k+1}, \dots, c_n\}$.
 For this, we first determine the symmetry transformation that maps each $c_i \in S$ onto
-$c_k$ using ICP (iterated closest point) procedure and the respective transformation is applied
-to $c_i$ so that each contour in $S$ is spatially aligned with $c_k$. These spatially
-aligned meshes in $S$ are then glued together to generate a single mesh, say $c_sum$, with 
-respect to which asymmetry of $c_k$ is determined using the Metro tool~\cite{CigRS98}. The tool
-evaluates the distance from the vertices of $c_k$ to the mesh $c_sum$ by computing for each 
-vertex $c_k$ the closest point in $c_sum$. If the distance for a vertex is high, it means that there
+$c_k$ and spatially align $c_i$ with $c_k$ by applying the transformation. 
+The transformation may be determined using a procedure like ICP (Iterative Closest Point).
+These spatially aligned meshes in $S$ are then glued together to generate a single mesh, say $c_{avg}$, 
+with respect to which asymmetry of $c_k$ is determined. For this purpose, we use the 
+\texttt{Metro} tool~\cite{CigRS98} which evaluates the distance from the vertices of the mesh 
+$c_k$ to the mesh $c_{avg}$ by computing for each vertex in $c_k$ the closest point in $c_{avg}$. 
+If the distance for a vertex is high, it means that there
 was no point corresponding to it in the rest of the contours which is an indication of asymmetry.
-The distance at each vertex is stored as a scalar field of $c_k$ and the procedure is repeated
-for each contour. The asymmetry in the contours can then be located by visualizing the scalar fields
+Note that the tool cannot compute distances between contours directly from their original
+spatial coordinates as it requires both the meshes to be spatially aligned. 
+The distance computed at each vertex using \texttt{Metro} is stored as a scalar field of 
+$c_k$ and the procedure is repeated
+for each contour. The asymmetry in the contours can then be located by visualizing the distance fields
 as shown in Figure~\ref{asym}.
 \section{Discussion}
-
 \section{Conclusion}
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer

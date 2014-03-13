@@ -6,6 +6,9 @@
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
+extern "C" {
+#include "tourtre.h"
+}
 
 extern unsigned int fsz;
 class FnCmp
@@ -16,7 +19,20 @@ class FnCmp
 	std::vector<Vertex>* pverts;
 
 };
+class ArcCmp
+{
+	public:
+	ArcCmp(std::vector<Vertex>*  pv) : pverts(pv) {};
+	bool operator ()(ctArc* const &  l, ctArc* const & r);
+	std::vector<Vertex>* pverts;
 
+};
+struct NodeData
+{
+	NodeData(unsigned int s = 0, unsigned int n = 0) : sz(s), num(n) {};
+	unsigned int sz;
+	unsigned int num;
+};
 struct SymBranch
 {
 	SymBranch() : sz(0), csz(0), orgbr(0), totch(0), ht(1) {};
@@ -61,9 +77,12 @@ public:
 	void SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval);
 	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float fval);
 	void UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx);
+	void Sample(std::vector<float> & isovals);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;
+	std::vector<int> arcdata;
+	std::vector<NodeData> nodedata;
 	std::vector<SymBranch*> bridsarr;
 	SymBranch* symroot;
 	unsigned int numbr;
@@ -72,6 +91,10 @@ public:
 	int SIZEZ;
 	unsigned int first;
 	vtkSmartPointer<vtkPolyData> mesh;
+	ctArc** arcsOut;
+	size_t numarcs;
+	ctNode** nodesOut;
+	size_t numNodes;
 };
 #endif
 

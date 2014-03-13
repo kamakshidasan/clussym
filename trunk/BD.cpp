@@ -1,9 +1,6 @@
 #include "BD.hpp"
 #include "Utils.hpp"
 #include <algorithm>
-extern "C" {
-#include "tourtre.h"
-}
 #include <string>
 #include <stdio.h>
 #include <vtkExtractEdges.h>
@@ -135,6 +132,12 @@ bool FnCmp::operator()(const unsigned int & l, const unsigned int & r)
 {
 	return ((*pverts)[l].w < (*pverts)[r].w);
 }
+bool ArcCmp::operator()(ctArc* const &  l, ctArc* const & r)
+{
+	float lv = (*pverts)[l->lo->i].w;
+	float rv = (*pverts)[r->lo->i].w;
+	return lv < rv;
+}
 
 SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid, 
 		unsigned int & ch, unsigned int & h)
@@ -212,11 +215,18 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx)
 	}	
 	ctContext* ctx = ct_init(nv, ar, value, neighbours, this);
 	ct_sweepAndMerge( ctx );
-	ctArc ** arcs = ct_arcMap(ctx );
-	ctArc** arcsOut;
-	ctNode** nodesOut;
-	size_t numarcs, numNodes;
-	ct_arcsAndNodes(*arcs, &arcsOut, &numarcs, &nodesOut, &numNodes);
+	ctArc ** arcmap = ct_arcMap(ctx );
+	ct_arcsAndNodes(*arcmap, &arcsOut, &numarcs, &nodesOut, &numNodes);
+	arcdata = std::vector<int>(numarcs,0);
+	nodedata = std::vector<NodeData>(numNodes);
+	for(unsigned int i = 0; i < m_vlist.size(); i++)
+	{
+		unsigned int arcidx = arcmap - &(arcmap[i]);
+		if(!arcdata[arcidx]++)
+		{
+			arcmap[i]->data = &arcdata[arcidx];
+		}
+	}
 	ctBranch* root = ct_decompose( ctx );
 
 	//create branch decomposition
@@ -362,5 +372,73 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 
 	}
 	fclose(fpminbin);
+
+}
+void BD::Sample(std::vector<float> & isovals)
+{
+	std::sort(arcsOut, arcsOut+numarcs, ArcCmp(&m_vlist));
+
+	std::vector<unsigned int> arcids;
+	std::vector<float> fvals;
+	float alpha;
+
+	for(unsigned int i = 0; i < numarcs; i++)
+	{
+		ctArc* lm = arcsOut[i];
+		ctNode* l = lm->hi; //f(l) > f(m)
+		ctNode* m = lm->lo;
+		NodeData* ldata = ((NodeData*)l->data);
+		NodeData* mdata = ((NodeData*)m->data);
+		unsigned int totsz = *(unsigned int*)lm->data + mdata->sz;
+		ldata->sz += totsz;
+		if(totsz >= fsz)
+		{
+			ldata->num++;
+			SymBranch* br = (SymBranch*)lm->branch->data;
+			float alphalo = m_vlist[m->i].w + alpha;
+			float alphahi = m_vlist[l->i].w - alpha;
+			if(BrType(br->bid, -1) && (alphahi > alphalo))
+			{
+				unsigned int fidx = fvals.size();
+				float w = fidx > 0 ? fvals[fidx-1] : 0;
+				if(!fidx || (alphalo > w) || (w > alphahi))
+				{
+					assert(w <= alphahi);
+					fvals.push_back(alphahi);
+					fidx++;
+				}
+				arcids.push_back(i);
+
+			}
+		}
+	}
+
+	std::vector<int> fidx(fvals.size(),-1);
+	for(int i = arcids.size()-1; i >= 0; i--)
+	{
+		for(int j = fvals.size()-1; j >= 0; j--)
+		{
+			unsigned int arcid = arcids[i];
+			ctArc* lm = arcsOut[arcid];
+			ctNode* l = lm->hi; //f(l) > f(m)
+			ctNode* m = lm->lo;
+			float alphalo = m_vlist[m->i].w + alpha;
+			float alphahi = m_vlist[l->i].w - alpha;
+			float isoval = fvals[j];
+			if(alphahi >= isoval && alphalo <= isoval)
+			{
+				if(fidx[j] == -1)
+				{
+					fidx[j] = isovals.size();
+					isovals.push_back(isoval);
+
+				}
+				SymBranch* br = (SymBranch*)lm->branch->data;
+				br->comps[fidx[j]] = -1;
+				break;
+			}
+				
+		}
+	}
 
 }

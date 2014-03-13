@@ -390,9 +390,9 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	ctr->ComputeGradientsOff();
 	ctr->ComputeScalarsOff();
 
-	unsigned int i = 0;
+	int i = fvals.size()-1;
 	unsigned int prev = 0;
-	for(; i < fvals.size(); i++)
+	for(; i >= 0; i--)
 	{
 		ctr->SetValue(0, fvals[i]);
 		ctr->Update();

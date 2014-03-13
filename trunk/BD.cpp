@@ -265,8 +265,11 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
 	std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
 
-	Sample(isovals, alpha);
+	std::vector<float> fvals;
+	std::vector<unsigned int> arcids;
+	PickIsoValues(fvals, arcids, alpha);
 	ctBranch* root = ct_decompose( ctx );
+	RestrictIsoValues(isovals, fvals, arcids, alpha);
 
 	//create branch decomposition
 	ctBranch ** brvertmap;
@@ -413,12 +416,10 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 	fclose(fpminbin);
 
 }
-void BD::Sample(std::vector<float> & isovals, float alpha)
+void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & arcids, float alpha)
+	
 {
 	std::sort(arcsOut, arcsOut+numarcs, ArcCmp(&m_vlist));
-
-	std::vector<unsigned int> arcids;
-	std::vector<float> fvals;
 
 	for(unsigned int i = 0; i < numarcs; i++)
 	{
@@ -444,7 +445,7 @@ void BD::Sample(std::vector<float> & isovals, float alpha)
 							<<" "<<m_vlist[m->i].xyz[2]
 							<<" "<<m_vlist[m->i].w
 						<<std::endl;&*/
-			if(/*BrType(br->bid, -1) && */(alphahi > alphalo))
+			if((alphahi > alphalo))
 			{
 				unsigned int fidx = fvals.size();
 				float w = fidx > 0 ? fvals[fidx-1] : 0;
@@ -461,34 +462,38 @@ void BD::Sample(std::vector<float> & isovals, float alpha)
 			}
 		}
 	}
-
-/*	std::vector<int> fidx(fvals.size(),-1);
+}
+void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<float> & fvals, std::vector<unsigned int> & arcids, float alpha)
+{
+	std::vector<int> fidx(fvals.size(),-1);
 	for(int i = arcids.size()-1; i >= 0; i--)
 	{
-		for(int j = fvals.size()-1; j >= 0; j--)
+		unsigned int arcid = arcids[i];
+		ctArc* lm = arcsOut[arcid];
+		ctNode* l = lm->hi; //f(l) > f(m)
+		ctNode* m = lm->lo;
+		float alphalo = m_vlist[m->i].w + alpha;
+		float alphahi = m_vlist[l->i].w - alpha;
+		SymBranch* br = (SymBranch*)(ctArc_find(lm))->branch->data;
+		if(BrType(br->bid, -1))
 		{
-			unsigned int arcid = arcids[i];
-			ctArc* lm = arcsOut[arcid];
-			ctNode* l = lm->hi; //f(l) > f(m)
-			ctNode* m = lm->lo;
-			float alphalo = m_vlist[m->i].w + alpha;
-			float alphahi = m_vlist[l->i].w - alpha;
-			float isoval = fvals[j];
-			if(alphahi >= isoval && alphalo <= isoval)
+			for(int j = fvals.size()-1; j >= 0; j--)
 			{
-				if(fidx[j] == -1)
+				float isoval = fvals[j];
+				if(alphahi >= isoval && alphalo <= isoval)
 				{
-					fidx[j] = isovals.size();
-					isovals.push_back(isoval);
-					std::cout<<"Isovalues: "<<isoval<<std::endl;
+					if(fidx[j] == -1)
+					{
+						fidx[j] = isovals.size();
+						isovals.push_back(isoval);
+						std::cout<<"Isovalues: "<<isoval<<std::endl;
 
+					}
+					br->comps[fidx[j]] = -1;
+					break;
 				}
-				SymBranch* br = (SymBranch*)(ctArc_find(lm))->branch->data;
-				br->comps[fidx[j]] = -1;
-				break;
+
 			}
-				
-		}
+		}	
 	}
-*/	
 }

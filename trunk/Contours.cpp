@@ -469,8 +469,10 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	tgrid->GetDimensions(dim);
 	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
 	std::vector<unsigned int> sadidx;
-	bd[did]->BuildBD(sadidx);
-	Sampler s(bd[did], sadidx, verts[did]);
+	float alpha;
+	bd[did]->BuildBD(sadidx,fvals,alpha);
+
+	/*Sampler s(bd[did], sadidx, verts[did]);
 	if(did == 0)
 	{
 		s.Sample(fvals);
@@ -480,7 +482,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 		float max = verts[0][bd[0]->bridsarr[1]->ext].w;
 		float min = verts[0][bd[0]->bridsarr[1]->sad].w;
 		s.PropogateValues(fvals, min, max);
-	}
+	}*/
 }
 
 void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)

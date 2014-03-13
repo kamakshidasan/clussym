@@ -64,7 +64,7 @@ class BD
 public:
 	BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz);
 	BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid);
-	void BuildBD(std::vector<unsigned int> & sadidx);
+	void BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isovals, float alpha);
 	unsigned int NumBr() { return numbr; };
 	SymBranch* BuildSymTree(class ctBranch* b, SymBranch* node, unsigned int & brid, 
 			unsigned int & ch, unsigned int & ht);
@@ -77,7 +77,7 @@ public:
 	void SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval);
 	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float fval);
 	void UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx);
-	void Sample(std::vector<float> & isovals);
+	void Sample(std::vector<float> & isovals, float alpha);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;
 	std::vector<int> vtobrmap;

@@ -272,11 +272,13 @@ void CompMgr::ClusterComps()
 	cl = new Cluster(symcords);
 	std::vector<unsigned int> & cltrs = cl->GetClusters();
 	
-	bd[0]->SetVertMask(0, 0, cltrs, cltrs, 0);
-	for(unsigned int i = 0; i < cltrs.size(); i++)
+	std::vector<unsigned int> vrmask;
+	std::vector<unsigned int> brmask;
+	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
+	for(unsigned int i = 0; i < cl->clidarr.size(); i++)
 	{
-		if(cltrs[i])
-			Export(i, cltrs[i]);
+		if(cl->clidarr[i])
+			Export(i, cl->clidarr[i]);
 	}
 }
 
@@ -304,7 +306,7 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
-	return exp(-(0.1*diff/std::min(anorm,bnorm)));
+	return exp(-(5*diff/std::min(anorm,bnorm)));
 	
 }
 

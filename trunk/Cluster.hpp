@@ -18,12 +18,12 @@ class Cluster
 		void GetMembers(unsigned int id, std::vector<unsigned int> & mem);
 		std::vector<unsigned int> & GetClusters();
 		~Cluster();
+		std::vector<unsigned int> clidarr;
 	private:
 		ANNpointArray datapts;
 		ANNkd_tree* kdTree;
 		unsigned int nPts;
 		unsigned int dim;
-		std::vector<unsigned int> clidarr;
 		std::vector<ClusInfo> clusters;
 };
 #endif

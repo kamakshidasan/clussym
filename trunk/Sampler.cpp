@@ -11,7 +11,7 @@ void Sampler::PickValues(std::vector<float> & isovals)
 	unsigned int sz = sadidx.size();
 	float maxf = m_vlist[bd->bridsarr[1]->ext].w;
 	float minf = m_vlist[bd->bridsarr[1]->sad].w;
-	float curf = minf, nextf, delta = (maxf - minf)/30;
+	float curf = minf, nextf, delta = (maxf - minf)/100;
 	for(unsigned int i = 1; i < sz; i++)
 	{
 //		std::cout<<"Saddle "<<i<<" at "<<curf<<std::endl;

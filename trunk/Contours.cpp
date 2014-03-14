@@ -390,9 +390,9 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	ctr->ComputeGradientsOff();
 	ctr->ComputeScalarsOff();
 
-	int i = fvals.size()-1;
+	int i = 0;
 	unsigned int prev = 0;
-	for(; i >= 0; i--)
+	for(; i < fvals.size(); i++)
 	{
 		ctr->SetValue(0, fvals[i]);
 		ctr->Update();
@@ -472,7 +472,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	float alpha;
 	bd[did]->BuildBD(sadidx,fvals,alpha);
 
-	/*Sampler s(bd[did], sadidx, verts[did]);
+	Sampler s(bd[did], sadidx, verts[did]);
 	if(did == 0)
 	{
 		s.Sample(fvals);
@@ -482,7 +482,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 		float max = verts[0][bd[0]->bridsarr[1]->ext].w;
 		float min = verts[0][bd[0]->bridsarr[1]->sad].w;
 		s.PropogateValues(fvals, min, max);
-	}*/
+	}
 }
 
 void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)

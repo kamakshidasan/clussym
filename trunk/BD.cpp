@@ -8,7 +8,7 @@
 #include <vtkTriangleFilter.h>
 #include <vtkIdList.h>
 
-unsigned int fsz = 50;
+unsigned int fsz = 60;
 void BD::GetTNeighbours(unsigned int id, std::vector<unsigned int> & nbrs, unsigned int ftype)
 {
 	vtkSmartPointer<vtkIdList> cellIdList =	vtkSmartPointer<vtkIdList>::New();
@@ -181,7 +181,7 @@ BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) 
 	mesh = extractEdges->GetOutput();
 }
 BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(verts), 
-	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz)
+	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz), first(1)
 {
 }
 
@@ -205,7 +205,7 @@ std::size_t hash_value(const ctNode* & nd)
 	return h;
 }
 
-void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isovals, float alpha)
+void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isovals, float delta)
 {
 	size_t nv = m_vlist.size();
 	size_t *ar = new size_t [nv];
@@ -222,12 +222,14 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	{
 		ar[i] = vidx[i];
 	}
-	alpha = (m_vlist[vidx[nv-1]].w - m_vlist[vidx[0]].w)/40;
+	float maxf = m_vlist[vidx[nv-1]].w;
+	float minf = m_vlist[vidx[0]].w;
+	delta = (maxf-minf)/100;
 	ctContext* ctx = ct_init(nv, ar, value, neighbours, this);
 	ct_sweepAndMerge( ctx );
 	ctArc ** arcmap = ct_arcMap(ctx );
 	ct_arcsAndNodes(*arcmap, &arcsOut, &numarcs, &nodesOut, &numNodes);
-	arcdata = std::vector<int>(numarcs,0);
+	arcdata = std::vector<ArcData>(numarcs);
 	nodedata = std::vector<NodeData>(numNodes);
 	unsigned int arcidx = 0;
 	unsigned int ndidx = 0;
@@ -241,8 +243,8 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 		{
 			lm->data = &arcdata[arcidx];
 			arcidx++;
-			ctNode* l = lm->hi; //f(l) > f(m)
-			ctNode* m = lm->lo;
+			ctNode* l = ((ArcData*)lm->data)->hi = lm->hi; //f(l) > f(m)
+			ctNode* m = ((ArcData*)lm->data)->lo = lm->lo;
 //			cout<<" Arc lm "<<l->i<<" "<<m->i<<std::endl;
 			if(ndmap.find(l) == ndmap.end())
 			{
@@ -265,11 +267,9 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
 	std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
 
-	std::vector<float> fvals;
 	std::vector<unsigned int> arcids;
-	PickIsoValues(fvals, arcids, alpha);
+	//PickIsoValues(isovals, arcids, vidx[0], vidx[nv-1], delta);
 	ctBranch* root = ct_decompose( ctx );
-	RestrictIsoValues(isovals, fvals, arcids, alpha);
 
 	//create branch decomposition
 	ctBranch ** brvertmap;
@@ -293,6 +293,7 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	}
 
 	UpdateSymTree(symroot, sadidx);
+	//RestrictIsoValues(isovals, arcids);
 
        	ct_cleanup( ctx );
 }
@@ -416,6 +417,7 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 	fclose(fpminbin);
 
 }
+/*
 void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & arcids, float alpha)
 	
 {
@@ -436,7 +438,7 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 			ldata->num++;
 			float alphalo = m_vlist[m->i].w + alpha;
 			float alphahi = m_vlist[l->i].w - alpha;
-/*			std::cout<<"Feature saddle: s ("<<m_vlist[l->i].xyz[0]
+			std::cout<<"Feature saddle: s ("<<m_vlist[l->i].xyz[0]
 							<<" "<<m_vlist[l->i].xyz[1]
 							<<" "<<m_vlist[l->i].xyz[2]
 							<<" "<<m_vlist[l->i].w
@@ -444,7 +446,7 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 							<<" "<<m_vlist[m->i].xyz[1]
 							<<" "<<m_vlist[m->i].xyz[2]
 							<<" "<<m_vlist[m->i].w
-						<<std::endl;&*/
+						<<std::endl;
 			if((alphahi > alphalo))
 			{
 				unsigned int fidx = fvals.size();
@@ -462,16 +464,94 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 			}
 		}
 	}
+}*/
+void BD::PickIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids, unsigned int min, unsigned int max, float delta)
+{
+
+	std::sort(arcsOut, arcsOut+numarcs, ArcCmp(&m_vlist));
+	std::vector<unsigned int> sadidx;
+	sadidx.push_back(min);
+	sadidx.push_back(max);
+	for(unsigned int i = 0; i < numarcs; i++)
+	{
+		ctArc* lm = arcsOut[i];
+		ctNode* l = lm->hi; //f(l) > f(m)
+		ctNode* m = lm->lo;
+		NodeData* ldata = ((NodeData*)l->data);
+		NodeData* mdata = ((NodeData*)m->data);
+		unsigned int totsz = *(unsigned int*)lm->data + mdata->sz;
+		ldata->sz += totsz;
+		if(totsz >= fsz)
+		{
+			ldata->num++;
+			arcids.push_back(i);
+			sadidx.push_back(l->i);
+		}
+	}
+	std::sort(sadidx.begin(), sadidx.end(), FnCmp(&m_vlist));
+	unsigned int sz = sadidx.size();
+	float curf = m_vlist[min].w, nextf;
+	for(unsigned int i = 1; i < sz; i++)
+	{
+//		std::cout<<"Saddle "<<i<<" at "<<curf<<std::endl;
+		nextf = m_vlist[sadidx[i]].w;
+		if(nextf - curf > delta)
+		{
+			float f = nextf - delta;
+			isovals.push_back(f);
+			std::cout<<"Isovalues: "<<f<<std::endl;
+		}
+		curf = nextf;
+	}
 }
-void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<float> & fvals, std::vector<unsigned int> & arcids, float alpha)
+
+void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids)
+{
+	for(int i = arcids.size()-1; i >= 0; i--)
+	{
+		unsigned int arcid = arcids[i];
+		ctArc* lm = arcsOut[arcid];
+		ctNode* l = ((ArcData*)lm->data)->hi; //f(l) > f(m)
+		ctNode* m = ((ArcData*)lm->data)->lo;
+		float ext = m_vlist[m->i].w;
+		float sad = m_vlist[l->i].w;
+		SymBranch* br = (SymBranch*)(ctArc_find(lm))->branch->data;
+		if(BrType(br->bid, -1))
+		{
+			for(int j = 0; j < isovals.size(); j++)
+			{
+				float isoval = isovals[j];
+				if(sad > isoval && ext < isoval)
+				{
+					unsigned int e  = m->i;
+					unsigned int s  = l->i;
+					std::cout<<"Selecting Isovalue "<<isoval<<" for arc of br "<<br->bid
+							<<" m ("<<m_vlist[e].xyz[0]
+							<<" "<<m_vlist[e].xyz[1]
+							<<" "<<m_vlist[e].xyz[2]
+							<<" "<<m_vlist[e].w
+						<<" l ("<<m_vlist[s].xyz[0]
+							<<" "<<m_vlist[s].xyz[1]
+							<<" "<<m_vlist[s].xyz[2]
+							<<" "<<m_vlist[s].w
+						<<std::endl;
+					br->comps[j] = -1;
+					break;
+				}
+
+			}
+		}	
+	}
+}
+/*void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<float> & fvals, std::vector<unsigned int> & arcids, float alpha)
 {
 	std::vector<int> fidx(fvals.size(),-1);
 	for(int i = arcids.size()-1; i >= 0; i--)
 	{
 		unsigned int arcid = arcids[i];
 		ctArc* lm = arcsOut[arcid];
-		ctNode* l = lm->hi; //f(l) > f(m)
-		ctNode* m = lm->lo;
+		ctNode* l = ((ArcData*)lm->data)->hi; //f(l) > f(m)
+		ctNode* m = ((ArcData*)lm->data)->lo;
 		float alphalo = m_vlist[m->i].w + alpha;
 		float alphahi = m_vlist[l->i].w - alpha;
 		SymBranch* br = (SymBranch*)(ctArc_find(lm))->branch->data;
@@ -489,6 +569,18 @@ void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<float> & fv
 						std::cout<<"Isovalues: "<<isoval<<std::endl;
 
 					}
+					unsigned int e  = m->i;
+					unsigned int s  = l->i;
+					std::cout<<"Selecting Isovalue "<<isoval<<" for arc of br "<<br->bid
+							<<" m ("<<m_vlist[e].xyz[0]
+							<<" "<<m_vlist[e].xyz[1]
+							<<" "<<m_vlist[e].xyz[2]
+							<<" "<<m_vlist[e].w
+						<<" l ("<<m_vlist[s].xyz[0]
+							<<" "<<m_vlist[s].xyz[1]
+							<<" "<<m_vlist[s].xyz[2]
+							<<" "<<m_vlist[s].w
+						<<std::endl;
 					br->comps[fidx[j]] = -1;
 					break;
 				}
@@ -496,4 +588,4 @@ void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<float> & fv
 			}
 		}	
 	}
-}
+}*/

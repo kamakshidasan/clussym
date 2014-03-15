@@ -873,6 +873,18 @@ club-like portion of the top contour is thin while that of the bottom contour is
 can be distinguished from the dark red regions that depict vertices with large distance values.
 \section{Discussion}
 \section{Conclusion}
+In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
+We show that mapping contours to points in a descriptor space is a powerful representation for
+performing similarity analysis on scalar fields. One of the main limitations of our method is that
+symmetry identification is restricted to regions obtained from the segmentation of the domain induced
+by the contour tree. We plan to extend our method to handle other kinds of segmentation by designing
+an appropriate surface representation for the segments. A related issue is that our method does not 
+consider symmetry within a contour. A preprocessing step that segments contours into smaller partial
+surfaces may be designed to solve this problem. Another limitation is that the current implementation
+does not incorporate geometric stability criteria for selecting representative contours. We believe
+that the descriptor space representation of scalar fields will spur research in determining structurally
+similar features in collections of related datasets like time-varying and ensemble data and plan to 
+investigate this in future.
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

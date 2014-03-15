@@ -33,6 +33,9 @@
 \usepackage{subfigure}
 \usepackage{algorithm2e}
 
+\usepackage{amsthm}
+\newtheorem*{defi}{Definition}
+
 %% We encourage the use of mathptmx for consistent usage of times font
 %% throughout the proceedings. However, if you encounter conflicts
 %% with other math-related packages, you may want to disable it.
@@ -56,10 +59,10 @@
 %% If you are submitting a paper to a conference for review with a double
 %% blind reviewing process, please replace the value ``0'' below with your
 %% OnlineID. Otherwise, you may safely leave it at ``0''.
-\onlineid{0}
+\onlineid{111}
 
 %% declare the category of your paper, only shown in review mode
-\vgtccategory{Technique}
+\vgtccategory{Algorithm/Technique}
 
 %% allow for this line if you want the electronic option to work properly
 \vgtcinsertpkg
@@ -68,7 +71,8 @@
 %\preprinttext{To appear in an IEEE VGTC sponsored conference.}
 
 %% Paper title.
-\title{Symmetry Detection in Scalar Fields by Clustering Contours}
+\title{Multiscale Symmetry Detection in Scalar Fields\\
+by Clustering Contours}
 
 
 %% This is how authors are specified in the journal style
@@ -102,20 +106,21 @@
 %\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
 
 %% Abstract section.
-\abstract{The complex nature of volumetric data often limits the scope of direct exploration
-of features in the data. Isocontours are quite popular in analysing the characteristics
-of scalar field data due to its simpler presentation and assists users in segmenting
-important features in the data via the contour tree. In this paper, we present a novel representation 
-of contours in a scalar field with the aim of studying the similarity relationship between the 
-contours. The representation maps contours as points in a high dimensional transformation invariant 
-descriptor space. We leverage the power of this representation to design a clustering based algorithm for 
-detecting symmetric regions in a scalar field. Symmetry detection is a challenging problem because it demands
-both segmentation of the data and identification of transformation invariant segments.
-While the former task can be addressed using topological analysis of scalar fields,
-the latter requires geometry based solutions. Our approach combines the two by utilizing the contour
-tree for segmenting the data and the descriptor space for identifying transformation invariance.
-We show the effectiveness of our method in designing applications like query driven exploration using
-contours and asymmetry visualization.
+\abstract{
+The complexity in visualizing volumetric data often limits the scope of direct exploration
+of scalar fields. Isocontours are quite popular in analysing the characteristics
+of scalar field data because of its simplicity in presenting features in the data. 
+In this paper, we present a novel representation of contours in a scalar field with 
+the aim of studying the similarity relationship between the contours. The representation 
+maps contours as points in a high-dimensional transformation-invariant descriptor space. 
+We leverage the power of this representation to design a clustering based algorithm for 
+detecting symmetric regions in a scalar field. Symmetry detection is a challenging problem 
+because it demands both segmentation of the data and identification of transformation 
+invariant segments. While the former task can be addressed using topological analysis of 
+scalar fields, the latter requires geometry based solutions. Our approach combines the two 
+by utilizing the contour tree for segmenting the data and the descriptor space for 
+identifying transformation invariance. We show the effectiveness of our method in 
+designing applications like query driven exploration and asymmetry visualization.
 } % end of abstract
 
 %% Keywords that describe your work. Will show as 'Index Terms' in journal
@@ -131,27 +136,26 @@ contours and asymmetry visualization.
 %}
 \teaser{
 	\centering
-	\subfigure[]
+	\begin{minipage}{\textwidth}
 	{
-		\includegraphics[scale=.33]{figures/1897-full.png}
+			$\vcenter{\hbox{\includegraphics[scale=.33]{figures/1897-full.png}}}$
 	}
-	\subfigure[]
 	{
-		\scalebox{.33}{\input{xfig/desspace.pdf_t}}
+			$\vcenter{\hbox{\includegraphics[scale=.25]{figures/descspace.png}}}$
 	}
-	\subfigure[]
 	{
-		\includegraphics[scale=.33]{figures/1897-sym.png}
+			$\vcenter{\hbox{\includegraphics[scale=.33]{figures/1897-sym.png}}}$
 	}
 	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the electron microscopy 
-	data of AMP-activated kinase (EMDB-1897). (a)~Volume rendering of the data shows different symmetric patterns
-	that exhibit 3-fold rotational symmetry. (b)~Contours 
-	are represented as points in a high dimensional descriptor space (shown in 2D for illustration) using
+	data of AMP-activated kinase (EMDB-1897). (left)~Volume rendering of the data shows different symmetric patterns
+	that exhibit 3-fold rotational symmetry. (centre)~Contours 
+	are represented as points in a high-dimensional descriptor space (shown in 2D for illustration) using
 	a suitable shape descriptor. Contours belonging to symmetric regions are also symmetric and have similar descriptors.
 	Hence, symmetric contours form a cluster in the descriptor space and can be easily identified.  
-	Three such clusters detected are shown in golden, blue, and pink colours. (c)~Symmetric regions in the volume 
-	corresponding to the symmetric contours are extracted and three different symmetric regions are highlighted 
-	in golden, blue, and pink colours corresponding to the three clusters.}
+	Three such clusters detected are shown in orange, blue, and pink colours. (right)~Regions in the volume 
+	to which the symmetric contours belong are extracted and three different symmetric regions are highlighted 
+	in orange, blue, and pink colours corresponding to the three clusters.}
+	\end{minipage}
 }
 
 %% Uncomment below to include a teaser figure.
@@ -181,8 +185,8 @@ contours and asymmetry visualization.
 %-------------------------------------------------------------------------
 \firstsection{Introduction}
 \maketitle
-Many scientific experiments and simulations generate scalar field data and 
-they often contain symmetric or repeating patterns. In many disciplines, 
+Many scientific experiments and simulations generate scalar field data that
+contain symmetric or repeating patterns. In many disciplines, 
 symmetry plays an important role in studying the underlying scientific phenomena. 
 For example, in crystallography, symmetry information is used to determine 
 the structure of a crystal~\cite{som07}. In product design, symmetry is important 
@@ -198,9 +202,8 @@ detection is ongoing. Though symmetry detection in scalar
 fields is a relatively new area of research, the problem of detecting symmetry
 in shapes has been well studied in the geometry processing community.
 These studies have established that clustering based analyses result in superior
-performance in robust identification of symmetry. Some of the methods
-that use clustering for detecting symmetry in shapes have been extended to
-scalar fields. These methods operate by determining symmetry
+performance in robust identification of symmetry. Some of these clustering methods
+have been extended to scalar fields and they operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
 domain. Scalar field datasets are typically represented using scalar values 
 assigned to a discrete set of sample points that represent the domain under 
@@ -208,7 +211,7 @@ consideration. However, the domain and the scalar values are assumed to be conti
 interpolating the values at the sample points. Therefore, the sample points in a scalar 
 field capture the lowest level of information. In practice, scientists are more interested
 in higher level features, extracted through methods like segmentation and isosurface extraction,
-for studying the underlying physical phenomena. Hence, symmetry detection methods based on 
+for studying the underlying physical phenomena. Hence, symmetry detection methods that are based on 
 local information available at the sample points face considerable difficulty in representing 
 and extracting meaningful symmetric regions. Moreover, these methods are computationally 
 expensive since the number of sample points in scalar field datasets is typically orders of magnitude
@@ -223,7 +226,7 @@ are extensively used in studying scalar field datasets and contours capture info
 about a scalar field at a macroscale as opposed to sample points of the domain. Therefore, they
 are more suitable for a clustering based analysis. It is easy to see that contours
 belonging to regions with symmetric scalar field distribution are also symmetric. Using an 
-appropriate shape descriptor, our method maps contours as points in the space of descriptors 
+appropriate shape descriptor, our method maps contours to points in a descriptor space 
 such that the distance between points in the descriptor space is a measure of similarity 
 between the contours. As a result, points in the descriptor space 
 representing symmetric contours lie in close 
@@ -248,7 +251,7 @@ and we show its benefit in similarity analysis of scalar fields.
 symmetry detection methods are typically computationally costly, we design an efficient algorithm 
 that employs elegant optimisations by incorporating topological information 
 about the contours using the contour tree.
-\item Applications to feature correspondence estimation and asymmetry visualization.
+\item Applications to query driven exploration and asymmetry visualization.
 \end{itemize}
 Symmetry information in scalar fields
 has been used for transfer function design, exploration of isosurfaces, selection of cross-section
@@ -269,8 +272,8 @@ the challenges in extending geometric methods to scalar fields.
 Scalar field datasets are significantly larger in size and hence symmetry detection is computationally costly.
 Geometric methods typically consider geometric information derived from a small region around each sample
 point of the domain for symmetry detection. Directly applying this approach to scalar field makes it difficult 
-to capture important features in a scalar field and hence these methods perform poorly in extracting higher level
-features of interest and handling noise in the data.
+to capture important features in a scalar field leading to poor performance in extracting higher level
+features and handling of noise in the data.
 Moreover, the scalar values are assumed to be continuous over the domain by interpolating the values at 
 the discrete set of sample points. Therefore, inspecting only local information at the sample points
 introduces additional challenges due to discretization errors since the symmetric counterpart for a 
@@ -289,10 +292,10 @@ domain. This method relies on local signatures of sample points for determining
 transformations and as a result several parameters need to be tweaked at various stages of 
 the symmetry detection pipeline to limit the adverse effects of variations in the local signatures 
 and discretization errors.  Moreover, the transformation space is often cluttered with a lot of 
-spurious transformations and introduces artifacts in the extraction of symmetric regions from the point set. 
+spurious transformations and introduces artifacts in the extraction of symmetric regions.
 The above methods compute geometric transformations between candidate pairs for identifying
-symmetry and are computationally costly. These methods being purely driven by local geometric 
-information, do not incorporate any notion of importance of a feature. Hence, they consider every 
+symmetry and are computationally costly. Moreover, they are driven by purely local geometric 
+measures and therefore do not incorporate any criterion to recognize important features. Hence, they consider every 
 candidate pair, including pairs corresponding to noise, to be equally important in their analysis. 
 Our method, on the other hand, uses topological information derived from the contour tree to infer 
 importance of a feature and this allows the design of a feature-aware algorithm for symmetry detection. 
@@ -305,23 +308,25 @@ similar isosurfaces within and across datasets. Although closely related to our 
 by virtue of using distance transforms as the descriptor, 
 this method identifies similar family of isosurfaces within a range of isovalues that 
 form an onion-peel like layered arrangement. Our method, on the other hand, is more suited 
-for identifying partial similarities and symmetric regions by identifying
+for identifying partial similarities and extracting symmetric regions by identifying
 similarity between contours and not isosurfaces. While the isosurface similarity map based
 method is limited to analysing similarity between
-datasets only in pairs, the descriptor space can be used to analyse multiple datasets.
+datasets only in pairs, the descriptor space can be used to analyse multiple datasets simultaneously.
 Similarity between different scalar fields has also been studied by measuring the extent of overlap
-between contours~\cite{SchneiderWCHS08,schn13}. Changes in orientation affects the distance transform
-descriptor and contour overlap thus affecting the similarity estimation whereas our method is not tied 
-to a particular choice of descriptor. Based on the requirements of the application under 
-consideration, our method  can be adapted to be sensitive or insensitive to orientation. 
+between contours~\cite{SchneiderWCHS08,schn13}. The distance transform
+descriptor and the overlap between contours are affected by changes in orientation
+whereas our method is not tied to a particular choice of descriptor. Based on the requirements of 
+the application under consideration, our method  can be adapted to be sensitive or 
+insensitive to orientation. 
 \subsection{Topology based methods}
 Thomas and Natarajan propose topology based methods for symmetry detection and these methods 
 are computationally efficient because they operate on graph representations of the scalar field
 like the contour tree~\cite{ThomN11} and the extremum graph~\cite{ThomN13}. The contour tree based method 
 assumes that the subtrees of the contour tree corresponding to symmetric regions are structurally
 similar. They detect symmetry by evaluating structural similarity between the subtrees using a 
-similarity score. This method can detect symmetry at multiple scales but cannot handle
-noise in scalar fields that destroy the repeating structure of the subtrees. The extremum 
+similarity score that measures the overlap between the branches of the trees. 
+This method can find symmetry at multiple scales but cannot handle
+noise that destroy the repeating structure of the subtrees. The extremum 
 graph based method selects a set of extrema called seed set and 
 estimates distances robustly through a graph traversal procedure. A carefully chosen distance 
 threshold is used to disconnect the graph and classify the seeds into different groups called 
@@ -330,21 +335,21 @@ corresponding to each super-seed. This procedure makes a strong assumption that 
 can be identified purely from the proximity relationship between the seeds. Hence,
 it relies heavily on a meaningful selection of seed set which involves significant effort 
 and understanding about the symmetry of the domain. In addition, this method requires several thresholds
-to be set.
 \begin{figure}[b]
 \centering
 {
 	\scalebox{0.3}{\input {xfig/ctrmap.pdf_t}}
 	\caption{\label{ctmap}Mapping of contours as points in the descriptor space. Symmetric contours
 		shown in blue colour are mapped to the same blue point in the descriptor space. Six approximately
-		symmetric contours shown in golden colour are mapped to six points which lie in close
+		symmetric contours shown in orange colour are mapped to six points which lie in close
 		proximity to each other in the descriptor space.}
 }
 \end{figure}
+to be set.
 
-The above two methods being topological in nature do not ensure that the regions detected by
+The above methods being topological in nature do not ensure that the regions detected by
 them are indeed geometrically symmetric while our method being geometric in nature, 
-ensures that the regions detected are symmetric. Moreover, they compare candidate regions 
+ensures that the regions detected are symmetric. Moreover, current methods compare candidate regions 
 pairwise and rely on a similarity threshold to classify them into symmetric groups. Determining
 the similarity threshold is a challenge when using datasets with varying characteristics.
 Clustering based analysis avoids the need for pairwise comparisons. Instead, the symmetric regions
@@ -354,11 +359,11 @@ studied in the context of shape matching applications by using graph matching me
 discrete approximations of the contour tree~\cite{ZhangBKDNB06,HilagaSKK01}.
 The contour tree provides metadata information about the contours
 and allows integration of topological information in geometric processing. Thus, by utilizing 
-geometric information of contours and the power of contour tree as a topological abstraction of 
-contours, our method offers significant advantages over existing symmetry detection methods. 
+the descriptor space to capture geometric information about contours along with the power of contour 
+tree as a topological abstraction of contours, our method offers significant advantages over 
 \begin{figure*}[t]
 	\centering
-	\scalebox{0.2}{\input {xfig/pipeline.pdf_t}}
+		\includegraphics[scale=0.5]{figures/pipe.png}
 	\caption{\label{pipeline} Symmetry detection pipeline. Contours are extracted
 		from the scalar field dataset and a descriptor is generated for each contour.
 		A correspondence score is estimated between pairs of contours based on the
@@ -366,15 +371,16 @@ contours, our method offers significant advantages over existing symmetry detect
 		contours are identified through clustering and the region of the domain corresponding
 	to each symmetric contour is extracted and reported.}
 \end{figure*}
+existing symmetry detection methods. 
 \section{Definitions}
 Consider a \emph{scalar field}, $f : \mathbb{M}  \rightarrow \mathbb{R}$, defined on a 
 simply connected domain $\mathbb{M}$. The preimage of $f$ for a given value $u \in \mathbb{R}$, 
 $f^{-1}(u)$, is called a \emph{level set} of $f$. A level set may have multiple components
-and each component is called a \emph{contour}. Consider a sweep of the level sets in the order
+and each component is called a \emph{contour}. Consider a sweep of the domain using level sets in the order
 of increasing function values. A contour is created at a \emph{minimum}, may merge
 with another contour or split into different contours at a \emph{saddle}, and is destroyed
 at a \emph{maximum}. The \emph{contour tree} is a topological 
-data structure that captures these changes in the connectivity of the level sets. 
+data structure that captures these changes in the connectivity of the level sets, see Figure~\ref{ct}.
 Let $R$ be an equivalence relation defined on points in $\mathbb{M}$: $xRy$ for $x,y 
 \in \mathbb{M}$  if $x,y$ belong to the same contour. The contour tree is the quotient space 
 induced by this relation. 
@@ -386,32 +392,34 @@ set that belong to $\mathbb{M}_1$ and $\mathbb{M}_2$ respectively, it is easy to
 $\mathbb{M}_1$ and $\mathbb{M}_2$ are symmetric then $c_1$ and $c_2$ are also symmetric. 
 We make use of this property and detect symmetric subdomains by identifying symmetry of the 
 contours belonging to the subdomains. The above definition of symmetry requires computation of the symmetry 
-transformation $T$ which is a costly operation. Let $\mathbb{C}$ be the set of all contours. 
+transformation $T$, which is a costly operation. Therefore, we use an alternate definition of symmetry.
+Let $\mathbb{C}$ be the set of all contours. 
 Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
-where $T$ is any transformation. In other words, $g$ is a function that maps each
-contour to a point in a high dimensional space, called a \emph{descriptor}, 
+where $T$ is a transformation. In other words, $g$ is a function that maps each
+contour to a point in a high-dimensional space, called a \emph{descriptor}, 
 such that a contour and its symmetric copies are mapped to the same point, see Figure~\ref{ctmap}.
 For illustration, the descriptor space is shown in 2D but the actual dimension of the space
-depends on the choice of the descriptor. We call this high dimensional space the
-\emph{descriptor space}. Thus, if $c_1$ and $c_2$ are perfectly symmetric,
-the distance between them in the descriptor space is zero, i.e., 
-$\lVert g(c_1)-g(c_2) \rVert = 0$, where $\lVert \cdot \rVert$ is a norm in
-the descriptor space. Shape descriptors have been extensively used in the
-geometry processing community for shape matching and there is a
-vast collection of research papers in this 
-area~\cite{lian2013,van2011,tangelder2008survey,qin2008content}. Note that
-different norms may have to be used for different descriptors. 
-
-In practice, scalar field datasets do not exhibit perfect symmetry and therefore
+depends on the choice of the descriptor. We call this high-dimensional space the
+\emph{descriptor space} and the distance between contours in the descriptor space is a
+measure of their similarity. In practice, scalar field datasets do not exhibit perfect symmetry and therefore
 it is important to detect symmetry in an approximate sense. Ideally, deviation
-from perfect symmetry should be measured in the space of shapes but in practice,
+from perfect symmetry should be measured in the space of shapes but 
 it is more convenient to measure deviations in the descriptor space. If contours $c_1$ and 
 $c_2$ deviate from perfect symmetry, then $c_1$ and $c_2$ will not be mapped
 to the same point in the descriptor space and the distance between
 them in the descriptor space, $\lVert g(c_1)-g(c_2) \rVert$, will be indicative
-of the deviation from perfect symmetry. We say that $c_1$ and $c_2$ are
-\emph{$\epsilon$-symmetric} if the distance between $c_1$ and $c_2$ in the descriptor 
-space is at most $\epsilon$, i.e., $\lVert g(c_1)-g(c_2) \rVert \leq \epsilon$.
+\begin{defi}
+Contours $c_1$ and $c_2$ are perfectly symmetric if $\lVert g(c_1)-g(c_2) \rVert = 0$,
+where $\lVert \cdot \rVert$ is a norm in the descriptor space. They are 
+{$\epsilon$-symmetric} if $\lVert g(c_1)-g(c_2) \rVert \leq \epsilon$.
+\end{defi}
+of the deviation from perfect symmetry. 
+
+Shape descriptors have been extensively used in the
+geometry processing community for shape matching and there is a
+vast collection of research papers in this 
+area~\cite{lian2013,van2011,tangelder2008survey,qin2008content}. Note that
+different norms may have to be used for different descriptors. 
 It is possible that a shape descriptor may incorrectly map contours $c_1$ and 
 $c_2$ to the same point even when they have totally different shapes. A good shape descriptor should 
 discriminate between different shapes well and reduce the occurrence of such incorrect
@@ -420,22 +428,22 @@ mappings.
 Methods based on clustering~\cite{Mitra06,Lip10,MitraGP07,Xu12,RavBBK10,Xu09}
 have shown superior performance in detecting
 symmetry in shapes. However, directly extending these methods to scalar fields
-is not easy. In this section, we describe a novel symmetry detection method
+is non-trivial. In this section, we describe a novel symmetry detection method
 based on the idea of clustering contours of the scalar field.
 \subsection{Overview}
-The main steps of our algorithm is shown in Figure~\ref{pipeline}.
+Figure~\ref{pipeline} illustrates the main steps of our algorithm.
 Given a scalar field as input, we generate a set of contours. For each contour
 thus generated, a descriptor is computed. The descriptor for each contour
 can be considered to be a point in a high dimensional 
-descriptor space. The descriptor space is a transformation invariant space,
+descriptor space. The descriptor space is a transformation-invariant space,
 i.e., it reverses the effect of geometric transformation on contours. Thus, perfectly
 symmetric contours are mapped to the same point in the descriptor space.
 Imperfections in symmetry results in imperfections in the mapping.
 Since contours with similar shape have similar descriptors,
-the points in the descriptor space corresponding to approximately symmetric 
+the points in the descriptor space representing approximately symmetric 
 contours will lie in close proximity to each other. Therefore, symmetric contours
 can be detected by identifying clusters in the descriptor space. The volumetric
-region represented by each contours in a cluster is then reported as
+regions represented by the contours within a cluster are then reported as
 symmetric regions.
 \begin{figure}[t]
 	\centering
@@ -466,24 +474,21 @@ very different, two clusters are formed in the descriptor space, one correspondi
 six contours before merge and the second corresponding to the three contours after merge.}
 \end{figure}
 \subsection{Contour Generation}\label{congen}
-Isosurface extraction is a well understood topic since it is one of the basic
-operations performed while studying scalar field data. Our algorithm assumes that
-each region of interest in the domain is represented by a contour belonging to it.
+Our algorithm assumes that each region of interest in the domain is represented by a contour belonging to it.
 Hence, it is important to use a sampling strategy that generates a contour from each
 region of interest. The obvious method for generating contours is 
 to sample isovalues uniformly from the range of the function values and extract contours 
-corresponding to these isovalues. However, uniform sampling has several drawbacks as shown 
-in Figure~\ref{sam-ct}. A coarse uniform sampling may result in no contours getting 
-generated from a region and thus fail to detect it as a symmetric region. On the other hand, 
-a fine sampling will lead to multiple contours getting generated from the same region 
-leading to redundant computations. Ideally, each symmetric region should require only a single 
-representative contour belonging to the region to be processed.
-The contour tree is a powerful tool that encapsulates information about the evolution of contours 
+corresponding to these isovalues. A coarse uniform sampling may not generate contours 
+within a specific region and thus fail to detect it as a symmetric region. On the other hand, 
+a fine sampling may generate multiple contours within the same region 
+and redundant computations. Ideally, each symmetric region should require only a single 
+representative contour for its detection.
+The contour tree is a powerful tool that encapsulates information about the evolution of contours~\cite{CarrSP10} 
 and we leverage information obtained from the contour tree for optimal generation of contours. 
-Each arc of the contour tree represents a family of contours that are nested one inside the other.
-Each contour in this family is typically a scaled version of the contour nested inside it. 
-Hence, to capture the geometry of the region of the domain corresponding to an arc of the contour tree, 
-we select only one contour from each arc of the contour tree.
+Each arc of the contour tree represents a family of contours that are nested one inside the other
+forming offset surfaces similar to layers of onion peel. Hence, to capture the geometry of the region of 
+the domain corresponding to an arc of the contour tree, we select only one contour from each 
+arc of the contour tree.
 
 Selecting a representative contour from each arc of the contour tree ensures that no regions
 are missed in the subsequent symmetry analysis. However, for noisy scalar fields, a large

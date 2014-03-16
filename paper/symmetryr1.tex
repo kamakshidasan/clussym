@@ -556,7 +556,7 @@ positives during shape retrieval.
 		(a)~Six contours before they merge. (b)~Partial contour tree depicting
 	merging of pairs of contours. (c)~Three contours after the merge.}
 \end{figure}
-\subsection{Contour Clustering}
+\subsection{Contour Clustering}\label{clus}
 After the descriptor generation stage, any standard clustering method may be used to
 locate clusters in the descriptor space that represent symmetric contours. However,
 enforcing the generation of descriptors as a constraint limits the flexibility of 
@@ -723,16 +723,28 @@ vertices in our experiments.
 %The presence of a large number of skinny triangles
 %in the mesh may introduce numerical errors in the computation of the spectra
 %and may require remeshing of the simplified mesh.
-\subsection{Clustering}\label{clust}
-The distance between the points in the descriptor space is used to assign 
-a correspondence score between the contours they represent. Let $c_i$
-and $c_j$ be two contours that belong to the same level set and $d$ be
+\subsection{Clustering}
+We observe that clusters in the descriptor space are well separated and therefore
+employ a simple scheme based on nearest neighbour search for clustering.
+For a given contour $c$, other contours that are $\epsilon$-symmetric
+with respect to $c$ are determined by locating points in the descriptor
+space that lie within a sphere of radius $\epsilon$ centred at $p_c$,
+where $p_c$ is the point in the descriptor space to which $c$ is mapped.
+To improve performance, we limit the number of points in the search space 
+by considering only those points that represent the contours that belong to
+the level set of $c$. The value of the approximation parameter $\epsilon$
+is specified by the user.
+
+In addition to clustering based on nearest neighbour search,
+we also implement spectral clustering to locate cliques in the symmetry
+correspondence graph described in Section~\ref{clus}.
+Let $c_i$ and $c_j$ be two contours that belong to the same level set and $d$ be
 the distance between their descriptors. The ideal metric for computing
 distances in the descriptor space may be determined using methods like
 metric learning~\cite{Kulis13}, however, we use
-Euclidean distances since it has yielded good results with shape 
-retrieval~\cite{reuter2006laplace,lian2013}. We build a symmetry
-correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
+Euclidean distances since it has yielded good results 
+for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. 
+We build a symmetry correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
 matrix denotes the correspondence score between the contours $c_i$
 and $c_j$.
 $$s_{ij} = 
@@ -741,15 +753,14 @@ $$s_{ij} =
 	0 & \text{otherwise}
 \end{cases}
 $$
-Here, $\sigma$ is a user defined parameter that controls the quality of symmetry detected
-where higher values of $\sigma$ tolerate larger deviations in symmetry. We use spectral clustering
+Here, $\sigma$ is a parameter that depends on $\epsilon$ and controls the quality of symmetry detected.
+Higher values of $\sigma$ tolerate larger deviations in symmetry. We use spectral clustering
 to identify clusters of symmetric contours from $\mathrm{S}$. As described by 
 Lipman~et~al.~\cite{Lip10}, spectral clustering is well suited for identifying
 cliques in the symmetry correspondence graph and clusters of symmetric
 contours can be detected from their spectral coordinates. Any standard clustering
-method may be used to recognize the clusters. We observe that the clusters
-are well separated in the spectral domain and for a given contour, we identify
-the set of contours symmetric to it with a simple nearest neighbour search.
+method may be used to recognize the clusters. We reuse the nearest neighbour search
+procedure outlined above to identify the clusters in the spectral domain.
 \section{Applications}
 It is easy to see that our method can be used to demonstrate the existing
 applications of identifying symmetry in scalar fields reported earlier

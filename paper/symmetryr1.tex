@@ -136,26 +136,45 @@ designing applications like query driven exploration and asymmetry visualization
 %}
 \teaser{
 	\centering
-	\begin{minipage}{\textwidth}
+	\subfigure[]
 	{
-			$\vcenter{\hbox{\includegraphics[scale=.33]{figures/1897-full.png}}}$
+		\begin{minipage}[c][1\width]{0.32\textwidth}
+		{
+			\centering
+			\includegraphics[scale=.33]{figures/1897-full.png}
+		}
+		\end{minipage}
 	}
+	\hspace{0.02cm}
+	\subfigure[]
 	{
+		\begin{minipage}[c][1\width]{0.32\textwidth}
+		{
+			\centering
+			\hspace{0.1cm}
 			$\vcenter{\hbox{\includegraphics[scale=.25]{figures/descspace.png}}}$
-	}
+			\vspace{0.6cm}
+%			\includegraphics[scale=.25]{figures/descspace.png}
+		}
+		\end{minipage}
+	}	
+	\subfigure[]
 	{
-			$\vcenter{\hbox{\includegraphics[scale=.33]{figures/1897-sym.png}}}$
+		\begin{minipage}[c][1\width]{0.32\textwidth}
+		{
+			\centering
+			\includegraphics[scale=.33]{figures/1897-sym.png}
+		}
+		\end{minipage}
 	}
 	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the electron microscopy 
-	data of AMP-activated kinase (EMDB-1897). (left)~Volume rendering of the data shows different symmetric patterns
-	that exhibit 3-fold rotational symmetry. (centre)~Contours 
-	are represented as points in a high-dimensional descriptor space (shown in 2D for illustration) using
-	a suitable shape descriptor. Contours belonging to symmetric regions are also symmetric and have similar descriptors.
-	Hence, symmetric contours form a cluster in the descriptor space and can be easily identified.  
-	Three such clusters detected are shown in orange, blue, and pink colours. (right)~Regions in the volume 
-	to which the symmetric contours belong are extracted and three different symmetric regions are highlighted 
-	in orange, blue, and pink colours corresponding to the three clusters.}
-	\end{minipage}
+	data of AMP-activated kinase (EMDB-1897). (a)~Volume rendering of the data displays different symmetric patterns
+	that exhibit 3-fold rotational symmetry. (b)~Contours 
+	are represented as points in a high-dimensional descriptor space (illustrated in 2D) using
+	a suitable shape descriptor. Symmetric contours form a cluster in the descriptor space and can be easily identified.  
+	Three such clusters located are shown in orange, blue, and pink colours. (c)~Three symmetric regions of
+	different sizes highlighted in orange, blue, and pink colours demonstrates the multiscale aspect of our method.}
+
 }
 
 %% Uncomment below to include a teaser figure.
@@ -232,9 +251,13 @@ between the contours. As a result, points in the descriptor space
 representing symmetric contours lie in close 
 proximity to each other and form clusters in the descriptor space. The region of the domain
 corresponding to each such contour can be extracted and these regions
-are reported as symmetric as illustrated in Figure~\ref{teaser}. Note that the choice
+are reported as symmetric.Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
+Figure~\ref{teaser} illustrates our approach for a cryo-EM dataset (EMDB-1897) 
+with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
+identification of symmetry with respect to small-scale features highlighted in blue and pink
+as well as large-scale features highlighted in orange.
 
 The main contributions of this paper are the following:
 \begin{itemize}
@@ -462,14 +485,17 @@ the domain corresponding to an arc of the contour tree, we select only one conto
 arc of the contour tree.
 
 Selecting a representative contour from each arc of the contour tree ensures that no regions
-are missed in the subsequent symmetry analysis. However, for noisy scalar fields, a large
+are missed in the subsequent symmetry analysis. Thus, we select a representative contour
+from each region associated with a feature defined by an extremum as well as larger regions formed
+by the merging of the features associated with two or more extrema. As a result,
+our method can detect symmetry at multiple scales. However, for noisy scalar fields, a large
 number of arcs of the contour tree may correspond to noise. Selecting a contour from each
 arc of the contour tree will result in significant amount of computational time spent in
 processing these noisy contours and result in poor performance. To overcome this problem,
 we generate a contour from an arc of the contour tree only if the arc is deemed to represent
 a feature and not noise. The definition of noise is subjective and depends on the application.
 In this work, we consider an arc to be noise if the volume of the 
-largest contour associated with the arc is below a user defined threshold $\eta$. The volume of a
+largest contour associated with the arc is below a user defined threshold $\delta$. The volume of a
 contour is approximated as the number of vertices of the domain enclosed by the contour. 
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
@@ -494,23 +520,41 @@ from each other should be mapped to far away points. Therefore, it is important 
 with high precision and recall ratios~\cite{lian2013} for applications that cannot tolerate false 
 positives during shape retrieval.
 \begin{figure}[b]
-	\begin{minipage}{\linewidth}
 	\centering
+	\subfigure[]
 	{
-			$\vcenter{\hbox{\includegraphics[scale=.1]{figures/ctrs-before-merge.png}}}$
+		\begin{minipage}[c][1\width]{0.3\linewidth}
+		{
+			\centering
+			%$\vcenter{\hbox{\includegraphics[scale=.1]{figures/ctrs-before-merge.png}}}$
+			\includegraphics[scale=.1]{figures/ctrs-before-merge.png}
+		}
+		\end{minipage}
 	}
-	\hspace{0.3cm}
+	\subfigure[]
 	{
-			$\vcenter{\hbox{\includegraphics[scale=.25]{figures/partct.png}}}$
+		\begin{minipage}[c][1\width]{0.3\linewidth}
+		{
+			\centering
+			%$\vcenter{\hbox{\includegraphics[scale=.25]{figures/partct.png}}}$
+			\includegraphics[scale=.25]{figures/partct.png}
+		}
+		\end{minipage}
 	}
-	\hspace{0.3cm}
+	\subfigure[]
 	{
-			$\vcenter{\hbox{\includegraphics[scale=.1]{figures/ctrs-after-merge.png}}}$
+		\begin{minipage}[c][1\width]{0.3\linewidth}
+		{
+			\centering
+			%$\vcenter{\hbox{\includegraphics[scale=.1]{figures/ctrs-after-merge.png}}}$
+			\includegraphics[scale=.1]{figures/ctrs-after-merge.png}
+		}
+		\end{minipage}
+
 	}
 	\caption{\label{ct-merge}When contours merge, their shape change drastically. 
-		(left)~Six contours before they merge. (centre)~Partial contour tree depicting
-	merging of pairs of contours. (right)~Three contours after the merge.}
-\end{minipage}
+		(a)~Six contours before they merge. (b)~Partial contour tree depicting
+	merging of pairs of contours. (c)~Three contours after the merge.}
 \end{figure}
 \subsection{Contour Clustering}
 After the descriptor generation stage, any standard clustering method may be used to
@@ -524,14 +568,14 @@ as a node in the graph and inserting an edge between two nodes if the respective
 contours are similar. It is easy to see that the contours that are similar form
 a clique under this representation and these cliques can be identified to detect
 a set of similar contours~\cite{Lip10}. Thus, given a procedure that assigns a similarity 
-correspondence score between pairs of contours, further processing is performed 
+score between pairs of contours, further processing is performed 
 solely on the graph and is independent of the actual definition of similarity.
 This allows considerable freedom in choosing a similarity measure that is relevant to an application.
 In particular, for symmetry identification, the distance between points in the descriptor space is
-used to assign the correspondence score between pairs of contours. 
+used to assign the score between pairs of contours. 
 
 Given a set of contours marked as symmetric, the arc in the contour tree 
-corresponding to each contour can be determined. The region of the domain
+to which each contour belong can be determined. The region of the domain
 enclosed by the largest contour of the arc can then be extracted and reported
 as a symmetric region. Although this works well in practice, note that the contour
 itself may have evolved due to the merging of contours nested within it.
@@ -560,39 +604,54 @@ To address this issue, we incorporate the similarity score between the children 
 (contours before merging) into the calculation of the similarity score between the given pair
 of parent contours (contours after merging). Let $p$ and $q$ be two parent contours
 with children contours ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$, respectively. 
-Assume that the correspondence score between any two
+Assume that the score between two
 children contours ${c_i}^p$ and ${c_j}^q$ is known. For contours with children,
-the procedure below can be applied bottom up to determine their correspondence
-while for contours that do not have children, the correspondence score can be directly 
-determined from the descriptor space. To calculate the score
+the procedure below can be applied bottom up to determine their score
+while for contours that do not have children, the score can be directly 
+determined from the descriptor space. To calculate the similarity score
 between $p$ and $q$, first the contribution from the children contours 
-is determined. We construct a bipartite graph where nodes in the first
-and second partitions are ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$ 
-respectively, see Figure~\ref{bip}. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
-with the correspondence score between ${c_i}^p$ and ${c_j}^q$. The maximum weight
-matching can then be computed and gives the correspondence score between the children
-contours. The correspondence score between the contours $p$ and $q$ obtained
+is determined. We construct a bipartite graph where nodes in the two partitions
+are ${c_1}^p,\dots,{c_n}^p$ and ${c_1}^q,\dots,{c_m}^q$,
+see Figure~\ref{bip}. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
+with the score between ${c_i}^p$ and ${c_j}^q$. The maximum weight
+matching is computed to determine the similarity score between the children
+contours. The score between the contours $p$ and $q$ obtained
 directly from the descriptor space is added to the maximum weight matching score
-and used as the cumulative correspondence score between $p$ and $q$. 
+to obtain the cumulative correspondence score between $p$ and $q$. Analogous procedure
+may be used for nested contours that split from a parent contour.
 \section{Implementation}
-In the previous section, we described the generic details of our symmetry
-detection algorithm. In this section, we elaborate on the details of our 
-implementation of the algorithm.
+We now elaborate on the implementation details of our symmetry identification algorithm.
+We describe the factors that determine the selection of isovalues, the particular shape descriptor
+that we use and its properties, and the clustering algorithm we employ.
 \subsection{Isovalue Selection}
-In Section~\ref{congen}, we explained that the contour tree facilitates smart
-sampling of contours by selecting a contour from each arc of the contour tree
-that is not deemed as noise. Each arc of the contour tree encodes the range
+Each arc of the contour tree encodes the range
 of values of the scalar field restricted to the subdomain represented by the arc.
 The question that remains is which function value in this range should be used
-to generate the representative contour for the arc. Rather than selecting any 
-value, it is beneficial to employ a stability criterion and select the
-maximally stable contour from each arc~\cite{MatasCUP04}. This ensures consistency
-in the shape of the contours extracted from different regions that are symmetric.
-The important observation here is that the contours within the same arc
-may undergo changes to its shape just before (or soon after) it merges 
-with another contour at a saddle. Similarly, the shape of the contour in the
-immediate neighbourhood of an extremum is typically very small and undergoes
-changes as it evolves into a bigger contour. 
+to generate the representative contour for the arc. As discussed by 
+Thomas and Natarajan~\cite{ThomN11}, perturbation in function values due to noise
+may lead to instability in the branch decomposition representation of the contour tree.
+In the context of our method, this issue manifests as inconsistency among the symmetric
+regions that are related with respect to the function value of the saddle at which 
+the contours merge and split. To generate a large contour belonging to the subvolume 
+represented by an arc, the isovalue selected should lie below the saddle at which 
+the contour merges into another contour. We choose an isovalue that is
+close to the saddle and generates isocontours that are consistent, with respect to merging
+or splitting, from all the related symmetric regions. This requires that the isovalue
+should be lower than the lowest join saddle of the contours.
+The interval of function values within which the contours are not stable due to
+variations in the saddle values is captured using a parameter $\alpha$, which is set
+to the length of the interval. After discarding the saddles of all arcs that are 
+considered to be noise, for a join saddle $s$, we select an isovalue $w = f(s)-\alpha$
+if there are no other saddles in the interval $[w,f(s)]$. Analogous procedure is
+used to select isovalues with respect to split saddles. A procedure for determining
+the value of $\alpha$ is described in Section~\ref{para}.
+%
+%Rather than selecting any 
+%value, The important observation here is that the contours within the same arc
+%may undergo changes to its shape just before (or soon after) it merges 
+%with another contour at a saddle. Similarly, the shape of the contour in the
+%immediate neighbourhood of an extremum is typically very small and undergoes
+%changes as it evolves into a bigger contour. 
 %\begin{algorithm}[b]
 %	\SetAlgoLined
 %	add arcs into a queue Q in the decreasing order\\
@@ -616,19 +675,19 @@ changes as it evolves into a bigger contour.
 %			When an arc does not satisfy the criterion, the process is repeated with a new isovalue $w$.}
 %}
 %\end{algorithm}
-
-For the purpose of computational efficiency, we adopt a simple strategy
-based on the above observation that contours in the immediate vicinity
-of a saddle or an extremum are not stable. A parameter $\alpha$ is chosen
-such that for each arc $lm$ the isovalue $w$ satisfies the condition
-$f(m)+\alpha \leq w \leq f(l)-\alpha$, assuming $f(l) > f(m)$. In other words,
-the isovalue $w$ is chosen such that it is not too close to either
-$f(l)$ or $f(m)$. It is important
-to note that the exact value of $\alpha$ is not critical because within an arc,
-only those contours generated from isovalues that are very close to an extremum or
-saddle may undergo significant changes in shape. Therefore, the exact value of $\alpha$
-is not important as long as it is not set to a value too close to zero.
-In our experiments we set $\alpha$ to 1\% of the range of the function values. 
+%
+%For the purpose of computational efficiency, we adopt a simple strategy
+%based on the above observation that contours in the immediate vicinity
+%of a saddle or an extremum are not stable. A parameter $\alpha$ is chosen
+%such that for each arc $lm$ the isovalue $w$ satisfies the condition
+%$f(m)+\alpha \leq w \leq f(l)-\alpha$, assuming $f(l) > f(m)$. In other words,
+%the isovalue $w$ is chosen such that it is not too close to either
+%$f(l)$ or $f(m)$. It is important
+%to note that the exact value of $\alpha$ is not critical because within an arc,
+%only those contours generated from isovalues that are very close to an extremum or
+%saddle may undergo significant changes in shape. Therefore, the exact value of $\alpha$
+%is not important as long as it is not set to a value too close to zero.
+%In our experiments we set $\alpha$ to 1\% of the range of the function values. 
 %Consider a level set sweep in the increasing order of function values.
 %The saddle at which a contour, created at a minimum, merge
 %into another contour is called a join saddle. The algorithm is described
@@ -647,19 +706,23 @@ In our experiments we set $\alpha$ to 1\% of the range of the function values.
 %then a contour is generated at the isovalue $w$ from the arc $lm$.
 %
 \subsection{Shape Descriptor}
-As described, the choice of shape descriptor depends on the kind of similarity
+The choice of shape descriptor depends on the kind of similarity
 analysis required by an application. For symmetry detection, we use the 
-Laplace-Beltrami spectra as the shape descriptor. The descriptor has been used for 
+Laplace-Beltrami spectra as the shape descriptor. This descriptor has been used for 
 shape matching and retrieval and is robust in the 
 presence of noise, deformations in shape, and differences in the underlying 
 triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}. 
 Although it is possible that two different shapes may have the same spectra,
-it is very rare in practice~\cite{reuter2006laplace} and is the descriptor is 
-quite discriminative
-with high precision and recall ratios~\cite{lian2013}. We use the popular cotangent
-weighted scheme for computing the Laplace-Beltrami spectra~\cite{PinkallP93}.
-Computation of the Laplace-Beltrami spectra on large meshes is costly and therefore
-we simplify the contour meshes so that the number of vertices in the mesh is around 1000.
+it is very rare in practice~\cite{reuter2006laplace} and the descriptor is 
+quite discriminative with high precision and recall ratios~\cite{lian2013}. 
+We use the popular cotangent weighted scheme for computing the 
+Laplace-Beltrami spectra~\cite{PinkallP93}. Computation of the Laplace-Beltrami spectra 
+on large meshes is costly and therefore we simplify the contour meshes 
+so that the number of vertices is small. We simplify the mesh down to 1000 
+vertices in our experiments. 
+%The presence of a large number of skinny triangles
+%in the mesh may introduce numerical errors in the computation of the spectra
+%and may require remeshing of the simplified mesh.
 \subsection{Clustering}\label{clust}
 The distance between the points in the descriptor space is used to assign 
 a correspondence score between the contours they represent. Let $c_i$
@@ -872,6 +935,7 @@ above is applied to two contours marked as symmetric by our method. Observe that
 club-like portion of the top contour is thin while that of the bottom contour is fat. This asymmetry
 can be distinguished from the dark red regions that depict vertices with large distance values.
 \section{Discussion}
+\subsection{Parameter Selection}\label{para}
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for
@@ -881,7 +945,11 @@ by the contour tree. We plan to extend our method to handle other kinds of segme
 an appropriate surface representation for the segments. A related issue is that our method does not 
 consider symmetry within a contour. A preprocessing step that segments contours into smaller partial
 surfaces may be designed to solve this problem. Another limitation is that the current implementation
-does not incorporate geometric stability criteria for selecting representative contours. We believe
+does not incorporate geometric stability criteria for selecting representative contours. 
+It is beneficial to employ a stability criterion and select the maximally stable contour 
+~\cite{MatasCUP04} from each arc of the contour tree to ensure consistency
+in the shape of the contours extracted from different regions that are symmetric.
+We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
 similar features in collections of related datasets like time-varying and ensemble data and plan to 
 investigate this in future.

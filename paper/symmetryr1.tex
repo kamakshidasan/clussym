@@ -891,11 +891,6 @@ of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane 
 The query is successful even with these challenges and emphasizes the robustness of our method.
 The volumetric region of the domain extracted in each case is shown in yellow in the context of the rest
 of the volume in Figure~\ref{volisa12}-~\ref{volisa48}.
-\subsection{Asymmetry Visualization}
-Asymmetry in scalar fields often reveals crucial characteristics of the underlying
-physical phenomena. For example, asymmetry between 
-the left and the right breasts in mammogram images is an indicator of breast 
-cancer~\cite{tahmoush2007improved}.
 \begin{figure*}[t]
 	\centering
 	\subfigure[]
@@ -924,6 +919,45 @@ in maroon and orange. The tip of the long club-like portion of the contours at t
 (c)~The top contour is aligned with the bottom contour and a distance field is computed. (d)~Visualization
 of the distance field. The dark red regions are asymmetric.}
 \end{figure*}
+\begin{figure*}[t]
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/5214.png}
+		\label{5214}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/eps1.png}
+		\label{eps1}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/eps4.png}
+		\label{eps4}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/eps8.png}
+		\label{eps8}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/eps10.png}
+		\label{eps10}
+	}
+	\caption{\label{eps}Effect of $\epsilon$ on symmetry detection. (a)~Volume rendering of a cryo-EM dataset (EMDB-5214)
+		with 2-fold symmetry where the left and the right regions show deviations from perfect symmetry.
+		(b)~Two sets of nearly symmetric regions shown in green and maroon for $\epsilon=1$\%. (c)~At
+		$\epsilon=4$\% a new maroon region, which is only partially symmetric with the existing maroon regions, is detected. 
+		Similarly, the green regions also deviate from perfect symmetry. (d)~Larger green regions are detected at 
+		$\epsilon=4$\% and (e)~$\epsilon=$10\%.}
+\end{figure*}
+\subsection{Asymmetry Visualization}
+Asymmetry in scalar fields often reveals crucial characteristics of the underlying
+physical phenomena. For example, asymmetry between 
+the left and the right breasts in mammogram images is an indicator of breast 
+cancer~\cite{tahmoush2007improved}.
 Given a set of contours $c_1,\dots,c_n$, marked as symmetric
 by our algorithm, we determine asymmetry of contour $c_k$, $1 \leq k \leq n$, with
 respect to the set of remaining contours $S = \{c_1, \dots, c_{k-1}, c_{k+1}, \dots, c_n\}$.
@@ -947,6 +981,38 @@ club-like portion of the top contour is thin while that of the bottom contour is
 can be distinguished from the dark red regions that depict vertices with large distance values.
 \section{Discussion}
 \subsection{Parameter Selection}\label{para}
+The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external parameters to our algorithm
+and are unavoidable. Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
+method.
+
+\noindent{\textbf{Approximation parameter $\epsilon$.}} 
+Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
+controls the quality of the symmetry detected. We believe that it is best to let the user choose the value
+of $\epsilon$ for a dataset, on the basis of the output it generates, instead of determining a specific
+value through a heuristic procedure. Note that the first and the second stages of our algorithm,
+namely, generation of contours and computation of descriptors, are independent of the value of 
+$\epsilon$. Nearest neighbour search can be performed efficiently. Therefore, if the first and 
+second stages of our method are precomputed, it is possible to efficiently regenerate the output
+as $\epsilon$ is varied. This makes it possible to provide the user with a slider interface
+to visualize the effect of varying $\epsilon$ and choose the ideal value that is relevant
+for the dataset.
+
+Figure~\ref{eps} illustrates the effect of varying $\epsilon$ on a cryo-EM dataset (EMDB-5214).
+Even though the global symmetry is evident, carefully observe the variation between the left
+and the right regions. These variations affect the quality of symmetry and is captured by
+different values of $\epsilon$ in our experiment. We determine the maximum distance between a
+pair of points in the descriptor space and specify different values of $\epsilon$ as a percentage
+of the maximum distance. For $\epsilon=1$\%, contours that are highly symmetric, shown in 
+Figure~\ref{eps1}, are detected. As the value of $\epsilon$ is increased, more approximately
+symmetric contours are detected as shown in Figure~\ref{eps4}-\ref{eps10}. In each figure,
+contours belonging to the same cluster are shown with the same colour.
+Note that the same dataset was used by Thomas and Natarajan to emphasize the advantage of
+the extremum graph based method over the contour tree based method. They illustrate, 
+with figures in the supplemental material, that the former method is able to do detect
+the global symmetry by virtue of being geometry-aware, while the latter method fails to
+do so due to variations in the features of the left and the right regions. Our method is able
+to quantify the effect of these variations on the quality of symmetry. Moreover, it can
+recognize partial symmetry at different scales in addition identifying the global symmetry.
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for
@@ -1281,7 +1347,7 @@ investigate this in future.
 %
 %%-------------------------------------------------------------------------
 %
-\bibliographystyle{abbrv}
+\bibliographystyle{eg-alpha}
 \acknowledgments{
 This work was supported by a grant from Department of Science and
 Technology, India (SR/S3/EECE/0086/2012) and by the Robert Bosch

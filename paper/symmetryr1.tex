@@ -749,12 +749,12 @@ matrix denotes the correspondence score between the contours $c_i$
 and $c_j$.
 $$s_{ij} = 
 \begin{cases}
-	e^{-\frac{d^2}{\sigma}} & \text{if $c_i$ and $c_j$ belong to the same level set}\\
+	e^{-\frac{d}{\sigma}} & \text{if $c_i$ and $c_j$ belong to the same level set}\\
 	0 & \text{otherwise}
 \end{cases}
 $$
-Here, $\sigma$ is a parameter that depends on $\epsilon$ and controls the quality of symmetry detected.
-Higher values of $\sigma$ tolerate larger deviations in symmetry. We use spectral clustering
+Here, $\sigma$ is chosen such that for distances greater than $\epsilon$, $s_{ij}$ quickly drops to 0.
+We use spectral clustering
 to identify clusters of symmetric contours from $\mathrm{S}$. As described by 
 Lipman~et~al.~\cite{Lip10}, spectral clustering is well suited for identifying
 cliques in the symmetry correspondence graph and clusters of symmetric
@@ -991,7 +991,7 @@ The approximation parameter $\epsilon$ and the noise parameter $\delta$ are exte
 and are unavoidable. Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
 method.
 
-\noindent{\textbf{Approximation parameter $\epsilon$.}} 
+\noindent{\textbf{Approximation parameter $\epsilon$}}.
 Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
 controls the quality of the symmetry detected. We believe that it is best to let the user choose the value
 of $\epsilon$ for a dataset, on the basis of the output it generates, instead of determining a specific
@@ -1019,6 +1019,36 @@ the global symmetry by virtue of being geometry-aware, while the latter method f
 do so due to variations in the features of the left and the right regions. Our method is able
 to quantify the effect of these variations on the quality of symmetry. Moreover, it can
 recognize partial symmetry at different scales in addition identifying the global symmetry.
+
+\noindent{\textbf{Stabilization parameter $\alpha$}}.
+The value of the stabilization parameter affects the detection of features that are very
+transient with respect to the evolution of contours during a level set sweep. Choosing
+too small a value for the stabilization parameter $\alpha$ may result in only partial detection
+of such unstable symmetric regions while choosing too high a value may result in ignoring
+these unstable regions in the symmetry analysis. We illustrate this with a cryo-EM dataset
+(EMDB-1292) with 7-fold rotational symmetry, which can be noticed from the volume rendering
+in Figure~\ref{}. In an attempt to capture the symmetry of the small unstable regions within
+the long tube-like regions that form the 7-fold symmetry, we set $\alpha$ to 0.5\% of 
+the length of the total range of scalar values. However, only two of the seven symmetric
+regions generates contours belonging to the small regions within the tube-like regions, shown
+in red in Figure~\ref{}. Due to the instability of the saddles, the contours belonging to
+the remaining five regions for the same isovalue have already merged as shown by the green contours.
+
+To determine a suitable value for $\alpha$, we adopt the same heuristic used by Thomas and Natarajan
+to stabilize the branch decomposition representation of the contour tree~\ref{ThomN11}. We plot
+the drop in the number of branches with increasing simplification of the contour tree,
+see Figure~\ref{}. Initially, there is a sudden drop due to the unstable critical points, 
+after which the curve tapers off. Based on this plot, we select a value after the curve tapers off.
+Setting $\alpha$ to 2\% discards the unstable isovalue generated earlier. 
+Figure~\ref{} depicts the 7-fold symmetry of the small blue regions within the tube-like
+regions identified using the new isovalue generated. The symmetry of the remaining small regions
+are not detected since there are no stable contours in this region. We observe that the exact
+value of $\alpha$ is crucial only while determining symmetry of the contours belonging to 
+very small arcs of the contour tree. These contours are very transient and quickly merge or split
+into another contour during a level set sweep. Note that for both values of $\alpha$, the symmetry of
+the tube-like regions is detected correctly at a different isovalue that is more stable, 
+as illustrated in Figure~ref{}. This is because these contours belong to longer arcs and are 
+insensitive to the exact value of $alpha$ as long as it is not too close to the saddle.
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for

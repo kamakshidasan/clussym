@@ -923,35 +923,41 @@ of the distance field. The dark red regions are asymmetric.}
 	\centering
 	\subfigure[]
 	{
-		\includegraphics[scale=0.17]{figures/5214.png}
+		\includegraphics[scale=0.15]{figures/5214.png}
 		\label{5214}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.13]{figures/eps1.png}
+		\includegraphics[scale=0.11]{figures/eps0pt1.png}
+		\label{eps0pt1}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/eps1.png}
 		\label{eps1}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.13]{figures/eps4.png}
+		\includegraphics[scale=0.11]{figures/eps4.png}
 		\label{eps4}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.13]{figures/eps8.png}
+		\includegraphics[scale=0.1]{figures/eps8.png}
 		\label{eps8}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.13]{figures/eps10.png}
+		\includegraphics[scale=0.11]{figures/eps10.png}
 		\label{eps10}
 	}
 	\caption{\label{eps}Effect of $\epsilon$ on symmetry detection. (a)~Volume rendering of a cryo-EM dataset (EMDB-5214)
 		with 2-fold symmetry where the left and the right regions show deviations from perfect symmetry.
-		(b)~Two sets of nearly symmetric regions shown in green and maroon for $\epsilon=1$\%. (c)~At
-		$\epsilon=4$\% a new maroon region, which is only partially symmetric with the existing maroon regions, is detected. 
-		Similarly, the green regions also deviate from perfect symmetry. (d)~Larger green regions are detected at 
-		$\epsilon=4$\% and (e)~$\epsilon=$10\%.}
+		(b)~Green oval contours that are almost perfectly symmetric identified when $\epsilon=0.1$\%. (c)~Increasing
+		$\epsilon$ to 1\% results in the addition of two more smaller contours of oval shape and a new set of symmetric
+		contours shown in maroon. (d)~At $\epsilon=4$\% a new maroon contour, which is only partially symmetric with the 
+		existing maroon contours, is located. Similarly, the green contours also deviate from perfect symmetry. 
+		(d)~Larger green regions are detected at $\epsilon=4$\% and (e)~$\epsilon=$10\%.}
 \end{figure*}
 \subsection{Asymmetry Visualization}
 Asymmetry in scalar fields often reveals crucial characteristics of the underlying
@@ -1002,9 +1008,9 @@ Even though the global symmetry is evident, carefully observe the variation betw
 and the right regions. These variations affect the quality of symmetry and is captured by
 different values of $\epsilon$ in our experiment. We determine the maximum distance between a
 pair of points in the descriptor space and specify different values of $\epsilon$ as a percentage
-of the maximum distance. For $\epsilon=1$\%, contours that are highly symmetric, shown in 
-Figure~\ref{eps1}, are detected. As the value of $\epsilon$ is increased, more approximately
-symmetric contours are detected as shown in Figure~\ref{eps4}-\ref{eps10}. In each figure,
+of the maximum distance. For $\epsilon=0.1$\%, the oval contours that are highly symmetric, shown in 
+Figure~\ref{eps0pt1}, are detected. As the value of $\epsilon$ is increased, more approximately
+symmetric contours are detected as shown in Figure~\ref{eps1}-\ref{eps10}. In each figure,
 contours belonging to the same cluster are shown with the same colour.
 Note that the same dataset was used by Thomas and Natarajan to emphasize the advantage of
 the extremum graph based method over the contour tree based method. They illustrate, 

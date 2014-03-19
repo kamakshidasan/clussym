@@ -1,35 +1,39 @@
 #include "Sampler.hpp"
 #include "BD.hpp"
 #include <iostream>
+extern unsigned int fsz;
 
 Sampler::Sampler(BD* pbd, std::vector<unsigned int> & sidx, std::vector<Vertex> & vlist)
 	: bd(pbd), sadidx(sidx), m_vlist(vlist)
 {}
-void Sampler::PickValues(std::vector<float> & isovals)
+void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 {
 	std::sort(sadidx.begin(), sadidx.end(), FnCmp(&m_vlist));
 	unsigned int sz = sadidx.size();
 	float maxf = m_vlist[bd->bridsarr[1]->ext].w;
 	float minf = m_vlist[bd->bridsarr[1]->sad].w;
-	float curf = minf, nextf, delta = (maxf - minf)/100;
-	for(unsigned int i = 1; i < sz; i++)
+	float curf = minf, nextf;
+	float alpha = orgalpha*(maxf - minf);
+	std::cout<<"orgalpha range alpha "<<orgalpha<<" "<<maxf-minf<<" "<<alpha<<std::endl;
+	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
+	for(unsigned int i = 0; i < sz; i++)
 	{
-//		std::cout<<"Saddle "<<i<<" at "<<curf<<std::endl;
+		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
-		if(nextf - curf > delta)
+		if(nextf - curf > alpha)
 		{
-			float f = nextf - delta;
+			float f = nextf - alpha;
 			isovals.push_back(f);
 			std::cout<<"Isovalues: "<<f<<std::endl;
 		}
 		curf = nextf;
 	}
 }
-void Sampler::Sample(std::vector<float> & isovals)
+void Sampler::Sample(std::vector<float> & isovals, float alpha)
 {
 	//isovals.push_back(-77.55);
-	PickValues(isovals);	
-	RestrictSamples(isovals);
+	PickValues(isovals, alpha);	
+	//RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {

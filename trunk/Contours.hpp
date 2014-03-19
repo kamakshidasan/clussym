@@ -20,10 +20,10 @@ class Contours
 	public:
 		Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours);
 		~Contours();
-		void ExtractSymmetry(unsigned int inv, unsigned int dcnt);
+		void ExtractSymmetry(unsigned int inv, float epsd, float alpha, float delta, unsigned int dcnt);
 	private:
 		//void Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did);
-		void Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did);
+		void Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did, float alpha, float delta);
 		std::vector<class BD*> bd;
 		class CompMgr* compmgr;
 		void GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour);

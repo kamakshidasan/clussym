@@ -18,9 +18,9 @@ int main(int argc, char* argv[])
 	}
 
 	vtkSmartPointer<vtkAppendPolyData> allcontours = vtkSmartPointer<vtkAppendPolyData>::New();
-	Contours ct(argv[1], argv[3], allcontours);
+	Contours ct(argv[1],  argv[6] ? argv[6] : 0, allcontours);
 
-	ct.ExtractSymmetry(atoi(argv[2]), argc - 2);
+	ct.ExtractSymmetry(atoi(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]), argv[6] ? 2 : 1);
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();

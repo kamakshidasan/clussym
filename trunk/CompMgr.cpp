@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <lemon/matching.h>
 
-CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd)
+CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd), maxd(0)
 {
 }
 void CompMgr::Init(std::vector<float> & fnvals)
@@ -27,7 +27,7 @@ void CompMgr::AddComp(CompNode* c)
 		unsigned int did2 = other->did;
 		if(bd[did1]->BrType(c->bid, -1) && bd[did2]->BrType(other->bid, -1))
 		{
-			float orgval = c->Vote(other);
+			float orgval = c->Vote(other, maxd);
 			float val = 0.0;
 			//if(orgval > 0.98) val = 1.0;
 			//else val = 0.0;
@@ -229,10 +229,10 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 	Lrw = I - D*U;
 //	Lrw = D - U;
 }
-void CompMgr::ClusterComps()
+void CompMgr::ClusterComps(float epsd)
 {
 	unsigned int csz = comps.size();
-	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
+	/*Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	Matrix<float, Dynamic, Dynamic> Lrw = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A);
 	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
@@ -269,8 +269,13 @@ void CompMgr::ClusterComps()
 	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
 	symcords.col(eigcords.cols()) = fncords;
 	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
+	
 	cl = new Cluster(symcords);
-	std::vector<unsigned int> & cltrs = cl->GetClusters();
+	*/
+	float d = epsd*epsd*maxd;
+	cl = new Cluster(this,d);
+	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
+	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
@@ -294,7 +299,7 @@ void CompMgr::Export(unsigned int cid, unsigned int clid)
 	bd[did]->SetVertMask(clid, cid, vmask, brmask, fvals[c->fnid]);
 	
 }
-float CompNode::Vote(CompNode* other)
+float CompNode::Vote(CompNode* other, float & maxd)
 {
 	float diff = 0;
 	std::vector<float>::iterator it1 = cords.begin();
@@ -306,7 +311,29 @@ float CompNode::Vote(CompNode* other)
 		bnorm += (*it2)*(*it2);
 		diff += (*it1 - *it2)*(*it1 - *it2);
 	}
+	if(maxd < diff)
+		maxd = diff;
 	return exp(-(5*diff/std::min(anorm,bnorm)));
 	
 }
-
+void CompMgr::DistanceList()
+{
+	std::cout<<"Distance List"<<std::endl;
+	unsigned int n = comps.size();
+	for(unsigned int i = 0; i < n; i++)
+		for(unsigned int j = 0; j < n; j++)
+		{
+			float diff = 0;
+			std::vector<float>::iterator it1 = comps[i]->cords.begin();
+			std::vector<float>::iterator it2 = comps[j]->cords.begin();
+			float anorm = 0, bnorm = 0;
+			for(; it1 != comps[i]->cords.end(); it1++, it2++)
+			{
+				anorm += (*it1)*(*it1);
+				bnorm += (*it2)*(*it2);
+				diff += (*it1 - *it2)*(*it1 - *it2);
+			}
+			std::cout<<"Distance between "<<i<<" and "<<j<<" "<<sqrt(diff)<<std::endl;
+		
+		}
+}

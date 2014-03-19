@@ -84,9 +84,10 @@ public:
 	void SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fval);
 	void SetVertMask(unsigned int cid, unsigned int bid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval);
 	void MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float fval);
-	void UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx);
+	void UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx, float totp);
 	void RestrictIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids);
-	void PickIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids, unsigned int min, unsigned int max, float delta);
+	void PickIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids, float delta);
+	//void PickIsoValues(std::vector<float> & isovals, std::vector<unsigned int> & arcids, float delta);
 	void Sample(std::vector<float> & isovals, float alpha);
 	std::vector<int> & GetVertMap();
 	std::vector<Vertex> & m_vlist;

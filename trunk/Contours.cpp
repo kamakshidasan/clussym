@@ -346,7 +346,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			if(cit != b->comps.end() && cit->second == -1)
+			//if(cit != b->comps.end() && cit->second == -1)
 			//if(cit == b->comps.end())
 			{
 				
@@ -359,11 +359,11 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				compmgr->AddComp(c);
 				sprintf(fn,"%d-%d.vtk",c->did, c->id);
 			}
-			else
+			/*else
 			{
 				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
 				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
-			}
+			}*/
 			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 			writer->SetFileName(fn);
 			trifil->SetInput(polydata);
@@ -394,6 +394,7 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	unsigned int prev = 0;
 	for(; i < fvals.size(); i++)
 	{
+		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
 		ctr->SetValue(0, fvals[i]);
 		ctr->Update();
 		ProcessIsoSurface(i, prev, ctr, did);
@@ -437,7 +438,7 @@ Contours::~Contours()
 
 
 //void Contours::Preprocess(vtkSmartPointer<vtkUnstructuredGrid> tgrid, unsigned int inv, unsigned int did)
-void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did)
+void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned int inv, unsigned int did, float alpha, float delta)
 {
 	/*vtkSmartPointer<vtkImageGaussianSmooth> gaussianSmoother =
 		vtkSmartPointer<vtkImageGaussianSmooth>::New();
@@ -469,13 +470,13 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	tgrid->GetDimensions(dim);
 	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
 	std::vector<unsigned int> sadidx;
-	float alpha;
-	bd[did]->BuildBD(sadidx,fvals,alpha);
+	std::vector<float> tempf;
+	bd[did]->BuildBD(sadidx,tempf, delta);
 
 	Sampler s(bd[did], sadidx, verts[did]);
 	if(did == 0)
 	{
-		s.Sample(fvals);
+		s.Sample(fvals, alpha);
 	}
 	else
 	{
@@ -485,7 +486,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	}
 }
 
-void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
+void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float delta, unsigned int dcnt)
 {
 	/*vtkSmartPointer<vtkUnstructuredGridReader> prdr1 = vtkSmartPointer<vtkUnstructuredGridReader>::New();
 	vtkSmartPointer<vtkUnstructuredGridReader> prdr2 = vtkSmartPointer<vtkUnstructuredGridReader>::New();
@@ -529,7 +530,7 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 	verts = std::vector<std::vector<Vertex> >(dcnt);
 	for(unsigned int did = 0; did < dcnt; did++)
 	{
-		Preprocess(tgrid[did], inv, did);
+		Preprocess(tgrid[did], inv, did, alpha, delta);
 		if(did == 0)
 			compmgr->Init(fvals);
 		vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
@@ -554,7 +555,8 @@ void Contours::ExtractSymmetry(unsigned int inv, unsigned int dcnt)
 		strpwriter->Update();
 		GenerateIsoSpace(did);
 	}
-	compmgr->ClusterComps();
+	compmgr->ClusterComps(epsd);
+	//compmgr->DistanceList();
 	gettimeofday(&timeval_end, NULL);
 	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
 	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;

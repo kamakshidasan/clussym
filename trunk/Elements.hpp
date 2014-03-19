@@ -26,6 +26,7 @@ struct Vertex
 	my_float xyz[3];
 	my_float w;
 	unsigned int cof;
+	unsigned int feature;
 //	unsigned int marked;
 	std::list<unsigned int> reg;
 //	unsigned int tm;
@@ -36,6 +37,7 @@ struct Vertex
 //		marked = 0; //tm = 0; 
 		w = field;
 		cof = 0;
+		feature = 0;
 		memcpy(xyz, v, sizeof(xyz));
 	}
 	const Vertex & operator = (const Vertex & vtx)

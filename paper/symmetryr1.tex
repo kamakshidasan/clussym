@@ -1049,6 +1049,27 @@ into another contour during a level set sweep. Note that for both values of $\al
 the tube-like regions is detected correctly at a different isovalue that is more stable, 
 as illustrated in Figure~ref{}. This is because these contours belong to longer arcs and are 
 insensitive to the exact value of $alpha$ as long as it is not too close to the saddle.
+
+\noindent{\textbf{Noise parameter $\delta$}}.
+We determine the number of arcs of the contour tree with volume above a particular value and plot
+the drop in the number of arcs with increasing value of volume. For the fuel dataset in 
+Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
+drop in the number of arcs initially, similar to the graph used for determining the stabilization
+parameter $\alpha$. This drop is due to a large number of small features in the data which are 
+considered to be noise under our simplistic model for determining noise based on the size of features.
+We choose a value immediately after this sudden drop and set this as the value of $\delta$. We
+set $\delta=$20 for the fuel dataset and four sets of symmetric features, each exhibiting
+4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym}. Observe that the
+the supplemental material of the extremum graph based symmetry detection method shows 
+that it does a poor job in reporting symmetric regions within the fuel dataset. 
+Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
+cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
+method is able to capture the symmetry of smaller symmetric regions for this dataset. They use a different model for determining
+noise based on persistence, which is the difference in function value between the extremum
+and the saddle of a topological feature. Although our implementation may be modified to incorporate
+persistence based noise determination, it is not possible to use a single model that works across
+datasets with different noise characteristics. Therefore, the model for determining noise should
+be adapted based on the application under consideration. 
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for

@@ -336,10 +336,9 @@ void BD::MaskBranches(SymBranch* br, std::vector<unsigned int> & brmask, float f
 }
 void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float fisoval)
 {
-	brmask = std::vector<unsigned int> (bridsarr.size(), 0);
 	SymBranch* br = bridsarr[bid];
 	SymBranch* root = bridsarr[1];
-	float fval = m_vlist[br->sad].w;
+	float fval = bid == 1 ? m_vlist[root->ext].w : m_vlist[br->sad].w;
 	float totper = m_vlist[root->ext].w - m_vlist[root->sad].w;
 	std::list<SymBranch*>::iterator bit = br->ch.begin();
 	for(; bit != br->ch.end(); bit++)
@@ -405,13 +404,13 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 	{
 		if(umask[i])
 		{
-			unsigned char val = (m_vlist[i].w - minval)/(maxval - minval)*(255);
+			unsigned char val = (maxval - m_vlist[i].w)/(maxval - minval)*(255);
 			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
 		}
 		else
 		{
 			unsigned char val = 0;
-			val = 255;
+			val = 0;
 			fwrite(&val, sizeof(unsigned char), 1, fpminbin);
 		}
 
@@ -436,13 +435,13 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 		NodeData* mdata = ((NodeData*)m->data);
 		unsigned int totsz = *(unsigned int*)lm->data + mdata->sz;
 		ldata->sz += totsz;
-		if(totsz >= fsz)
+		if(totsz >= 0)
 		{
 			ldata->num++;
 			m_vlist[l->i].feature = totsz;
 			float alphalo = m_vlist[m->i].w + alpha;
 			float alphahi = m_vlist[l->i].w - alpha;
-			std::cout<<"Feature saddle: s ("<<m_vlist[l->i].xyz[0]
+/*			std::cout<<"Feature saddle: s ("<<m_vlist[l->i].xyz[0]
 							<<" "<<m_vlist[l->i].xyz[1]
 							<<" "<<m_vlist[l->i].xyz[2]
 							<<" "<<m_vlist[l->i].w
@@ -450,17 +449,17 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 							<<" "<<m_vlist[m->i].xyz[1]
 							<<" "<<m_vlist[m->i].xyz[2]
 							<<" "<<m_vlist[m->i].w
-						<<std::endl;
-			if((alphahi > alphalo))
+						<<std::endl;*/
+//			if((alphahi > alphalo))
 			{
 				unsigned int fidx = fvals.size();
 				float w = fidx > 0 ? fvals[fidx-1] : 0;
-				std::cout<<"Valid arc. alphahi "<<alphahi<<" w "<<w<<" alphalo "<<alphalo<<std::endl;
+				std::cout<<"Valid arc. sz "<<totsz<<std::endl;
 				if(!fidx || (alphalo > w) || (w > alphahi))
 				{
 					assert(w <= alphahi);
 					fvals.push_back(alphahi);
-					std::cout<<"W values: "<<alphahi<<std::endl;
+//					std::cout<<"W values: "<<alphahi<<std::endl;
 					fidx++;
 				}
 				arcids.push_back(i);

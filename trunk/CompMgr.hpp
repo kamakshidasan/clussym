@@ -29,8 +29,8 @@ class CompMgr
 	public:
 		CompMgr(std::vector<class BD*> & pbd);
 		void AddComp(CompNode* c);
-		void ClusterComps(float epsd);
-		void Export(unsigned int clid, unsigned int cid);
+		void ClusterComps(float epsd, unsigned int vsz);
+		void Export(unsigned int cid, unsigned int clid, std::vector<unsigned int> & brmask);
 		void Init(std::vector<float> & fnvals);
 		void DistanceList();
 		std::vector<CompNode*> comps;

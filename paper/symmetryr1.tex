@@ -32,8 +32,9 @@
 \usepackage{amsmath, amsfonts}
 \usepackage{subfigure}
 \usepackage{algorithm2e}
-
+\usepackage{transparent}
 \usepackage{amsthm}
+
 \newtheorem*{defi}{Definition}
 
 %% We encourage the use of mathptmx for consistent usage of times font
@@ -152,9 +153,7 @@ designing applications like query driven exploration and asymmetry visualization
 		{
 			\centering
 			\hspace{0.1cm}
-			$\vcenter{\hbox{\includegraphics[scale=.25]{figures/descspace.png}}}$
-			\vspace{0.6cm}
-%			\includegraphics[scale=.25]{figures/descspace.png}
+			\includegraphics[scale=.25]{figures/descspace.png}
 		}
 		\end{minipage}
 	}	
@@ -407,6 +406,20 @@ data structure that captures these changes in the connectivity of the level sets
 Let $R$ be an equivalence relation defined on points in $\mathbb{M}$: $xRy$ for $x,y 
 \in \mathbb{M}$  if $x,y$ belong to the same contour. The contour tree is the quotient space 
 induced by this relation. 
+\begin{figure}
+	\centering
+	\subfigure[]
+	{
+			\includegraphics[scale=.2]{figures/ctfield.png}
+	}
+	\hspace{0.2cm}
+	\subfigure[]
+	{
+			\includegraphics[scale=.12]{figures/ct.png}
+	}
+	\caption{\label{ct}The contour tree captures changes in the topology of the level sets of a scalar field. 
+	(a)~A scalar field and its level sets. (b)~The contour tree for the field.}
+\end{figure}
 
 Subdomains $\mathbb{M}_1, \mathbb{M}_2 \subseteq \mathbb{M}$ are said to be \emph{symmetric} 
 if there is a transformation $T$ such that ${\mathbb{M}_2=T(\mathbb{M}_1)}$ and 
@@ -589,7 +602,7 @@ set of contours with the same shape. As illustrated in the left and right
 figures, the shape of individual nested contours
 before merge is different from the shape of the contour after the merge.
 Therefore the points corresponding to the contours before and after the merge may not be
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 	\scalebox{0.12}{\input {xfig/bip.pdf_t}}
 \caption{\label{bip}Maximum weight matching is used to determine the contribution of children
@@ -736,8 +749,8 @@ the level set of $c$. The value of the approximation parameter $\epsilon$
 is specified by the user.
 
 In addition to clustering based on nearest neighbour search,
-we also implement spectral clustering to locate cliques in the symmetry
-correspondence graph described in Section~\ref{clus}.
+for completeness, we also implement spectral clustering to locate cliques in the symmetry
+correspondence graph.
 Let $c_i$ and $c_j$ be two contours that belong to the same level set and $d$ be
 the distance between their descriptors. The ideal metric for computing
 distances in the descriptor space may be determined using methods like
@@ -761,19 +774,6 @@ cliques in the symmetry correspondence graph and clusters of symmetric
 contours can be detected from their spectral coordinates. Any standard clustering
 method may be used to recognize the clusters. We reuse the nearest neighbour search
 procedure outlined above to identify the clusters in the spectral domain.
-\section{Applications}
-It is easy to see that our method can be used to demonstrate the existing
-applications of identifying symmetry in scalar fields reported earlier
-in the literature. In this section, we describe two new applications
-for improving exploration and visualization of scalar fields.
-\subsection{Query Contour Driven Exploration}
-As the size and complexity of data generated through imaging and simulations
-grows, newer paradigms for effective exploration and interaction with
-the data are required. Query driven exploration is one such paradigm that
-facilitates navigation through complex data and is gaining popularity over the last few
-years~\cite{BeyerAKLPH13,LiuJH13}. Symmetric regions in a dataset facilitate query
-driven exploration of the data~\cite{ThomN13,MasoodTN13}. A region of interest that is segmented from 
-the domain is employed as the query region and symmetry information is utilized to identify
 \begin{figure*}[t]
 \begin{minipage}{\textwidth}
 	\centering
@@ -852,6 +852,20 @@ first time step is employed as the query and the result on four different time s
 is shown. Note that even though the contours contain noise, they are located correctly due to the robustness of
 our method. (i)-(l)~The corresponding volumetric region identified is show in yellow.}
 \end{figure*}
+\section{Applications}
+It is easy to see that our method can be used to demonstrate the existing
+applications of identifying symmetry in scalar fields reported earlier
+in the literature. In this section, we describe two new applications
+for improving exploration and visualization of scalar fields.
+\subsection{Query Contour Driven Exploration}
+As the size and complexity of data generated through imaging and simulations
+grows, newer paradigms for effective exploration and interaction with
+the data are required. Query driven exploration is one such paradigm that
+facilitates navigation through complex data and is gaining popularity over the last few
+years~\cite{BeyerAKLPH13,LiuJH13}. Symmetric regions in a dataset facilitate query
+driven exploration of the data~\cite{ThomN13,MasoodTN13}. A region of interest that is segmented from 
+the domain is employed as the query region and symmetry information is utilized to identify
+
 other regions similar to the query. To facilitate exploration using regions of the domain as query, the domain 
 needs to be segmented and this is often a challenge. Instead, we visualize the
 evolution of contours during a level set sweep and select a contour of interest. 
@@ -923,6 +937,45 @@ of the distance field. The dark red regions are asymmetric.}
 	\centering
 	\subfigure[]
 	{
+		\includegraphics[scale=0.15]{figures/1292-full.png}
+		\label{1292-full}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/alpha0pt2.png}
+		\label{alpha0pt2}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/1292-stable.png}
+		\label{1292-stable}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.15]{figures/1292-sym.png}
+		\label{1292-sym}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.1]{figures/alphaplot.png}
+		\label{alphaplot}
+	}
+	\caption{\label{alpha}Influence of stabilisation parameter, $\alpha$, on symmetry detection. 
+		(a)~Volume rendering of a cryo-EM dataset (EMDB-1292) shows long tube-like structures that
+		exhibit 7-fold rotational symmetry. (b)~Setting $\alpha$ to 0.2\% of the length of the range of scalar
+		values generates unstable contours within the tube-like regions indicated by inconsistency
+		in the merging of the blue and green contours. (c)~Setting $\alpha$ to 1\% discards the unstable contours
+		and the symmetry of the small blue contours generated at a more stable isovalue are identified.
+		(d)~The 7-fold symmetry of the tube like regions are identified in both cases since 
+		these larger features are not sensitive to the exact value of $alpha$.	
+		(e)~The plot of the number of critical points with increasing simplification shows an initial sudden drop
+	and we set $\alpha$ to a value immediately after this drop.}
+		
+\end{figure*}
+\begin{figure*}[t]
+	\centering
+	\subfigure[]
+	{
 		\includegraphics[scale=0.15]{figures/5214.png}
 		\label{5214}
 	}
@@ -951,7 +1004,7 @@ of the distance field. The dark red regions are asymmetric.}
 		\includegraphics[scale=0.11]{figures/eps10.png}
 		\label{eps10}
 	}
-	\caption{\label{eps}Effect of $\epsilon$ on symmetry detection. (a)~Volume rendering of a cryo-EM dataset (EMDB-5214)
+	\caption{\label{eps}Influence of approximation parameter, $\epsilon$, on symmetry detection. (a)~Volume rendering of a cryo-EM dataset (EMDB-5214)
 		with 2-fold symmetry where the left and the right regions show deviations from perfect symmetry.
 		(b)~Green oval contours that are almost perfectly symmetric identified when $\epsilon=0.1$\%. (c)~Increasing
 		$\epsilon$ to 1\% results in the addition of two more smaller contours of oval shape and a new set of symmetric
@@ -986,10 +1039,42 @@ above is applied to two contours marked as symmetric by our method. Observe that
 club-like portion of the top contour is thin while that of the bottom contour is fat. This asymmetry
 can be distinguished from the dark red regions that depict vertices with large distance values.
 \section{Discussion}
+In this section, we discuss the results of our method on different datasets and elaborate on
+the selection of parameters, comparison with existing topology based methods, and performance.
 \subsection{Parameter Selection}\label{para}
 The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external parameters to our algorithm
 and are unavoidable. Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
 method.
+
+\noindent{\textbf{Stabilisation parameter $\alpha$}}.
+The value of the stabilisation parameter affects the detection of features that are very
+transient with respect to the evolution of contours during a level set sweep. Choosing
+too small a value for the stabilisation parameter $\alpha$ may result in only partial detection
+of such unstable symmetric regions while choosing too high a value may result in ignoring
+these unstable regions in the symmetry analysis. We illustrate this with a cryo-EM dataset
+(EMDB-1292) with 7-fold rotational symmetry, see the volume rendering
+in Figure~\ref{1292-full}. In an attempt to capture the symmetry of the small unstable regions within
+the long tube-like regions that form the 7-fold symmetry, we set $\alpha$ to 0.2\% of 
+the length of the total range of scalar values. However, only four of the seven symmetric
+regions generates contours belonging to the small regions within the tube-like regions, shown
+in blue in Figure~\ref{alpha0pt2}. Due to the instability of the saddles, the contours belonging to
+the remaining three regions, for the same isovalue, have already merged as shown by the green contours.
+
+To determine a suitable value for $\alpha$, we adopt the same heuristic used by Thomas and Natarajan
+to stabilise the branch decomposition representation of the contour tree~\cite{ThomN11}. We plot
+the drop in the number of critical points with increasing simplification of the contour tree,
+see Figure~\ref{alphaplot}. Initially, there is a sudden drop due to the unstable critical points, 
+after which the curve tapers off. Based on this plot, we select a value immediately after the initial drop.
+Setting $\alpha$ to 1\% discards the unstable isovalue generated earlier. 
+Figure~\ref{1292-stable} depicts the 7-fold symmetry of the small blue contours from the top portion of
+the tube-like regions identified using the new isovalue generated. The symmetry of the remaining small regions
+are not detected since the higher value $\alpha$ discards the unstable contours in this region. 
+We observe that the exact value of $\alpha$ is crucial only while determining symmetry of the contours belonging to 
+very small arcs of the contour tree. These contours are very transient and quickly merge or split
+into another contour during a level set sweep. Note that for both values of $\alpha$, the symmetry of
+the tube-like regions is detected correctly at a different isovalue that is more stable, 
+as illustrated in Figure~\ref{1292-sym}. This is because these contours belong to longer arcs and are 
+insensitive to the exact value of $\alpha$.
 
 \noindent{\textbf{Approximation parameter $\epsilon$}}.
 Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
@@ -1018,55 +1103,50 @@ with figures in the supplemental material, that the former method is able to do 
 the global symmetry by virtue of being geometry-aware, while the latter method fails to
 do so due to variations in the features of the left and the right regions. Our method is able
 to quantify the effect of these variations on the quality of symmetry. Moreover, it can
+\begin{figure}[t]
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.15]{figures/fuel-full.png}
+		\label{fuel-full}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/fuel-sym200.png}
+		\label{fuel-sym200}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.13]{figures/fuel-sym20.png}
+		\label{fuel-sym20}
+	}
+	\caption{\label{delta}Influence of noise parameter, $\delta$, on symmetry detection. (a)~Volume rendering of 
+		the fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
+		(b)~Three symmetric regions identified when $\delta$ is set to 200. (c)~Lowering
+	$\delta$ to 20 results in the detection of two more smaller symmetric regions.}
+\end{figure}
 recognize partial symmetry at different scales in addition identifying the global symmetry.
-
-\noindent{\textbf{Stabilization parameter $\alpha$}}.
-The value of the stabilization parameter affects the detection of features that are very
-transient with respect to the evolution of contours during a level set sweep. Choosing
-too small a value for the stabilization parameter $\alpha$ may result in only partial detection
-of such unstable symmetric regions while choosing too high a value may result in ignoring
-these unstable regions in the symmetry analysis. We illustrate this with a cryo-EM dataset
-(EMDB-1292) with 7-fold rotational symmetry, which can be noticed from the volume rendering
-in Figure~\ref{}. In an attempt to capture the symmetry of the small unstable regions within
-the long tube-like regions that form the 7-fold symmetry, we set $\alpha$ to 0.5\% of 
-the length of the total range of scalar values. However, only two of the seven symmetric
-regions generates contours belonging to the small regions within the tube-like regions, shown
-in red in Figure~\ref{}. Due to the instability of the saddles, the contours belonging to
-the remaining five regions for the same isovalue have already merged as shown by the green contours.
-
-To determine a suitable value for $\alpha$, we adopt the same heuristic used by Thomas and Natarajan
-to stabilize the branch decomposition representation of the contour tree~\ref{ThomN11}. We plot
-the drop in the number of branches with increasing simplification of the contour tree,
-see Figure~\ref{}. Initially, there is a sudden drop due to the unstable critical points, 
-after which the curve tapers off. Based on this plot, we select a value after the curve tapers off.
-Setting $\alpha$ to 2\% discards the unstable isovalue generated earlier. 
-Figure~\ref{} depicts the 7-fold symmetry of the small blue regions within the tube-like
-regions identified using the new isovalue generated. The symmetry of the remaining small regions
-are not detected since there are no stable contours in this region. We observe that the exact
-value of $\alpha$ is crucial only while determining symmetry of the contours belonging to 
-very small arcs of the contour tree. These contours are very transient and quickly merge or split
-into another contour during a level set sweep. Note that for both values of $\alpha$, the symmetry of
-the tube-like regions is detected correctly at a different isovalue that is more stable, 
-as illustrated in Figure~ref{}. This is because these contours belong to longer arcs and are 
-insensitive to the exact value of $alpha$ as long as it is not too close to the saddle.
 
 \noindent{\textbf{Noise parameter $\delta$}}.
 We determine the number of arcs of the contour tree with volume above a particular value and plot
 the drop in the number of arcs with increasing value of volume. For the fuel dataset in 
 Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
-drop in the number of arcs initially, similar to the graph used for determining the stabilization
+drop in the number of arcs initially, similar to the graph used for determining the stabilisation
 parameter $\alpha$. This drop is due to a large number of small features in the data which are 
 considered to be noise under our simplistic model for determining noise based on the size of features.
-We choose a value immediately after this sudden drop and set this as the value of $\delta$. We
-set $\delta=$20 for the fuel dataset and four sets of symmetric features, each exhibiting
-4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym}. Observe that the
-the supplemental material of the extremum graph based symmetry detection method shows 
+We choose a value immediately after this sudden drop and set this as the value of $\delta$. When
+$\delta$ is set to 200 for the fuel dataset, three sets of symmetric features, each exhibiting
+4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20
+identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $delta$
+acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
+Observe that the the supplemental material of the extremum graph based symmetry detection method shows 
 that it does a poor job in reporting symmetric regions within the fuel dataset. 
 Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
 cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
-method is able to capture the symmetry of smaller symmetric regions for this dataset. They use a different model for determining
-noise based on persistence, which is the difference in function value between the extremum
-and the saddle of a topological feature. Although our implementation may be modified to incorporate
+method is able to easily capture the symmetry of smaller symmetric regions for this dataset. 
+They use a different model for determining noise based on persistence, which is the difference in 
+function value between the extremum and the saddle of a topological feature. 
+Although our implementation may be modified to incorporate
 persistence based noise determination, it is not possible to use a single model that works across
 datasets with different noise characteristics. Therefore, the model for determining noise should
 be adapted based on the application under consideration. 

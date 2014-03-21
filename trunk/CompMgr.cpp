@@ -229,7 +229,7 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 	Lrw = I - D*U;
 //	Lrw = D - U;
 }
-void CompMgr::ClusterComps(float epsd)
+void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 {
 	unsigned int csz = comps.size();
 	/*Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
@@ -280,23 +280,35 @@ void CompMgr::ClusterComps(float epsd)
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
 	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
-	for(unsigned int i = 0; i < cl->clidarr.size(); i++)
+	for(unsigned int i = 0; i < cl->clusters.size(); i++)
 	{
-		if(cl->clidarr[i])
-			Export(i, cl->clidarr[i]);
+		std::cout<<"For cluster "<<i<<"mebers are "<<std::endl;
+		int cid = -1;
+		for(unsigned int j = 0; j < cl->clusters[i].mem.size(); j++)
+		{
+			std::vector<unsigned int> brmask = std::vector<unsigned int> (bsz, 0);
+			cid = cl->clusters[i].mem[j];
+			std::cout<<cid<<" "<<std::endl;
+			Export(cid,i, brmask);
+		if(cid != -1)
+		{
+			CompNode* c = comps[cid];
+			unsigned int bid = c->bid;
+			unsigned int did = c->did;
+			std::vector<unsigned int> vmask;
+			bd[did]->SetVertMask(i, cid, vmask, brmask, fvals[c->fnid]);
+		}
+		}
 	}
 }
 
-void CompMgr::Export(unsigned int cid, unsigned int clid)
+void CompMgr::Export(unsigned int cid, unsigned int clid, std::vector<unsigned int> & brmask)
 {
 	CompNode* c = comps[cid];
 	unsigned int bid = c->bid;
 	unsigned int did = c->did;
-	std::vector<unsigned int> brmask;
 	
 	bd[did]->SetBrMask(bid, brmask, fvals[c->fnid]);
-	std::vector<unsigned int> vmask;
-	bd[did]->SetVertMask(clid, cid, vmask, brmask, fvals[c->fnid]);
 	
 }
 float CompNode::Vote(CompNode* other, float & maxd)

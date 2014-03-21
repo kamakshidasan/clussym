@@ -48,7 +48,7 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows()
 }
 std::vector<unsigned int> & Cluster::GetClusters(float d)
 {
-	for(unsigned int i = 1; i < nPts; i++)
+	for(unsigned int i = 0; i < nPts; i++)
 	{
 		if(clidarr[i] == 0)
 		{
@@ -72,6 +72,7 @@ void Cluster::GetMembers(unsigned int id, std::vector<unsigned int> & mem, float
 	{
 		std::cout << "\t" << j << "\t" << nnIdx[j] << "\t" << dists[j] << "\n";
 		clidarr[nnIdx[j]] = clusters.size();
+		mem.push_back(nnIdx[j]);
 	}
 	delete [] nnIdx;
 	delete [] dists;

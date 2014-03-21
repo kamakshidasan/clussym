@@ -18,7 +18,7 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
 	for(unsigned int i = 0; i < sz; i++)
 	{
-		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
+		//std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
 		if(nextf - curf > alpha)
 		{
@@ -33,7 +33,7 @@ void Sampler::Sample(std::vector<float> & isovals, float alpha)
 {
 	//isovals.push_back(-77.55);
 	PickValues(isovals, alpha);	
-	//RestrictSamples(isovals);
+	RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {

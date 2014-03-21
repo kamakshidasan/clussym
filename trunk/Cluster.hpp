@@ -20,11 +20,11 @@ class Cluster
 		std::vector<unsigned int> & GetClusters(float d);
 		~Cluster();
 		std::vector<unsigned int> clidarr;
+		std::vector<ClusInfo> clusters;
 	private:
 		ANNpointArray datapts;
 		ANNkd_tree* kdTree;
 		unsigned int nPts;
 		unsigned int dim;
-		std::vector<ClusInfo> clusters;
 };
 #endif

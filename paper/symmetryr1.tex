@@ -171,8 +171,8 @@ designing applications like query driven exploration and asymmetry visualization
 	that exhibit 3-fold rotational symmetry. (b)~Contours 
 	are represented as points in a high-dimensional descriptor space (illustrated in 2D) using
 	a suitable shape descriptor. Symmetric contours form a cluster in the descriptor space and can be easily identified.  
-	Three such clusters located are shown in orange, blue, and pink colours. (c)~Three symmetric regions of
-	different sizes highlighted in orange, blue, and pink colours demonstrates the multiscale aspect of our method.}
+	Three such clusters located are shown in golden, blue, and pink colours. (c)~Three symmetric regions of
+	different sizes highlighted in golden, blue, and pink colours demonstrates the multiscale aspect of our method.}
 
 }
 
@@ -256,7 +256,7 @@ of similarity relevant to the application of interest, an appropriate descriptor
 Figure~\ref{teaser} illustrates our approach for a cryo-EM dataset (EMDB-1897) 
 with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
 identification of symmetry with respect to small-scale features highlighted in blue and pink
-as well as large-scale features highlighted in orange.
+as well as large-scale features highlighted in golden colour.
 
 The main contributions of this paper are the following:
 \begin{itemize}
@@ -363,7 +363,7 @@ and understanding about the symmetry of the domain. In addition, this method req
 	\scalebox{0.3}{\input {xfig/ctrmap.pdf_t}}
 	\caption{\label{ctmap}Mapping of contours as points in the descriptor space. Symmetric contours
 		shown in blue colour are mapped to the same blue point in the descriptor space. Six approximately
-		symmetric contours shown in orange colour are mapped to six points which lie in close
+		symmetric contours shown in golden colour are mapped to six points which lie in close
 		proximity to each other in the descriptor space.}
 }
 \end{figure}
@@ -821,36 +821,37 @@ procedure outlined above to identify the clusters in the spectral domain.
 		\label{conisa48}
 	}
 \end{minipage}
-\begin{minipage}{\textwidth}
-	\centering
-	\subfigure[]
-	{
-		\includegraphics[scale=0.09]{figures/isabel12.png}
-		\label{volisa12}
-	}
-	\subfigure[]
-	{
-		\includegraphics[scale=0.09]{figures/isabel24.png}
-		\label{volisa24}
-	}
-	\subfigure[]
-	{
-		\includegraphics[scale=0.09]{figures/isabel36.png}
-		\label{volisa36}
-	}
-	\subfigure[]
-	{
-		\includegraphics[scale=0.09]{figures/isabel48.png}
-		\label{volisa48}
-	}
-\end{minipage}
+%\begin{minipage}{\textwidth}
+%	\centering
+%	\subfigure[]
+%	{
+%		\includegraphics[scale=0.09]{figures/isabel12.png}
+%		\label{volisa12}
+%	}
+%	\subfigure[]
+%	{
+%		\includegraphics[scale=0.09]{figures/isabel24.png}
+%		\label{volisa24}
+%	}
+%	\subfigure[]
+%	{
+%		\includegraphics[scale=0.09]{figures/isabel36.png}
+%		\label{volisa36}
+%	}
+%	\subfigure[]
+%	{
+%		\includegraphics[scale=0.09]{figures/isabel48.png}
+%		\label{volisa48}
+%	}
+%\end{minipage}
 \caption{Query driven exploration using contours. (a)~Volume rendering of the first time step of 
 Isabel dataset shows low pressure region in red. Querying with (b)~a~synthetically generated 
 half-ellipsoid finds (c)~an isocontour with similar shape from the low pressure region. (d)~The low
 pressure region extracted is shown in yellow. (e)-(h)~The isocontour from the low pressure region of the
 first time step is employed as the query and the result on four different time steps, 12, 24, 36, and 48
 is shown. Note that even though the contours contain noise, they are located correctly due to the robustness of
-our method. (i)-(l)~The corresponding volumetric region identified is show in yellow.}
+our method.}
+%(i)-(l)~The corresponding volumetric region identified is show in yellow.}
 \end{figure*}
 \section{Applications}
 It is easy to see that our method can be used to demonstrate the existing
@@ -903,28 +904,27 @@ the contours show variations in their shape and has considerable amount of noise
 Also, as opposed to the query contour, a significant portion
 of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane makes landfall.
 The query is successful even with these challenges and emphasizes the robustness of our method.
-The volumetric region of the domain extracted in each case is shown in yellow in the context of the rest
-of the volume in Figure~\ref{volisa12}-~\ref{volisa48}.
+The supplemental material shows the volumetric region of the domain extracted in each case.
 \begin{figure*}[t]
 	\centering
 	\subfigure[]
 	{
-		\includegraphics[scale=0.17]{figures/asymvol.png}
+		\includegraphics[scale=0.15]{figures/asymvol.png}
 		\label{asymvol}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.17]{figures/asymctrs.png}
+		\includegraphics[scale=0.15]{figures/asymctrs.png}
 		\label{asymctrs}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.17]{figures/asymalign.png}
+		\includegraphics[scale=0.15]{figures/asymalign.png}
 		\label{asymalign}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.17]{figures/asym.png}
+		\includegraphics[scale=0.15]{figures/asym.png}
 		\label{asym}
 	}
 	\caption{Asymmetry visualization. (a)~Volume rendering of a cryo-EM dataset (EMDB-1134) 
@@ -933,6 +933,144 @@ in maroon and orange. The tip of the long club-like portion of the contours at t
 (c)~The top contour is aligned with the bottom contour and a distance field is computed. (d)~Visualization
 of the distance field. The dark red regions are asymmetric.}
 \end{figure*}
+\subsection{Asymmetry Visualization}
+Asymmetry in scalar fields often reveals crucial characteristics of the underlying
+physical phenomena. For example, asymmetry between 
+the left and the right breasts in mammogram images is an indicator of breast 
+cancer~\cite{tahmoush2007improved}.
+Given a set of contours $c_1,\dots,c_n$, marked as symmetric
+by our algorithm, we determine asymmetry of contour $c_k$, $1 \leq k \leq n$, with
+respect to the set of remaining contours $S = \{c_1, \dots, c_{k-1}, c_{k+1}, \dots, c_n\}$.
+For this, we first determine the symmetry transformation that maps each $c_i \in S$ onto
+$c_k$ and spatially align $c_i$ with $c_k$ by applying the transformation. 
+The transformation may be determined using the ICP (Iterative Closest Point) algorithm.
+These spatially aligned meshes in $S$ are then glued together to generate a single mesh, say $c_{avg}$, 
+with respect to which asymmetry of $c_k$ is determined. For this purpose, we use the 
+\texttt{Metro} tool~\cite{CigRS98}, which evaluates the distance from the vertices of the mesh 
+$c_k$ to the mesh $c_{avg}$ by computing for each vertex in $c_k$ the closest point in $c_{avg}$. 
+A large distance means that there was no point corresponding to it in the other contours,
+which is an indication of asymmetry. Note that the \texttt{Metro} tool cannot compute distances 
+between contours directly from their original spatial coordinates. 
+It requires both the meshes to be spatially aligned. 
+The distance computed at each vertex using \texttt{Metro} is stored as a scalar field of 
+$c_k$ and the procedure is repeated
+for each contour. The asymmetry in the contours can then be located by visualizing the distance fields.
+Figure~\ref{asym} shows a cryo-EM dataset in which the top and bottom regions are symmetric. The procedure
+above is applied to two contours marked as symmetric by our method. Observe that the tip of the long
+club-like portion of the top contour is thin while that of the bottom contour is fat. This asymmetry
+can be distinguished from the dark red regions that depict vertices with large distance values.
+\begin{figure*}[t]
+\begin{minipage}{\textwidth}
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/1654-full.png}
+		\label{1654-full}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/1654-glosym.png}
+		\label{1654-glosym}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/1654-larsym2.png}
+		\label{1654-larsym2}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/1654-larsym1.png}
+		\label{1654-larsym1}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.17]{figures/1654-smallsym.png}
+		\label{1654-smallsym}
+	}
+\end{minipage}
+\begin{minipage}{\textwidth}
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/kneevol.png}
+		\label{kneevol}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/kneectrssym.png}
+		\label{kneectrssym}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.11]{figures/kneectrsflat.png}
+		\label{kneectrsflat}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.14]{figures/1hga-full.png}
+		\label{1hga-full}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.14]{figures/1hga-sym.png}
+		\label{1hga-sym}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.14]{figures/1hgaext.png}
+		\label{1hgaext}
+	}
+\end{minipage}
+	\caption{\label{res}Symmetric regions detected on different datasets. (a)~Volume rendering of a cryo-EM dataset (EMDB-1654),
+		with noisy regions depicted in violet. (b)-(e)~Symmetric regions at multiple scales detected by our method.
+		The extremum graph based method can detect symmetry only at the largest scale. (f)~Volume rendering of
+		a pair of knees. (g)~Bilateral symmetry of the bones detected by our method, shown in orange, blue, and pink, 
+		even in the presence of missing regions and noise in the contours of the dataset. (h)~Volume rendering
+		of the electron densty of a haemoglobin	molecule (PDB-ID 1HGA) that exhibit 2-fold rotational symmetry. 
+		(i)~The two symmetric regions are detected by our method even though they lie in close proximity to each other.
+		(j)~Flat regions corresponding to the global maximum of the knee dataset and (k)~asymmetric distribution of
+	the extrema of the molecule dataset pose challenges in determining the seed set for the extremum graph based method.}
+\end{figure*}
+\section{Discussion}
+In this section, we report the results of our method on different datasets and elaborate on
+comparison with existing topology based methods, selection of parameters,  and performance.
+\subsection{Comparison With Topological Methods}
+The segmentation of the domain utilized by our algorithm for locating symmetric regions is
+derived from topological features identified through the contour tree. We compare our
+method with existing symmetry detection methods that also segment the domain on the
+basis of topological features. While the contour tree based method~\cite{ThomN11} relies 
+on structural similarity between the subtrees for symmetry identification, the extremum graph
+based method depends on distances between the extrema evaluated on an augmented version of the extremum
+graph~\cite{ThomN13}. 
+
+Thomas and Natarajan~\cite{ThomN13} point out that noise in the data
+that destroy the repeating structure of the subtrees of the contour tree poses challenges in
+determining symmetry using the contour tree. They argue that their method using the extremum graph
+is better at handling noise and report symmetry detected at the largest scale for several 
+cryo-EM datasets. The contour tree based method, on the other hand, can detect symmetry at different scales.
+Our method combines the advantage of these two methods. The first row in Figure~\ref{res} shows the result of our
+method on one of the noisy datasets used by Thomas and Natarajan~\cite{ThomN13}, EMDB-1654. In addition 
+to detecting symmetry at the largest scale, our method is able to identify smaller symmetric
+regions at different scales. The extremum graph based method requires user guidance for carefully
+selecting a set of well separated and symmetrically distributed extrema, called the seed set, 
+for symmetry detection. Typical cryo-EM datasets is devoid of noise in the high and low density regions and therefore
+the symmetry of the extrema belonging to these regions can be easily identified for choosing
+a seed set. Our method does not make such assumptions and we show the results of our method 
+on two datasets where selection of seed
+set is non-trivial. Figure~\ref{kneevol} shows a volume rendering of a CT scan of a pair of knees. Observe the
+dark regions in the bone where the scalar values are noisy. Our method identifies
+the symmetry between the contours belonging to three portions of the bones in the left and the right knee, shown
+in orange, blue, and pink in Figure~\ref{kneectrssym}. An inspection of these contours show that the dark regions of the bone in 
+the volume rendering capture missing regions and noise in the contours. Despite these missing regions and noise,
+our method successfully identifies the symmetry of the bones. The isosurface for this dataset at
+the global maximum in Figure~\ref{kneectrsflat} shows that the global maximum forms a flat region. 
+Figure~\ref{1hga-full} shows an electron density field
+derived from the atomic coordinates of a haemoglobin molecule using EMAN software~\cite{ludtke1999eman}.
+Our method identifies two symmetric regions, shown in blue and pink in Figure~\ref{1hga-sym},
+despite these two regions being in close proximity to each other. An isovalue close to the
+global maximum, see Figure~\ref{1hgaext}, shows that the extrema belonging to the high density regions are not
+symmetrically distributed within the two symmetric regions. In both these cases, selection of a set of extrema as seed set 
+is not easy because of the flat regions and the asymmetric distribution of the extrema in the data. 
 \begin{figure*}[t]
 	\centering
 	\subfigure[]
@@ -970,7 +1108,6 @@ of the distance field. The dark red regions are asymmetric.}
 		these larger features are not sensitive to the exact value of $alpha$.	
 		(e)~The plot of the number of critical points with increasing simplification shows an initial sudden drop
 	and we set $\alpha$ to a value immediately after this drop.}
-		
 \end{figure*}
 \begin{figure*}[t]
 	\centering
@@ -1012,35 +1149,7 @@ of the distance field. The dark red regions are asymmetric.}
 		existing maroon contours, is located. Similarly, the green contours also deviate from perfect symmetry. 
 		(d)~Larger green regions are detected at $\epsilon=4$\% and (e)~$\epsilon=$10\%.}
 \end{figure*}
-\subsection{Asymmetry Visualization}
-Asymmetry in scalar fields often reveals crucial characteristics of the underlying
-physical phenomena. For example, asymmetry between 
-the left and the right breasts in mammogram images is an indicator of breast 
-cancer~\cite{tahmoush2007improved}.
-Given a set of contours $c_1,\dots,c_n$, marked as symmetric
-by our algorithm, we determine asymmetry of contour $c_k$, $1 \leq k \leq n$, with
-respect to the set of remaining contours $S = \{c_1, \dots, c_{k-1}, c_{k+1}, \dots, c_n\}$.
-For this, we first determine the symmetry transformation that maps each $c_i \in S$ onto
-$c_k$ and spatially align $c_i$ with $c_k$ by applying the transformation. 
-The transformation may be determined using the ICP (Iterative Closest Point) algorithm.
-These spatially aligned meshes in $S$ are then glued together to generate a single mesh, say $c_{avg}$, 
-with respect to which asymmetry of $c_k$ is determined. For this purpose, we use the 
-\texttt{Metro} tool~\cite{CigRS98}, which evaluates the distance from the vertices of the mesh 
-$c_k$ to the mesh $c_{avg}$ by computing for each vertex in $c_k$ the closest point in $c_{avg}$. 
-A large distance means that there was no point corresponding to it in the other contours,
-which is an indication of asymmetry. Note that the \texttt{Metro} tool cannot compute distances 
-between contours directly from their original spatial coordinates. 
-It requires both the meshes to be spatially aligned. 
-The distance computed at each vertex using \texttt{Metro} is stored as a scalar field of 
-$c_k$ and the procedure is repeated
-for each contour. The asymmetry in the contours can then be located by visualizing the distance fields.
-Figure~\ref{asym} shows a cryo-EM dataset in which the top and bottom regions are symmetric. The procedure
-above is applied to two contours marked as symmetric by our method. Observe that the tip of the long
-club-like portion of the top contour is thin while that of the bottom contour is fat. This asymmetry
-can be distinguished from the dark red regions that depict vertices with large distance values.
-\section{Discussion}
-In this section, we discuss the results of our method on different datasets and elaborate on
-the selection of parameters, comparison with existing topology based methods, and performance.
+
 \subsection{Parameter Selection}\label{para}
 The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external parameters to our algorithm
 and are unavoidable. Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
@@ -1049,16 +1158,16 @@ method.
 \noindent{\textbf{Stabilisation parameter $\alpha$}}.
 The value of the stabilisation parameter affects the detection of features that are very
 transient with respect to the evolution of contours during a level set sweep. Choosing
-too small a value for the stabilisation parameter $\alpha$ may result in only partial detection
+too small a value for the stabilisation parameter may result in only partial detection
 of such unstable symmetric regions while choosing too high a value may result in ignoring
 these unstable regions in the symmetry analysis. We illustrate this with a cryo-EM dataset
 (EMDB-1292) with 7-fold rotational symmetry, see the volume rendering
 in Figure~\ref{1292-full}. In an attempt to capture the symmetry of the small unstable regions within
 the long tube-like regions that form the 7-fold symmetry, we set $\alpha$ to 0.2\% of 
-the length of the total range of scalar values. However, only four of the seven symmetric
-regions generates contours belonging to the small regions within the tube-like regions, shown
+the total range of scalar values. However, only four of the seven symmetric
+regions generate contours belonging to the small regions within the tube-like regions, shown
 in blue in Figure~\ref{alpha0pt2}. Due to the instability of the saddles, the contours belonging to
-the remaining three regions, for the same isovalue, have already merged as shown by the green contours.
+the remaining three regions, for the same isovalue, have already merged, as shown by the green contours.
 
 To determine a suitable value for $\alpha$, we adopt the same heuristic used by Thomas and Natarajan
 to stabilise the branch decomposition representation of the contour tree~\cite{ThomN11}. We plot
@@ -1074,7 +1183,9 @@ very small arcs of the contour tree. These contours are very transient and quick
 into another contour during a level set sweep. Note that for both values of $\alpha$, the symmetry of
 the tube-like regions is detected correctly at a different isovalue that is more stable, 
 as illustrated in Figure~\ref{1292-sym}. This is because these contours belong to longer arcs and are 
-insensitive to the exact value of $\alpha$.
+insensitive to the exact value of $\alpha$. We believe that employing a geometric criterion like 
+maximally stable contour~\cite{MatasCUP04} is a better strategy for selecting a stable contour 
+from an arc and plan to explore this approach in our future work.
 
 \noindent{\textbf{Approximation parameter $\epsilon$}}.
 Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
@@ -1098,10 +1209,10 @@ Figure~\ref{eps0pt1}, are detected. As the value of $\epsilon$ is increased, mor
 symmetric contours are detected as shown in Figure~\ref{eps1}-\ref{eps10}. In each figure,
 contours belonging to the same cluster are shown with the same colour.
 Note that the same dataset was used by Thomas and Natarajan to emphasize the advantage of
-the extremum graph based method over the contour tree based method. They illustrate, 
-with figures in the supplemental material, that the former method is able to do detect
-the global symmetry by virtue of being geometry-aware, while the latter method fails to
-do so due to variations in the features of the left and the right regions. Our method is able
+the extremum graph based method~\cite{ThomN13} over the contour tree based method. They illustrate, 
+with figures in the supplemental material, that their method is able to do detect
+the global symmetry by virtue of being geometry-aware, while the contour tree based method~\cite{ThomN11} 
+fails to do so due to variations in the features of the left and the right regions. Our method is able
 to quantify the effect of these variations on the quality of symmetry. Moreover, it can
 \begin{figure}[t]
 	\centering
@@ -1134,10 +1245,10 @@ Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This pl
 drop in the number of arcs initially, similar to the graph used for determining the stabilisation
 parameter $\alpha$. This drop is due to a large number of small features in the data which are 
 considered to be noise under our simplistic model for determining noise based on the size of features.
-We choose a value immediately after this sudden drop and set this as the value of $\delta$. When
+We choose a value immediately after this sudden drop as the value of $\delta$. When
 $\delta$ is set to 200 for the fuel dataset, three sets of symmetric features, each exhibiting
 4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20
-identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $delta$
+identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
 acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
 Observe that the the supplemental material of the extremum graph based symmetry detection method shows 
 that it does a poor job in reporting symmetric regions within the fuel dataset. 
@@ -1150,6 +1261,7 @@ Although our implementation may be modified to incorporate
 persistence based noise determination, it is not possible to use a single model that works across
 datasets with different noise characteristics. Therefore, the model for determining noise should
 be adapted based on the application under consideration. 
+\subsection{Performance}
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for
@@ -1160,8 +1272,8 @@ an appropriate surface representation for the segments. A related issue is that 
 consider symmetry within a contour. A preprocessing step that segments contours into smaller partial
 surfaces may be designed to solve this problem. Another limitation is that the current implementation
 does not incorporate geometric stability criteria for selecting representative contours. 
-It is beneficial to employ a stability criterion and select the maximally stable contour 
-~\cite{MatasCUP04} from each arc of the contour tree to ensure consistency
+It is beneficial to employ a geometric stability criterion that selects a stable contour 
+from each arc of the contour tree to ensure consistency
 in the shape of the contours extracted from different regions that are symmetric.
 We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
@@ -1484,7 +1596,7 @@ investigate this in future.
 %
 %%-------------------------------------------------------------------------
 %
-\bibliographystyle{eg-alpha}
+\bibliographystyle{abbrv}
 \acknowledgments{
 This work was supported by a grant from Department of Science and
 Technology, India (SR/S3/EECE/0086/2012) and by the Robert Bosch

@@ -196,7 +196,7 @@ void BD::UpdateSymTree(SymBranch* b, std::vector<unsigned int> & sadidx, float t
 		b->csz += (*bit)->csz;
 	}
 //	if(b->csz > fsz) sadidx.push_back(b->sad);
-	std::cout<<" Br "<<b->bid<<" per "<<(fabs(m_vlist[b->sad].w - m_vlist[b->ext].w)/totp)<<std::endl;	
+//	std::cout<<" Br "<<b->bid<<" per "<<(fabs(m_vlist[b->sad].w - m_vlist[b->ext].w)/totp)<<std::endl;	
 	if(m_vlist[b->sad].feature) sadidx.push_back(b->sad);
 }
 
@@ -266,8 +266,8 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	assert(ndidx == numNodes);
 	assert(arcidx == numarcs);
 
-	std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
-	std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
+	//std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
+	//std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
 
 	std::vector<unsigned int> arcids;
 	//PickIsoValues(isovals, arcids, vidx[0], vidx[nv-1], delta);
@@ -435,7 +435,7 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 		NodeData* mdata = ((NodeData*)m->data);
 		unsigned int totsz = *(unsigned int*)lm->data + mdata->sz;
 		ldata->sz += totsz;
-		if(totsz >= 0)
+		if(totsz >= fsz)
 		{
 			ldata->num++;
 			m_vlist[l->i].feature = totsz;
@@ -454,7 +454,7 @@ void BD::PickIsoValues(std::vector<float> & fvals, std::vector<unsigned int> & a
 			{
 				unsigned int fidx = fvals.size();
 				float w = fidx > 0 ? fvals[fidx-1] : 0;
-				std::cout<<"Valid arc. sz "<<totsz<<std::endl;
+//				std::cout<<"Valid arc. sz "<<totsz<<std::endl;
 				if(!fidx || (alphalo > w) || (w > alphahi))
 				{
 					assert(w <= alphahi);
@@ -528,16 +528,16 @@ void BD::RestrictIsoValues(std::vector<float> & isovals, std::vector<unsigned in
 				{
 					unsigned int e  = m->i;
 					unsigned int s  = l->i;
-					std::cout<<"Selecting Isovalue "<<isoval<<" for arc of br "<<br->bid
-							<<" m ("<<m_vlist[e].xyz[0]
-							<<" "<<m_vlist[e].xyz[1]
-							<<" "<<m_vlist[e].xyz[2]
-							<<" "<<m_vlist[e].w
-						<<" l ("<<m_vlist[s].xyz[0]
-							<<" "<<m_vlist[s].xyz[1]
-							<<" "<<m_vlist[s].xyz[2]
-							<<" "<<m_vlist[s].w
-						<<std::endl;
+//					std::cout<<"Selecting Isovalue "<<isoval<<" for arc of br "<<br->bid
+//							<<" m ("<<m_vlist[e].xyz[0]
+//							<<" "<<m_vlist[e].xyz[1]
+//							<<" "<<m_vlist[e].xyz[2]
+//							<<" "<<m_vlist[e].w
+//						<<" l ("<<m_vlist[s].xyz[0]
+//							<<" "<<m_vlist[s].xyz[1]
+//							<<" "<<m_vlist[s].xyz[2]
+//							<<" "<<m_vlist[s].w
+//						<<std::endl;
 					br->comps[j] = -1;
 					break;
 				}

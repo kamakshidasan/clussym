@@ -14,14 +14,14 @@ Cluster::Cluster(CompMgr* cmp, float dist) : clidarr(cmp->comps.size(), 0)
 		for(unsigned int i = 0; i < nPts; i++)
 		{
 			float cordid;
-			std::cout<<"Cord "<<i<<" : ";
+//			std::cout<<"Cord "<<i<<" : ";
 			for(unsigned int d = 0; d < dim-1; d++)
 			{
 				cordid = datapts[i][d] = cmp->comps[i]->cords[d];
-				std::cout<<cordid<<" ";
+//				std::cout<<cordid<<" ";
 			}
 			cordid = datapts[i][dim-1] = cmp->comps[i]->fnid*dist;
-			std::cout<<cordid<<std::endl;
+	//		std::cout<<cordid<<std::endl;
 		}
 
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
@@ -40,7 +40,7 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows()
 		{
 			for(unsigned int d = 0; d < dim; d++)
 				datapts[i][d] = cords(i,d);
-			std::cout<<"Cord "<<i<<" : "<<std::endl<<cords.row(i)<<std::endl;
+//			std::cout<<"Cord "<<i<<" : "<<std::endl<<cords.row(i)<<std::endl;
 		}
 
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
@@ -63,14 +63,14 @@ std::vector<unsigned int> & Cluster::GetClusters(float d)
 void Cluster::GetMembers(unsigned int id, std::vector<unsigned int> & mem, float d)
 {
 	unsigned int sz = kdTree->annkFRSearch(datapts[id], d, 0);
-	printf("For pt %d sphere of radius %f contains %d\n", id, d, sz);
+//	printf("For pt %d sphere of radius %f contains %d\n", id, d, sz);
 	ANNidxArray nnIdx = new ANNidx[sz];						// allocate near neigh indices
 	ANNdistArray dists = new ANNdist[sz];						// allocate near neighbor dists
 	kdTree->annkFRSearch(datapts[id], d, sz, nnIdx, dists);
 
 	for (unsigned int j = 0; j < sz; j++) 
 	{
-		std::cout << "\t" << j << "\t" << nnIdx[j] << "\t" << dists[j] << "\n";
+//		std::cout << "\t" << j << "\t" << nnIdx[j] << "\t" << dists[j] << "\n";
 		clidarr[nnIdx[j]] = clusters.size();
 		mem.push_back(nnIdx[j]);
 	}

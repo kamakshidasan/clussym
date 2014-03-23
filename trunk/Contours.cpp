@@ -256,9 +256,9 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 		decimate->SetTargetReduction(target);
 		decimate->Update();
 		contour = decimate->GetOutput();				
-		std::cout <<"After decimate "<<contour->GetNumberOfCells()
-			<<" "<<contour->GetNumberOfPolys()
-			<<" "<<contour->GetNumberOfPoints()<<std::endl;
+//		std::cout <<"After decimate "<<contour->GetNumberOfCells()
+//			<<" "<<contour->GetNumberOfPolys()
+//			<<" "<<contour->GetNumberOfPoints()<<std::endl;
 	}
 
 	LB lb;
@@ -315,17 +315,21 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 	{
 		confilter->InitializeSpecifiedRegionList();
 		confilter->AddSpecifiedRegion(r);
+		vtkSmartPointer<vtkPolyData> polydata1 = confilter->GetOutput();
+		if(polydata1->GetNumberOfPoints() < 1400) continue;
 		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
+		std::cout<<"begin cleaning"<<std::endl;
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
+		std::cout<<"end cleaning"<<std::endl;
 
 		if(nreg == 1)
 		{
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+//			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+//			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else if(polydata->GetNumberOfPoints() > 20)
+		else if(polydata->GetNumberOfPoints() > 1400)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
@@ -334,10 +338,10 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			if(bid == -1) 
 			{
 				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
-				writer->SetFileName(fn);
+/*				writer->SetFileName(fn);
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();
+				writer->Write();*/
 				std::cout<<"Branch Id is -1!!!"<<std::endl;
 				//assert(0);
 				//bid = 1;
@@ -358,24 +362,24 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				c->did = did;
 				compmgr->AddComp(c);
 				sprintf(fn,"%d-%d.vtk",c->did, c->id);
+				writer->SetFileName(fn);
+				trifil->SetInput(polydata);
+				writer->SetInputConnection(trifil->GetOutputPort());
+				writer->Write();
 			}
 			else
 			{
 				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
 				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
-			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
-			writer->SetFileName(fn);
-			trifil->SetInput(polydata);
-			writer->SetInputConnection(trifil->GetOutputPort());
-			writer->Write();
+//			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 
 		}
 		else
 		{
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+/*			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			std::cout<<" Too few points, not processing"<<std::endl;
+			std::cout<<" Too few points, not processing"<<std::endl;*/
 
 		}
 	}
@@ -394,7 +398,7 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	unsigned int prev = 0;
 	for(; i < fvals.size(); i++)
 	{
-		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
+//		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
 		ctr->SetValue(0, fvals[i]);
 		ctr->Update();
 		ProcessIsoSurface(i, prev, ctr, did);
@@ -533,26 +537,6 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 		Preprocess(tgrid[did], inv, did, alpha, delta);
 		if(did == 0)
 			compmgr->Init(fvals);
-		vtkSmartPointer<vtkIntArray> bidarray = vtkIntArray::New();
-		bidarray->SetName("bids");
-		std::vector<int> & bmap = bd[did]->GetVertMap();
-		bidarray->SetArray(&bmap[0], bmap.size(), 1);
-		tgrid[did]->GetPointData()->AddArray(bidarray);
-		tgrid[did]->Update();
-		
-		vtkSmartPointer<vtkStructuredPointsWriter> strpwriter =
-			vtkSmartPointer<vtkStructuredPointsWriter>::New();
-		//vtkSmartPointer<vtkUnstructuredGridWriter> ugwriter =
-		//	vtkSmartPointer<vtkUnstructuredGridWriter>::New();
-		strpwriter->SetInput(tgrid[did]);
-		//ugwriter->SetInput(tgrid[did]);
-		if(did == 0)
-			//ugwriter->SetFileName("u1.vtk");
-			strpwriter->SetFileName("u1.vtk");
-		else
-			//ugwriter->SetFileName("u2.vtk");
-			strpwriter->SetFileName("u2.vtk");
-		strpwriter->Update();
 		GenerateIsoSpace(did);
 	}
 	compmgr->ClusterComps(epsd, bd[0]->bridsarr.size());

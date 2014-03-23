@@ -18,8 +18,9 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
 	for(unsigned int i = 0; i < sz; i++)
 	{
-		//std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
+		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
+		std::cout<<"nextf curf"<<nextf<<" "<<curf<<std::endl;
 		if(nextf - curf > alpha)
 		{
 			float f = nextf - alpha;
@@ -99,7 +100,7 @@ void Sampler::PropogateValues(std::vector<float> & fvals, float min, float max)
 	std::vector<float> isovals;
 	float curmax = m_vlist[bd->bridsarr[1]->ext].w;
 	float curmin = m_vlist[bd->bridsarr[1]->sad].w;
-	isovals.push_back(-344.693);
+//	isovals.push_back(-344.693);
 /*	for(unsigned int i = 0; i < fvals.size(); i++)
 	{
 		float f = (fvals[i] - min)*(curmax-curmin)/(max - min) + curmin;

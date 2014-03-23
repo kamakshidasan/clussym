@@ -4,8 +4,9 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <lemon/matching.h>
-
+extern struct timeval clus_start, clus_end;
 CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd), maxd(0)
 {
 }
@@ -19,7 +20,7 @@ void CompMgr::AddComp(CompNode* c)
 	unsigned int did1 = c->did;
 	assert(c->id == comps.size());
 	comps.push_back(c);
-	unsigned int sz = fnmap[c->fnid].size();
+	/*unsigned int sz = fnmap[c->fnid].size();
 	for(unsigned int i = 0; i < sz; i++)
 	{
 		unsigned int compidx = fnmap[c->fnid][i];
@@ -34,7 +35,7 @@ void CompMgr::AddComp(CompNode* c)
 			c->votes[other->id] = orgval;
 //			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
 		}
-	}
+	}*/
 	fnmap[c->fnid].push_back(c->id);
 }
 void CompMgr::SetParent(CompNode* c, unsigned int ppfid)
@@ -273,9 +274,11 @@ void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 	cl = new Cluster(symcords);
 	*/
 	float d = epsd*epsd*maxd;
+	gettimeofday(&clus_start, NULL);
 	cl = new Cluster(this,d);
 //	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
+	gettimeofday(&clus_end, NULL);
 	
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
@@ -307,9 +310,7 @@ void CompMgr::Export(unsigned int cid, unsigned int clid, std::vector<unsigned i
 	CompNode* c = comps[cid];
 	unsigned int bid = c->bid;
 	unsigned int did = c->did;
-	
 	bd[did]->SetBrMask(bid, brmask, fvals[c->fnid]);
-	
 }
 float CompNode::Vote(CompNode* other, float & maxd)
 {
@@ -326,7 +327,6 @@ float CompNode::Vote(CompNode* other, float & maxd)
 	if(maxd < diff)
 		maxd = diff;
 	return exp(-(5*diff/std::min(anorm,bnorm)));
-	
 }
 void CompMgr::DistanceList()
 {

@@ -173,12 +173,12 @@ SymBranch* BD::BuildSymTree(ctBranch* b, SymBranch* node, unsigned int & brid,
 
 BD::BD(std::vector<Vertex> & verts, vtkSmartPointer<vtkUnstructuredGrid> tgrid) : m_vlist(verts), first(1)
 {
-	vtkSmartPointer<vtkExtractEdges> extractEdges =
+	/*vtkSmartPointer<vtkExtractEdges> extractEdges =
 		vtkSmartPointer<vtkExtractEdges>::New();
 	extractEdges->SetInput(tgrid);
 	extractEdges->Update();
 
-	mesh = extractEdges->GetOutput();
+	mesh = extractEdges->GetOutput();*/
 }
 BD::BD(std::vector<Vertex> & verts, int dimx, int dimy, int dimz) : m_vlist(verts), 
 	SIZEX(dimx), SIZEY(dimy), SIZEZ(dimz), first(1)

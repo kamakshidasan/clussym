@@ -45,6 +45,15 @@
 
 #include <sys/time.h>
 
+struct timeval clus_start, clus_end;
+struct timeval ct_start, ct_end;
+struct timeval dis_start, dis_end;
+double distime;
+struct timeval ctr_start, ctr_end;
+double ctrtime;
+struct timeval tot_start, tot_end;
+struct timeval oh_start, oh_end;
+double ohtime;
 /*typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::FT FT;
 typedef Kernel::Point_3 Point;
@@ -244,9 +253,6 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	cleanpolydata->SetInput(mesh);*/
 
-	cleanpolydata->SetInput(contour);
-	cleanpolydata->Update();
-	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
 	if(ntri > 2000)
 	{
@@ -263,7 +269,6 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	LB lb;
 	lb.GetEigen(contour, c->cords);
-	allcts->AddInputConnection(contour->GetProducerPort());
 
 	//mesh->Delete();
 }
@@ -317,10 +322,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		confilter->AddSpecifiedRegion(r);
 		vtkSmartPointer<vtkPolyData> polydata1 = confilter->GetOutput();
 		if(polydata1->GetNumberOfPoints() < 1400) continue;
-		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		std::cout<<"begin cleaning"<<std::endl;
+		gettimeofday(&oh_start, NULL);
+		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
+		gettimeofday(&oh_end, NULL);
+		ohtime += (oh_end.tv_sec-oh_start.tv_sec+oh_end.tv_usec/1000000.0-oh_start.tv_usec/1000000.0);
 		std::cout<<"end cleaning"<<std::endl;
 
 		if(nreg == 1)
@@ -357,7 +365,10 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
+				gettimeofday(&dis_start, NULL);
 				GenCompCords(c, polydata);
+				gettimeofday(&dis_end, NULL);
+				distime += (dis_end.tv_sec-dis_start.tv_sec+dis_end.tv_usec/1000000.0-dis_start.tv_usec/1000000.0);
 				c->csz = polydata->GetNumberOfPoints();
 				c->did = did;
 				compmgr->AddComp(c);
@@ -396,6 +407,7 @@ void Contours::GenerateIsoSpace(unsigned int did)
 
 	int i = 0;
 	unsigned int prev = 0;
+	gettimeofday(&ctr_start, NULL);
 	for(; i < fvals.size(); i++)
 	{
 //		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
@@ -404,6 +416,7 @@ void Contours::GenerateIsoSpace(unsigned int did)
 		ProcessIsoSurface(i, prev, ctr, did);
 		prev = i;
 	}
+	gettimeofday(&ctr_end, NULL);
 }
 
 Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAppendPolyData> allcontours)
@@ -475,6 +488,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	bd.push_back(new BD(verts[did], dim[0], dim[1], dim[2]));
 	std::vector<unsigned int> sadidx;
 	std::vector<float> tempf;
+	gettimeofday(&ct_start, NULL);
 	bd[did]->BuildBD(sadidx,tempf, delta);
 
 	Sampler s(bd[did], sadidx, verts[did]);
@@ -488,6 +502,7 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 		float min = verts[0][bd[0]->bridsarr[1]->sad].w;
 		s.PropogateValues(fvals, min, max);
 	}
+	gettimeofday(&ct_end, NULL);
 }
 
 void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float delta, unsigned int dcnt)

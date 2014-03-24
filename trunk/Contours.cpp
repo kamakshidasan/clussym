@@ -253,6 +253,9 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	cleanpolydata->SetInput(mesh);*/
 
+	cleanpolydata->SetInput(contour);
+	cleanpolydata->Update();
+	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
 	if(ntri > 2000)
 	{
@@ -269,6 +272,7 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	LB lb;
 	lb.GetEigen(contour, c->cords);
+	allcts->AddInputConnection(contour->GetProducerPort());
 
 	//mesh->Delete();
 }
@@ -557,9 +561,20 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	compmgr->ClusterComps(epsd, bd[0]->bridsarr.size());
 	//compmgr->DistanceList();
 	gettimeofday(&timeval_end, NULL);
-	double time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
-	double time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
-	printf("Time: %f Groups %d Branches %d\n", time_end - time_start,0,0);
+	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
+	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;
+	printf("Time: cttime %f\n", time_end - time_start);
+	printf("Time: distime %f\n", distime);
+	time_start = clus_start.tv_sec + (double) clus_start.tv_usec/1000000;
+	time_end= clus_end.tv_sec + (double) clus_end.tv_usec/1000000;
+	printf("Time: clustime %f\n", time_end - time_start);
+	printf("Time: ohtime %f\n", ohtime);
+	time_start = ctr_start.tv_sec + (double) ctr_start.tv_usec/1000000;
+	time_end= ctr_end.tv_sec + (double) ctr_end.tv_usec/1000000;
+	printf("Time: ctrtime %f\n", time_end-time_start);
+	time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
+	time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
+	printf("Time: tottime %f\n", time_end-time_start);
 	fflush(stdout);
 }
 

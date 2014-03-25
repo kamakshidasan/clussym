@@ -385,7 +385,7 @@ the descriptor space to capture geometric information about contours along with 
 tree as a topological abstraction of contours, our method offers significant advantages over 
 \begin{figure*}[t]
 	\centering
-		\includegraphics[scale=0.5]{figures/pipe.png}
+		\includegraphics[scale=0.15]{inkscape/pipe.pdf}
 	\caption{\label{pipeline} Symmetry detection pipeline. Contours are extracted
 		from the scalar field dataset and a descriptor is generated for each contour.
 		A correspondence score is estimated between pairs of contours based on the
@@ -904,7 +904,8 @@ the contours show variations in their shape and has considerable amount of noise
 Also, as opposed to the query contour, a significant portion
 of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane makes landfall.
 The query is successful even with these challenges and emphasizes the robustness of our method.
-The supplemental material shows the volumetric region of the domain extracted in each case.
+Similar to Figure~\ref{detisa1}, the volumetric region of the domain can be extracted in 
+each case and is shown in the supplemental material.
 \begin{figure*}[t]
 	\centering
 	\subfigure[]
@@ -1262,6 +1263,24 @@ persistence based noise determination, it is not possible to use a single model 
 datasets with different noise characteristics. Therefore, the model for determining noise should
 be adapted based on the application under consideration. 
 \subsection{Performance}
+\begin{table}[t]
+\centering
+\caption{Running time, measured in seconds, for various steps in the symmetry detection pipeline.
+	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM.}
+\label{exp-table}
+\begin{tabular}{c||c|c|c|c}
+EMDB	&  	 	& build & EMD		& traverse 	\\%& \#simp.
+dataset\# & \#vertices 	& graph & computation 	&  graph  	\\%& extrema
+\hline
+2094 	& $100^3$ 	& 5.4 	& 1.5 		&  	3.2       	\\%& 6217		432 
+1654 	& $112^3$ 	& 7.6 	& 3.3 		&  	1.1       	\\%& 14397		639
+1706 	& $130^3$ 	& 8.5 	& 0.04 		& 	0.5		\\%& 18440		35 
+1603 	& $160^3$ 	& 34.2 	& 8.9 		&  	45.4     	\\%& 19452		4731 
+5331	& $240^3$	& 106.5 & 19.8		&  	77.6		\\
+1179 	& $255^3$ 	& 106.9 & - 		&  	409.1    	%& 80127		3604
+\end{tabular}
+\end{table}
+
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for

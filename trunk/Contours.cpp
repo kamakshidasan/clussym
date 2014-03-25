@@ -325,36 +325,35 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		confilter->InitializeSpecifiedRegionList();
 		confilter->AddSpecifiedRegion(r);
 		vtkSmartPointer<vtkPolyData> polydata1 = confilter->GetOutput();
-		if(polydata1->GetNumberOfPoints() < 1400) continue;
-		std::cout<<"begin cleaning"<<std::endl;
+		//std::cout<<"begin cleaning"<<std::endl;
 		gettimeofday(&oh_start, NULL);
 		cleanpolydata->SetInputConnection(confilter->GetOutputPort());
 		cleanpolydata->Update();
 		vtkSmartPointer<vtkPolyData> polydata = cleanpolydata->GetOutput();
 		gettimeofday(&oh_end, NULL);
 		ohtime += (oh_end.tv_sec-oh_start.tv_sec+oh_end.tv_usec/1000000.0-oh_start.tv_usec/1000000.0);
-		std::cout<<"end cleaning"<<std::endl;
+		//std::cout<<"end cleaning"<<std::endl;
 
 		if(nreg == 1)
 		{
 //			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 //			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			std::cout<<" Only 1 contour, not processing"<<std::endl;
+//			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else if(polydata->GetNumberOfPoints() > 1400)
+		else if(polydata->GetNumberOfPoints() > 20)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+		//	std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+		//	std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(bid == -1) 
 			{
-				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
-/*				writer->SetFileName(fn);
+/*				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
+				writer->SetFileName(fn);
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();*/
-				std::cout<<"Branch Id is -1!!!"<<std::endl;
+//				std::cout<<"Branch Id is -1!!!"<<std::endl;
 				//assert(0);
 				//bid = 1;
 				continue;
@@ -384,8 +383,8 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			}
 			else
 			{
-				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
-				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
+//				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
+//				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
 //			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 

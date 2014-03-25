@@ -20,7 +20,7 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 	{
 		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
-		std::cout<<"nextf curf"<<nextf<<" "<<curf<<std::endl;
+//		std::cout<<"nextf curf"<<nextf<<" "<<curf<<std::endl;
 		if(nextf - curf > alpha)
 		{
 			float f = nextf - alpha;

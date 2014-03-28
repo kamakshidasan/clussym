@@ -1265,22 +1265,35 @@ be adapted based on the application under consideration.
 \subsection{Performance}
 \begin{table}[t]
 \centering
-\caption{Running time, measured in seconds, for various steps in the symmetry detection pipeline.
+{\small
+\caption{Running time, measured in seconds, for the different steps in the symmetry detection algorithm.
 	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM.}
 \label{exp-table}
 \begin{tabular}{c||c|c|c|c}
-EMDB	&  	 	& build & EMD		& traverse 	\\%& \#simp.
-dataset\# & \#vertices 	& graph & computation 	&  graph  	\\%& extrema
+		&  	 			& Contour tree	& Contour	& Descriptor	\\%& \#simp.
+Dataset		& \#vertices 			& computation	& generation	& computation  	\\%& extrema
 \hline
-2094 	& $100^3$ 	& 5.4 	& 1.5 		&  	3.2       	\\%& 6217		432 
-1654 	& $112^3$ 	& 7.6 	& 3.3 		&  	1.1       	\\%& 14397		639
-1706 	& $130^3$ 	& 8.5 	& 0.04 		& 	0.5		\\%& 18440		35 
-1603 	& $160^3$ 	& 34.2 	& 8.9 		&  	45.4     	\\%& 19452		4731 
-5331	& $240^3$	& 106.5 & 19.8		&  	77.6		\\
-1179 	& $255^3$ 	& 106.9 & - 		&  	409.1    	%& 80127		3604
+1HGA	 	& $72^3$ 			& 1.33 		& 7.86 		&  	28.39       	\\%& 14397		639
+EMDB-1654 	& $112^3$ 			& 4.64 		& 1.04		&  	8.70      	\\%& 6217		432 
+Vortex		& $253^3$			& 82.04	 	& 19.91		&  	163.56		\\
+EMDB-1179 	& $255^3$ 			& 67.39		& 10.63		&  	84.91     	\\%& 19452		4731 
+Knee 		& $379\times229\times305$ 	& 120.42	& 94.55		& 	429.10		%& 18440		35 
 \end{tabular}
+}
 \end{table}
-
+Table~\ref{exp-table} lists the running time of our algorithm on different datasets. While the
+performance of contour tree computation depends on the size of the dataset and the number of
+critical points present in it, the contour generation and the descriptor computation stages
+are primarily affected by the size and the number of contours processed. The contour tree
+generation stage includes the time taken for the simplification of large meshes. 
+In our implementation, symmetry with respect to contours that evolve from maxima and minima 
+are identified in two separate passes and the running time listed above is for a single pass.
+The clustering stage is very quick and requires less than a second.
+The current implementation is not very efficient and offers a lot of scope for improvement.
+However, we believe that even with our suboptimal implementation, the running times that 
+we report are reasonable for a geometry based algorithm that identifies
+symmetry at multiple scales. The results of our algorithm on Vortex and EMDB-1179 datasets
+are included in the supplemental figures.
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for

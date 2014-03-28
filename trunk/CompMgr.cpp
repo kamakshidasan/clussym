@@ -279,7 +279,6 @@ void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	gettimeofday(&clus_end, NULL);
-	
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
 	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
@@ -287,13 +286,12 @@ void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 	{
 		std::cout<<"For cluster "<<i<<"mebers are "<<std::endl;
 		int cid = -1;
-		std::vector<unsigned int> brmask = std::vector<unsigned int> (bsz, 0);
 		for(unsigned int j = 0; j < cl->clusters[i].mem.size(); j++)
 		{
+			std::vector<unsigned int> brmask = std::vector<unsigned int> (bsz, 0);
 			cid = cl->clusters[i].mem[j];
 			std::cout<<cid<<" "<<std::endl;
 			Export(cid,i, brmask);
-		}
 		if(cid != -1)
 		{
 			CompNode* c = comps[cid];
@@ -301,6 +299,7 @@ void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 			unsigned int did = c->did;
 			std::vector<unsigned int> vmask;
 			bd[did]->SetVertMask(i, cid, vmask, brmask, fvals[c->fnid]);
+		}
 		}
 	}
 }

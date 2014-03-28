@@ -14,18 +14,18 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 	float minf = m_vlist[bd->bridsarr[1]->sad].w;
 	float curf = minf, nextf;
 	float alpha = orgalpha*(maxf - minf);
-	std::cout<<"orgalpha range alpha "<<orgalpha<<" "<<maxf-minf<<" "<<alpha<<std::endl;
-	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
+//	std::cout<<"orgalpha range alpha "<<orgalpha<<" "<<maxf-minf<<" "<<alpha<<std::endl;
+//	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
 	for(unsigned int i = 0; i < sz; i++)
 	{
-		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
+//		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
 		nextf = m_vlist[sadidx[i]].w;
 //		std::cout<<"nextf curf"<<nextf<<" "<<curf<<std::endl;
 		if(nextf - curf > alpha)
 		{
 			float f = nextf - alpha;
 			isovals.push_back(f);
-			std::cout<<"Isovalues: "<<f<<std::endl;
+//			std::cout<<"Isovalues: "<<f<<std::endl;
 		}
 		curf = nextf;
 	}

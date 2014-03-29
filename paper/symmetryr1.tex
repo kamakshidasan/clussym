@@ -107,21 +107,20 @@ by Clustering Contours}
 %\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
 
 %% Abstract section.
-\abstract{
-The complexity in visualizing volumetric data often limits the scope of direct exploration
-of scalar fields. Isocontours are quite popular in analysing the characteristics
-of scalar field data because of its simplicity in presenting features in the data. 
-In this paper, we present a novel representation of contours in a scalar field with 
+\abstract{The complexity in visualizing volumetric data often limits the scope of direct exploration
+of scalar fields. Isocontour extraction is a popular method for analysing the characteristics
+of scalar field because of its simplicity in presenting features in the data. 
+In this paper, we present a novel representation of contours with 
 the aim of studying the similarity relationship between the contours. The representation 
-maps contours as points in a high-dimensional transformation-invariant descriptor space. 
+maps contours to points in a high-dimensional transformation-invariant descriptor space. 
 We leverage the power of this representation to design a clustering based algorithm for 
 detecting symmetric regions in a scalar field. Symmetry detection is a challenging problem 
 because it demands both segmentation of the data and identification of transformation 
 invariant segments. While the former task can be addressed using topological analysis of 
 scalar fields, the latter requires geometry based solutions. Our approach combines the two 
 by utilizing the contour tree for segmenting the data and the descriptor space for 
-identifying transformation invariance. We show the effectiveness of our method in 
-designing applications like query driven exploration and asymmetry visualization.
+determining transformation invariance. We discuss two applications, query driven exploration 
+and asymmetry visualization, that demonstrate the effectiveness of the approach.
 } % end of abstract
 
 %% Keywords that describe your work. Will show as 'Index Terms' in journal
@@ -166,14 +165,13 @@ designing applications like query driven exploration and asymmetry visualization
 		}
 		\end{minipage}
 	}
-	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the electron microscopy 
-	data of AMP-activated kinase (EMDB-1897). (a)~Volume rendering of the data displays different symmetric patterns
-	that exhibit 3-fold rotational symmetry. (b)~Contours 
-	are represented as points in a high-dimensional descriptor space (illustrated in 2D) using
-	a suitable shape descriptor. Symmetric contours form a cluster in the descriptor space and can be easily identified.  
-	Three such clusters located are shown in golden, blue, and pink colours. (c)~Three symmetric regions of
-	different sizes highlighted in golden, blue, and pink colours demonstrates the multiscale aspect of our method.}
-
+	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the scalar field
+		obtained from cryo-electron microscopy imaging of AMP-activated kinase (EMDB-1897). 
+		(a)~The three fold rotational symmetry is apparent from the volume rendering. (b)~Contours 
+		are represented as points in a high-dimensional shape descriptor space (illustrated in 2D). 
+		Symmetric contours form a cluster in the descriptor space and can be easily identified.  
+		Three such clusters are shown in gold, blue, and pink. (c)~Three symmetric regions of
+		different sizes, highlighted in gold, blue, and pink, detected by the method.}
 }
 
 %% Uncomment below to include a teaser figure.
@@ -220,7 +218,7 @@ detection is ongoing. Though symmetry identification in scalar
 fields is a relatively new area of research, the problem of detecting symmetry
 in shapes has been well studied in the geometry processing community.
 These studies have established that clustering based analyses result in superior
-performance in robust identification of symmetry. Some of these clustering methods
+performance and robust identification of symmetry. Some of these clustering methods
 have been extended to scalar fields and they operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
 domain. Scalar field datasets are typically represented using scalar values 
@@ -230,7 +228,7 @@ interpolating the values at the sample points. Therefore, the sample points in a
 field capture the lowest level of information. In practice, scientists are more interested
 in higher level features, extracted through methods like segmentation and isosurface extraction,
 for studying the underlying physical phenomena. Hence, symmetry identification methods that are based on 
-local information available at the sample points face considerable difficulty in representing 
+local information available at the sample points encounter considerable difficulty in representing 
 and extracting meaningful symmetric regions. Moreover, these methods are computationally 
 expensive since the number of sample points in scalar field datasets is typically orders of magnitude
 higher than that in geometric shape datasets.
@@ -240,9 +238,11 @@ that a clustering based analysis offers significant advantages in recognizing sy
 we believe that unlike shapes, low-level information available at the sample points of the 
 domain is not suited for symmetry detection in scalar fields. In this work, we propose 
 a novel symmetry detection method based on the idea of clustering contours. Isosurfaces
-are extensively used in studying scalar field datasets and contours capture information 
-about a scalar field at a macroscale as opposed to sample points of the domain. Therefore, they
-are more suitable for a clustering based analysis. It is easy to see that contours
+are extensively used in studying scalar field datasets and contours, which are 
+connected components of isosurfaces, capture information 
+about a scalar field at a macroscale.
+Therefore, contours are more suitable for a clustering based analysis as opposed to sample 
+points of the domain. It is easy to see that contours
 belonging to regions with symmetric scalar field distribution are also symmetric. Using an 
 appropriate shape descriptor, our method maps contours to points in a descriptor space 
 such that the distance between points in the descriptor space is a measure of similarity 
@@ -250,13 +250,13 @@ between the contours. As a result, points in the descriptor space
 representing symmetric contours lie in close 
 proximity to each other and form clusters in the descriptor space. The region of the domain
 corresponding to each such contour can be extracted and these regions
-are reported as symmetric.Note that the choice
+are reported as symmetric. Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
 Figure~\ref{teaser} illustrates our approach for a cryo-EM dataset (EMDB-1897) 
 with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
-identification of symmetry with respect to small-scale features highlighted in blue and pink
-as well as large-scale features highlighted in golden colour.
+identification of symmetry with respect to large-scale features highlighted in gold as well
+as small-scale features shown in blue and pink.
 
 The main contributions of this paper are the following:
 \begin{itemize}
@@ -293,51 +293,50 @@ been applied to scalar fields~\cite{MasoodTN13,HongS08,kerbWKS11}, however they 
 the challenges in extending geometric methods to scalar fields.
 Scalar field datasets are significantly larger in size and hence symmetry detection is computationally costly.
 Geometric methods typically consider geometric information derived from a small region around each sample
-point of the domain for symmetry recognition. Directly applying this approach to scalar field makes it difficult 
-to capture important features in a scalar field leading to poor performance in extracting higher level
-features and handling of noise in the data.
-Moreover, the scalar values are assumed to be continuous over the domain by interpolating the values at 
-the discrete set of sample points. Therefore, inspecting only local information at the sample points
+point of the domain for symmetry recognition. A direct extension of this approach to scalar fields
+suffers from the difficulty of capturing important features and leads to poor performance 
+in extracting higher level features and handling of noise in the data.
+Moreover, the scalar field is considered to be continuous over the domain by interpolating the values at 
+the discrete set of sample points. Inspecting only local information at the sample points
 introduces additional challenges due to discretization errors since the symmetric counterpart for a 
 given point may be an interpolated point.
 
 Hong and Shen~\cite{HongS08} propose a method to detect global reflective symmetry by identifying planes
 of reflection that minimize the difference between the scalar value at a point and its
 reflection. This method is computationally inefficient and cannot be easily extended to identify 
-other types of symmetry. Kerber~et~al.~\cite{kerbWKS11} build a graph network of crease line features in a dataset
+other types of symmetry. Kerber~et~al.~\cite{kerbWKS11} build a graph network of crease line features 
 and detect symmetry by computing geometric transformations that match subgraphs within the crease line network.
-Since only a small subset of features in scalar field datasets contain crease lines, 
+Since only a small subset of features in scalar fields contain crease lines, 
 this method is not very useful in practice. Masood~et~al.~\cite{MasoodTN13} detect
 symmetry by identifying symmetry transformations as clusters in the space of all transformations.
 The clusters are generated by aggregating local symmetry transformations of pairs of points in the 
 domain. This method relies on local signatures of sample points for determining 
 transformations and as a result several parameters need to be tweaked at various stages of 
 the symmetry detection pipeline to limit the adverse effects of variations in the local signatures 
-and discretization errors.  Moreover, the transformation space is often cluttered with a lot of 
-spurious transformations and introduces artifacts in the extraction of symmetric regions.
-The above methods compute geometric transformations between candidate pairs for identifying
-symmetry and are computationally costly. Moreover, they are driven by purely local geometric 
-measures and therefore do not incorporate any criterion to recognize important features. Hence, they consider every 
-candidate pair, including pairs corresponding to noise, to be equally important in their analysis. 
+and discretization errors.  Moreover, the transformation space often contains additional transformations
+that introduces artifacts. The above methods compute geometric transformations between 
+candidate pairs for identifying symmetry and are computationally costly. Moreover, they 
+are driven by purely local geometric measures and do not incorporate any criterion 
+to either recognize important features or discard pairs corresponding to noise. 
 Our method, on the other hand, uses topological information derived from the contour tree to infer 
 importance of a feature and this allows the design of a feature-aware algorithm for symmetry identification. 
 
 Bruckner~et~al. propose an information theoretic approach for isosurface similarity 
-detection~\cite{BrucknerM10,haidacher11}. This method uses mutual information of distance 
-transforms to quantify the information common to two isosurfaces and build a similarity map 
-between all pairs of isosurfaces. Clusters with high mutual information is used to detect 
-similar isosurfaces within and across datasets. Although closely related to our method, 
+detection~\cite{BrucknerM10,haidacher11}. This method uses mutual information between distance 
+transforms to quantify the information common to two isosurfaces and builds a similarity map 
+between all pairs of isosurfaces. Clusters with high mutual information correspond to
+similar isosurfaces both within and across datasets. Although closely related to our method, 
 by virtue of using distance transforms as the descriptor, 
 this method identifies similar family of isosurfaces within a range of isovalues that 
 form an onion-peel like layered arrangement. Our method, on the other hand, is more suited 
 for identifying partial similarities and extracting symmetric regions by identifying
 similarity between contours and not isosurfaces. While the isosurface similarity map based
-method is limited to analysing similarity between
-datasets only in pairs, the descriptor space can be used to analyse multiple datasets simultaneously.
-Similarity between different scalar fields has also been studied by measuring the extent of overlap
+method is limited to analysing similarity between pairs of datasets, the descriptor space can 
+be used to analyse multiple datasets simultaneously. Similarity between different scalar 
+fields has also been studied by measuring the extent of overlap
 between contours~\cite{SchneiderWCHS08,schn13}. The distance transform
-descriptor and the overlap between contours are affected by changes in orientation
-whereas our method is not tied to a particular choice of descriptor. Based on the requirements of 
+descriptor and the overlap measure are affected by changes in orientation.
+Our method is not restricted to a particular choice of descriptor. Based on the requirements of 
 the application under consideration, our method  can be adapted to be sensitive or 
 insensitive to orientation. 
 \subsection{Topology based methods}
@@ -357,19 +356,9 @@ corresponding to each super-seed. This procedure makes a strong assumption that 
 can be identified purely from the proximity relationship between the seeds. Hence,
 it relies heavily on a meaningful selection of seed set which involves significant effort 
 and understanding about the symmetry of the domain. In addition, this method requires several thresholds
-\begin{figure}[b]
-\centering
-{
-	\includegraphics[scale=0.15]{inkscape/ctrmap.pdf}
-	\caption{\label{ctmap}Mapping of contours as points in the descriptor space. Symmetric contours
-		shown in blue colour are mapped to the same blue point in the descriptor space. Six approximately
-		symmetric contours shown in golden colour are mapped to six points which lie in close
-		proximity to each other in the descriptor space.}
-}
-\end{figure}
 to be set.
 
-The above methods being topological in nature do not ensure that the regions marked by
+The above methods being topological in nature do not ensure that the regions reported by
 them are indeed geometrically symmetric while our method being geometric in nature, 
 ensures that the regions extracted are symmetric. Moreover, current methods compare candidate regions 
 pairwise and rely on a similarity threshold to classify them into symmetric groups. Determining
@@ -381,45 +370,44 @@ studied in the context of shape matching applications by using graph matching me
 discrete approximations of the contour tree~\cite{ZhangBKDNB06,HilagaSKK01}.
 The contour tree provides metadata information about the contours
 and allows integration of topological information in geometric processing. Thus, by utilizing 
-the descriptor space to capture geometric information about contours along with the power of contour 
-tree as a topological abstraction of contours, our method offers significant advantages over 
-\begin{figure*}[t]
-	\centering
-		\includegraphics[scale=0.15]{inkscape/pipe.pdf}
-	\caption{\label{pipeline} Symmetry detection pipeline. Contours are extracted
-		from the scalar field dataset and a descriptor is generated for each contour.
-		A correspondence score is estimated between pairs of contours based on the
-		distance between the points in the descriptor space. Next, the set of symmetric
-		contours are identified through clustering and the region of the domain corresponding
-	to each symmetric contour is extracted and reported.}
-\end{figure*}
+the descriptor space to capture geometric information about contours together with the power of 
+the contour tree as a topological abstraction of contours, our method offers significant advantages over 
 existing symmetry identification methods. 
+\begin{figure}[b]
+	\centering
+	{
+		\centering
+		\begin{minipage}[c][2.4cm][b]{0.4\linewidth}
+			{
+				\includegraphics[scale=0.15]{inkscape/ctfield.pdf}
+			}
+		\end{minipage}
+	}
+	{
+		\centering
+		\hspace{1cm}
+		\begin{minipage}[c][2.45cm][b]{0.3\linewidth}
+			{
+				\includegraphics[scale=0.15]{inkscape/ct.pdf}
+			}	
+		\end{minipage}
+	}
+	\caption{\label{ct}The contour tree captures changes in the topology of the level sets of a scalar field. 
+	(left)~A scalar field and its level sets. (right)~The corresponding contour tree. The red nodes are
+	local maxima, the blue nodes are local minima, and the green nodes are saddles.}
+\end{figure}
 \section{Definitions}
 Consider a \emph{scalar field}, $f : \mathbb{M}  \rightarrow \mathbb{R}$, defined on a 
 simply connected domain $\mathbb{M}$. The preimage of $f$ for a given value $u \in \mathbb{R}$, 
 $f^{-1}(u)$, is called a \emph{level set} of $f$. A level set may have multiple components
 and each component is called a \emph{contour}. Consider a sweep of the domain using level sets in the order
 of increasing function values. A contour is created at a \emph{minimum}, may merge
-with another contour or split into different contours at a \emph{saddle}, and is destroyed
-at a \emph{maximum}. The \emph{contour tree} is a topological 
+with another contour at a \emph{join saddle} or split into different contours at a \emph{split saddle}, 
+and is destroyed at a \emph{maximum}. The \emph{contour tree} is a topological 
 data structure that captures these changes in the connectivity of the level sets, see Figure~\ref{ct}.
 Let $R$ be an equivalence relation defined on points in $\mathbb{M}$: $xRy$ for $x,y 
 \in \mathbb{M}$  if $x,y$ belong to the same contour. The contour tree is the quotient space 
 induced by this relation. 
-\begin{figure}
-	\centering
-	\subfigure[]
-	{
-		\includegraphics[scale=0.15]{inkscape/ctfield.pdf}
-	}
-	\hspace{0.2cm}
-	\subfigure[]
-	{
-			\includegraphics[scale=.12]{figures/ct.png}
-	}
-	\caption{\label{ct}The contour tree captures changes in the topology of the level sets of a scalar field. 
-	(a)~A scalar field and its level sets. (b)~The contour tree for the field.}
-\end{figure}
 
 Subdomains $\mathbb{M}_1, \mathbb{M}_2 \subseteq \mathbb{M}$ are said to be \emph{symmetric} 
 if there is a transformation $T$ such that ${\mathbb{M}_2=T(\mathbb{M}_1)}$ and 
@@ -432,23 +420,23 @@ transformation $T$, which is a costly operation. Therefore, we use an alternate 
 Let $\mathbb{C}$ be the set of all contours. 
 Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
 where $T$ is a transformation. In other words, $g$ is a function that maps each
-contour to a point in a high-dimensional space, called a \emph{descriptor}, 
-such that a contour and its symmetric copies are mapped to the same point, see Figure~\ref{ctmap}.
+contour to a point in a high-dimensional space such that a contour and its symmetric 
+copies are mapped to the same point. The point to which a contour is mapped is called a 
+\emph{descriptor} and the high-dimensional space is called the \emph{descriptor space}, see Figure~\ref{ctmap}. 
 For illustration, the descriptor space is shown in 2D but the actual dimension of the space
-depends on the choice of the descriptor. We call this high-dimensional space the
-\emph{descriptor space} and the distance between contours in the descriptor space is a
-measure of their similarity. In practice, scalar field datasets do not exhibit perfect symmetry and therefore
+depends on the choice of the descriptor. The distance between contours in the descriptor space is a
+measure of their similarity. In practice, scalar fields do not exhibit perfect symmetry and therefore
 it is important to detect symmetry in an approximate sense. Ideally, deviation
 from perfect symmetry should be measured in the space of shapes but 
 it is more convenient to measure deviations in the descriptor space. If contours $c_1$ and 
-$c_2$ deviate from perfect symmetry, then $c_1$ and $c_2$ will not be mapped
-to the same point in the descriptor space and the distance between
-them in the descriptor space, $\lVert g(c_1)-g(c_2) \rVert$, will be indicative
+$c_2$ are not perfectly symmetric, then $c_1$ and $c_2$ will not be mapped
+to the same point in the descriptor space. The distance between
+the contours in the descriptor space, $\lVert g(c_1)-g(c_2) \rVert$, will be indicative
 of the deviation from perfect symmetry. 
-\begin{defi}
+\begin{defi}[Symmetric Contours]
 Contours $c_1$ and $c_2$ are perfectly symmetric if $\lVert g(c_1)-g(c_2) \rVert = 0$,
 where $\lVert \cdot \rVert$ is a norm in the descriptor space. They are 
-{$\epsilon$-symmetric} if $\lVert g(c_1)-g(c_2) \rVert \leq \epsilon$.
+{$\epsilon$-symmetric} if $\lVert g(c_1)-g(c_2) \rVert \leq \epsilon,$ for $\epsilon > 0$.
 \end{defi}
 Shape descriptors have been extensively used in the
 geometry processing community for shape matching and there is a
@@ -457,8 +445,18 @@ area~\cite{lian2013,van2011,tangelder2008survey,qin2008content}. Note that
 different norms may have to be used for different descriptors. 
 It is possible that a shape descriptor may incorrectly map contours $c_1$ and 
 $c_2$ to the same point even when they have totally different shapes. A good shape descriptor should 
-discriminate between different shapes well and reduce the occurrence of such incorrect
+discriminate well between different shapes and minimize such incorrect
 mappings. 
+\begin{figure}[b]
+\centering
+{
+	\includegraphics[scale=0.15]{inkscape/ctrmap.pdf}
+	\caption{\label{ctmap}Mapping contours to points in a descriptor space. Symmetric contours
+		shown in blue are mapped to the same blue point in the descriptor space. Six approximately
+		symmetric contours shown in gold are mapped to six points that lie in close
+		proximity to each other in the descriptor space.}
+}
+\end{figure}
 \section{Symmetry Detection via Contour Clustering}
 Methods based on clustering~\cite{Mitra06,Lip10,MitraGP07,Xu12,RavBBK10,Xu09}
 have shown superior performance in identifying
@@ -480,6 +478,16 @@ contours will lie in close proximity to each other. Therefore, symmetric contour
 can be recognized by identifying clusters in the descriptor space. The volumetric
 regions represented by the contours within a cluster are then reported as
 symmetric regions.
+\begin{figure*}[t]
+	\centering
+		\includegraphics[scale=0.14]{inkscape/pipe.pdf}
+	\caption{\label{pipeline} Symmetry detection pipeline. Contours are extracted
+		from the scalar field and a descriptor is generated for each contour.
+		A similarity score is estimated between pairs of contours based on the
+		distance between the points in the descriptor space. Next, the set of symmetric
+		contours are identified via clustering. Finally, the region of the domain to
+		which each symmetric contour belongs is extracted and reported.}
+\end{figure*}
 \subsection{Contour Generation}\label{congen}
 Our algorithm assumes that each region of interest in the domain is represented by a contour belonging to it.
 Hence, it is important to use a sampling strategy that generates a contour from each
@@ -498,17 +506,17 @@ the domain corresponding to an arc of the contour tree, we select only one conto
 arc of the contour tree.
 
 Selecting a representative contour from each arc of the contour tree ensures that no regions
-are missed in the subsequent symmetry analysis. Thus, we select a representative contour
-from each region associated with a feature defined by an extremum as well as larger regions formed
-by the merging of the features associated with two or more extrema. As a result,
+are missed in the subsequent symmetry analysis. An arc in the contour tree may either
+represent a feature associated with a single extremum or a region formed by the merger
+of multiple features and hence associated with multiple extrema. As a result,
 our method can detect symmetry at multiple scales. However, for noisy scalar fields, a large
 number of arcs of the contour tree may correspond to noise. Selecting a contour from each
 arc of the contour tree will result in significant amount of computational time spent in
-processing these noisy contours and result in poor performance. To overcome this problem,
+processing these noisy contours. To overcome this problem,
 we generate a contour from an arc of the contour tree only if the arc is deemed to represent
 a feature and not noise. The definition of noise is subjective and depends on the application.
 In this work, we consider an arc to be noise if the volume of the 
-largest contour associated with the arc is below a user defined threshold $\delta$. The volume of a
+largest contour associated with the arc is below a user defined \emph{noise threshold} $\delta$. The volume of a
 contour is approximated as the number of vertices of the domain enclosed by the contour. 
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
@@ -517,14 +525,14 @@ all contours would have had to be treated as equally important. Contour tree dri
 that each region has a unique representative contour and avoids sampling of contours from noisy regions.
 \subsection{Contour Representation in Descriptor Space}
 Once a representative contour is generated from each region of interest, the next step
-is to generate its descriptor. The correspondence score between a pair of
+is to generate its descriptor. The similarity score between a pair of
 contours is estimated using the distance between their descriptors.
 Designing shape descriptors for matching and retrieving similar shapes is a well studied 
 area in the geometry processing community. 
 The notion of similarity is subjective and varies from application to application.
 A major advantage of our method is that it is not restricted, in principle, to a particular choice
 of the shape descriptor. Instead, it offers flexibility in choosing 
-the right descriptor for an application.  Hence, our method may be viewed as a generic framework for identifying
+the descriptor appropriate for an application.  Hence, our method may be viewed as a generic framework for identifying
 similar regions in a scalar field. For example, if an application is interested in 
 identifying similarity only with respect to rotation, a rotation invariant descriptor may be used. 
 The only prerequisite on the descriptor is that it should be discriminative, i.e., contours which are 
@@ -550,7 +558,7 @@ positives during shape retrieval.
 		{
 			\centering
 			%$\vcenter{\hbox{\includegraphics[scale=.25]{figures/partct.png}}}$
-			\includegraphics[scale=.25]{figures/partct.png}
+			\includegraphics[scale=.25]{inkscape/ctmerge.pdf}
 		}
 		\end{minipage}
 	}
@@ -565,15 +573,15 @@ positives during shape retrieval.
 		\end{minipage}
 
 	}
-	\caption{\label{ct-merge}When contours merge, their shape change drastically. 
-		(a)~Six contours before they merge. (b)~Partial contour tree depicting
-	merging of pairs of contours. (c)~Three contours after the merge.}
+	\caption{\label{ct-merge}When contours merge, their shape change significantly. 
+		(a)~Six contours before they merge. (b)~Part of the contour tree depicting
+		merging of pairs of contours. (c)~Three contours after the merge.}
 \end{figure}
 \subsection{Contour Clustering}\label{clus}
 After the descriptor generation stage, any standard clustering method may be used to
-locate clusters in the descriptor space that represent symmetric contours. However,
+locate the clusters in the descriptor space that represent symmetric contours. However,
 enforcing the generation of descriptors as a constraint limits the flexibility of 
-using our approach as a generic framework for similarity detection. We observer that mapping of
+using our approach as a generic framework for similarity detection. We observe that mapping of
 contours to points in the
 descriptor space is not a prerequisite for clustering. A similarity correspondence
 graph can be constructed from a set of contours by representing each contour
@@ -588,7 +596,7 @@ In particular, for symmetry identification, the distance between points in the d
 used to assign the score between pairs of contours. 
 
 Given a set of contours marked as symmetric, the arc in the contour tree 
-to which each contour belong can be determined. The region of the domain
+to which each contour belongs can be determined. The region of the domain
 enclosed by the largest contour of the arc can then be extracted and reported
 as a symmetric region. Although this works well in practice, note that the contour
 itself may have evolved due to the merging of contours nested within it.
@@ -602,15 +610,6 @@ set of contours with the same shape. As illustrated in the left and right
 figures, the shape of individual nested contours
 before merge is different from the shape of the contour after the merge.
 Therefore the points corresponding to the contours before and after the merge may not be
-\begin{figure}[t]
-\centering
-	\scalebox{0.12}{\input {xfig/bip.pdf_t}}
-\caption{\label{bip}Maximum weight matching is used to determine the contribution of children
-	contours towards the correspondence score between the parent contours $p$ and $q$. The
-	first and second partitions of the bipartite graph represents the children contours of $p$
-	and $q$ respectively. Each edge is weighted with the correspondence score between the
-	contours represented by the end points of the edge.}
-\end{figure}
 part of the same cluster. 
 
 To address this issue, we incorporate the similarity score between the children contours 
@@ -629,9 +628,17 @@ see Figure~\ref{bip}. An edge between ${c_i}^p$ and ${c_j}^q$ is weighted
 with the score between ${c_i}^p$ and ${c_j}^q$. The maximum weight
 matching is computed to determine the similarity score between the children
 contours. The score between the contours $p$ and $q$ obtained
-directly from the descriptor space is added to the maximum weight matching score
-to obtain the cumulative correspondence score between $p$ and $q$. Analogous procedure
+directly from the descriptor space is added to the value of maximum weight matching
+to obtain the cumulative similarity score between $p$ and $q$. Analogous procedure
 may be used for nested contours that split from a parent contour.
+\begin{figure}[b]
+\centering
+	\scalebox{0.12}{\input {xfig/bip.pdf_t}}
+\caption{\label{bip}Maximum weight matching is used to determine the contribution of children
+	contours towards the similarity score between the parent contours $p$ and $q$. 
+	Each edge ${c_i}^p{c_j}^q$ is weighted with the similarity score between the
+	child contours ${c_i}^p$ and ${c_j}^q$.}
+\end{figure}
 \section{Implementation}
 We now elaborate on the implementation details of our symmetry identification algorithm.
 We describe the factors that determine the selection of isovalues, the particular shape descriptor
@@ -640,24 +647,27 @@ that we use and its properties, and the clustering algorithm we employ.
 Each arc of the contour tree encodes the range
 of values of the scalar field restricted to the subdomain represented by the arc.
 The question that remains is which function value in this range should be used
-to generate the representative contour for the arc. As discussed by 
+to generate the representative contour for the arc. To generate a large contour belonging 
+to the subvolume represented by an arc, the isovalue selected should be close to
+the saddle value at which the contour merges into another contour.  However, as discussed by 
 Thomas and Natarajan~\cite{ThomN11}, perturbation in function values due to noise
-may lead to instability in the branch decomposition representation of the contour tree.
-In the context of our method, this issue manifests as inconsistency among the symmetric
-regions that are related with respect to the function value of the saddle at which 
-the contours merge and split. To generate a large contour belonging to the subvolume 
-represented by an arc, the isovalue selected should lie below the saddle at which 
-the contour merges into another contour. We choose an isovalue that is
-close to the saddle and generates isocontours that are consistent, with respect to merging
-or splitting, from all the related symmetric regions. This requires that the isovalue
-should be lower than the lowest join saddle of the contours.
-The interval of function values within which the contours are not stable due to
-variations in the saddle values is captured using a parameter $\alpha$, which is set
-to the length of the interval. After discarding the saddles of all arcs that are 
-considered to be noise, for a join saddle $s$, we select an isovalue $w = f(s)-\alpha$
-if there are no other saddles in the interval $[w,f(s)]$. Analogous procedure is
-used to select isovalues with respect to split saddles. A procedure for determining
-the value of $\alpha$ is described in Section~\ref{para}.
+may lead to instability of the saddles in the contour tree. As a result, the function value
+at which the contours from symmetric regions merge and split may not be consistent. Figure~\ref{alpha0pt2}
+shows an example where, for the same isovalue, children contours of the green contours 
+have already merged to form a single component while the blue contours are yet to merge
+and form a single component. We require an isovalue that is
+close to the saddle and generates isocontours that are consistent, with respect to merging. 
+The simple strategy we adopt is to ensure that none of the contours merge by
+selecting an isovalue that is lower than the lowest join saddle at which the contours merge.
+The length of the interval of function values within which the saddle values are not consistent 
+with respect to merging of contours is captured using a \emph{stabilisation parameter} $\alpha$.
+After discarding the saddles of all arcs that are considered to be noise, for a join saddle $s$,
+where contours merge into one, we select an isovalue $w = f(s)-\alpha$ if there are no other 
+saddles in the interval $[w,f(s)]$. Among the set of isovalues thus generated,
+if $w$ is the highest isovalue that lies in between the function values at the 
+end points of an arc, then $w$ is chosen as the isovalue for the arc. 
+An analogous procedure is used to select isovalues with respect to split saddles. 
+A procedure for determining the value of $\alpha$ is described in Section~\ref{para}.
 %
 %Rather than selecting any 
 %value, The important observation here is that the contours within the same arc
@@ -726,8 +736,8 @@ shape matching and retrieval and is robust in the
 presence of noise, deformations in shape, and differences in the underlying 
 triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}. 
 Although it is possible that two different shapes may have the same spectra,
-it is very rare in practice~\cite{reuter2006laplace} and the descriptor is 
-quite discriminative with high precision and recall ratios~\cite{lian2013}. 
+it is very rare in practice~\cite{reuter2006laplace}. The descriptor is 
+discriminative with high precision and recall ratios~\cite{lian2013}. 
 We use the popular cotangent weighted scheme for computing the 
 Laplace-Beltrami spectra~\cite{PinkallP93}. Computation of the Laplace-Beltrami spectra 
 on large meshes is costly and therefore we simplify the contour meshes 
@@ -743,7 +753,7 @@ For a given contour $c$, other contours that are $\epsilon$-symmetric
 with respect to $c$ are determined by locating points in the descriptor
 space that lie within a sphere of radius $\epsilon$ centred at $p_c$,
 where $p_c$ is the point in the descriptor space to which $c$ is mapped.
-To improve performance, we limit the number of points in the search space 
+We limit the number of points in the search space 
 by considering only those points that represent the contours that belong to
 the level set of $c$. The value of the approximation parameter $\epsilon$
 is specified by the user.
@@ -758,7 +768,7 @@ metric learning~\cite{Kulis13}, however, we use
 Euclidean distances since it has yielded good results 
 for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. 
 We build a symmetry correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
-matrix denotes the correspondence score between the contours $c_i$
+matrix denotes the similarity score between the contours $c_i$
 and $c_j$.
 $$s_{ij} = 
 \begin{cases}
@@ -845,13 +855,12 @@ procedure outlined above to identify the clusters in the spectral domain.
 %	}
 %\end{minipage}
 \caption{Query driven exploration using contours. (a)~Volume rendering of the first time step of 
-Isabel dataset shows low pressure region in red. Querying with (b)~a~synthetically generated 
-half-ellipsoid finds (c)~an isocontour with similar shape from the low pressure region. (d)~The low
-pressure region extracted is shown in yellow. (e)-(h)~The isocontour from the low pressure region of the
-first time step is employed as the query and the result on four different time steps, 12, 24, 36, and 48
+the hurricane Isabel dataset. Low pressure region shown in red. Querying with (b)~a~synthetically generated 
+half-ellipsoid finds (c)~an isocontour with similar shape from the low pressure region. (d)~The corresponding
+volumetric region shown in yellow. (e)-(h)~The isocontour from the low pressure region of the
+first time step is employed as the query contour and the result on four different time steps, 12, 24, 36, and 48
 is shown. Note that even though the contours contain noise, they are located correctly due to the robustness of
-our method.}
-%(i)-(l)~The corresponding volumetric region identified is show in yellow.}
+our method. The corresponding volumetric regions are shown in the supplementary material.}
 \end{figure*}
 \section{Applications}
 It is easy to see that our method can be used to demonstrate the existing
@@ -866,7 +875,6 @@ facilitates navigation through complex data and is gaining popularity over the l
 years~\cite{BeyerAKLPH13,LiuJH13}. Symmetric regions in a dataset facilitate query
 driven exploration of the data~\cite{ThomN13,MasoodTN13}. A region of interest that is segmented from 
 the domain is employed as the query region and symmetry information is utilized to identify
-
 other regions similar to the query. To facilitate exploration using regions of the domain as query, the domain 
 needs to be segmented and this is often a challenge. Instead, we visualize the
 evolution of contours during a level set sweep and select a contour of interest. 
@@ -890,8 +898,7 @@ a contour from the low pressure region. The volumetric region of the domain from
 is generated, shown in yellow, is extracted and displayed in the context of the rest of the volume in 
 Figure~\ref{detisa1}. 
 
-We describe the above experiment where we query with
-a synthetic shape to demonstrate the power of the descriptor space as a geometry based representation 
+We describe the above experiment to demonstrate the power of the descriptor space as a geometry based representation 
 of the scalar field. But, we concede that using a synthetic shape as query object may not always be 
 possible. However, the user could select one of the contours from a region of interest as the query
 object. It is straightforward to see that this approach may be used
@@ -900,7 +907,7 @@ What is more interesting is that the same approach can be extended to search thr
 We use the contour shown in Figure~\ref{conisa1} from the first time step as the query object to search through 
 the other time steps. The contours detected as a result of executing the query on four different time 
 steps, 12, 24, 36, and 48, are shown in Figure~\ref{conisa12}-~\ref{conisa48}. Observe that
-the contours show variations in their shape and has considerable amount of noise. 
+the contours show variations in their shape and have considerable amount of noise. 
 Also, as opposed to the query contour, a significant portion
 of the mouth of the contour is closed in Figure~\ref{conisa48} as the hurricane makes landfall.
 The query is successful even with these challenges and emphasizes the robustness of our method.
@@ -950,7 +957,7 @@ with respect to which asymmetry of $c_k$ is determined. For this purpose, we use
 \texttt{Metro} tool~\cite{CigRS98}, which evaluates the distance from the vertices of the mesh 
 $c_k$ to the mesh $c_{avg}$ by computing for each vertex in $c_k$ the closest point in $c_{avg}$. 
 A large distance means that there was no point corresponding to it in the other contours,
-which is an indication of asymmetry. Note that the \texttt{Metro} tool cannot compute distances 
+an indication of asymmetry. Note that the \texttt{Metro} tool cannot compute distances 
 between contours directly from their original spatial coordinates. 
 It requires both the meshes to be spatially aligned. 
 The distance computed at each vertex using \texttt{Metro} is stored as a scalar field of 
@@ -1013,27 +1020,28 @@ can be distinguished from the dark red regions that depict vertices with large d
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.11]{figures/kneectrsflat.png}
+		\includegraphics[scale=0.11]{inkscape/kneectrsflat.pdf}
 		\label{kneectrsflat}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.14]{figures/1hgaext.png}
+		\includegraphics[scale=0.14]{inkscape/1hgaext.pdf}
 		\label{1hgaext}
 	}
 \end{minipage}
-	\caption{\label{res}Symmetric regions detected on different datasets. (a)~Volume rendering of a cryo-EM dataset (EMDB-1654),
+	\caption{\label{res}Comparison with topological methods for symmetry detection.  
+		(a)~Volume rendering of a cryo-EM dataset (EMDB-1654),
 		with noisy regions depicted in violet. (b)-(e)~Symmetric regions at multiple scales detected by our method.
-		The extremum graph based method can detect symmetry only at the largest scale. (f)~Volume rendering of
-		a pair of knees. (g)~Bilateral symmetry of the bones detected by our method, shown in orange, blue, and pink, 
+		The extremum graph based method~\cite{ThomN13} reports symmetry only at the largest scale. (f)~Volume rendering of
+		a CT scan of a pair of knees. (g)~Bilateral symmetry of the bones detected by our method, shown in orange, blue, and pink, 
 		even in the presence of missing regions and noise in the contours of the dataset. (h)~Volume rendering
-		of the electron densty of a haemoglobin	molecule (PDB-ID 1HGA) that exhibit 2-fold rotational symmetry. 
+		of the electron density of a haemoglobin molecule (PDB-ID 1HGA) that exhibit 2-fold rotational symmetry. 
 		(i)~The two symmetric regions are detected by our method even though they lie in close proximity to each other.
 		(j)~Flat regions corresponding to the global maximum of the knee dataset and (k)~asymmetric distribution of
 	the extrema of the molecule dataset pose challenges in determining the seed set for the extremum graph based method.}
 \end{figure*}
 \section{Discussion}
-In this section, we report the results of our method on different datasets and elaborate on
+In this section, we report the results of applying our method on different datasets and elaborate on
 comparison with existing topology based methods, selection of parameters,  and performance.
 \subsection{Comparison With Topological Methods}
 The segmentation of the domain utilized by our algorithm for locating symmetric regions is
@@ -1064,14 +1072,15 @@ the symmetry between the contours belonging to three portions of the bones in th
 in orange, blue, and pink in Figure~\ref{kneectrssym}. An inspection of these contours show that the dark regions of the bone in 
 the volume rendering capture missing regions and noise in the contours. Despite these missing regions and noise,
 our method successfully identifies the symmetry of the bones. The isosurface for this dataset at
-the global maximum in Figure~\ref{kneectrsflat} shows that the global maximum forms a flat region. 
+the global maximum in Figure~\ref{kneectrsflat} shows that the global maximum is degenerate
+and forms a flat region. 
 Figure~\ref{1hga-full} shows an electron density field
 derived from the atomic coordinates of a haemoglobin molecule using EMAN software~\cite{ludtke1999eman}.
 Our method identifies two symmetric regions, shown in blue and pink in Figure~\ref{1hga-sym},
 despite these two regions being in close proximity to each other. An isovalue close to the
 global maximum, see Figure~\ref{1hgaext}, shows that the extrema belonging to the high density regions are not
-symmetrically distributed within the two symmetric regions. In both these cases, selection of a set of extrema as seed set 
-is not easy because of the flat regions and the asymmetric distribution of the extrema in the data. 
+symmetrically distributed within the two regions. In both these cases, selection of a set of extrema as seed set 
+is not an easy task because of the flat regions and the asymmetric distribution of the extrema.
 \begin{figure*}[t]
 	\centering
 	\subfigure[]
@@ -1102,13 +1111,13 @@ is not easy because of the flat regions and the asymmetric distribution of the e
 	\caption{\label{alpha}Influence of stabilisation parameter, $\alpha$, on symmetry detection. 
 		(a)~Volume rendering of a cryo-EM dataset (EMDB-1292) shows long tube-like structures that
 		exhibit 7-fold rotational symmetry. (b)~Setting $\alpha$ to 0.2\% of the length of the range of scalar
-		values generates unstable contours within the tube-like regions indicated by inconsistency
-		in the merging of the blue and green contours. (c)~Setting $\alpha$ to 1\% discards the unstable contours
-		and the symmetry of the small blue contours generated at a more stable isovalue are identified.
-		(d)~The 7-fold symmetry of the tube like regions are identified in both cases since 
+		values results in the generates of unstable contours within the tube-like regions. The inconsistency
+		in the merging of the blue and green contours indicates this instability. (c)~Setting $\alpha$ to 1\% 
+		discards the unstable contours. The small blue contours are generated instead at a more stable isovalue.
+		(d)~The 7-fold symmetry of the tube-like regions are identified in both cases since 
 		these larger features are not sensitive to the exact value of $\alpha$.	
-		(e)~The plot of the number of critical points with increasing simplification shows an initial sudden drop
-	and we set $\alpha$ to a value immediately after this drop.}
+		(e)~The plot of the number of critical points with increasing simplification shows a significant drop
+		at a low value of $\alpha$. We set $\alpha$ to a value immediately after this drop.}
 \end{figure*}
 \begin{figure*}[t]
 	\centering
@@ -1146,14 +1155,13 @@ is not easy because of the flat regions and the asymmetric distribution of the e
 		with 2-fold symmetry where the left and the right regions show deviations from perfect symmetry.
 		(b)~Green oval contours that are almost perfectly symmetric identified when $\epsilon=0.1$\%. (c)~Increasing
 		$\epsilon$ to 1\% results in the addition of two more smaller contours of oval shape and a new set of symmetric
-		contours shown in maroon. (d)~At $\epsilon=4$\% a new maroon contour, which is only partially symmetric with the 
-		existing maroon contours, is located. Similarly, the green contours also deviate from perfect symmetry. 
+		contours shown in maroon. (d)~At $\epsilon=4$\% a new maroon contour, which is only partially symmetric with
+		respect to the existing maroon contours, is located. Similarly, the green contours also deviate from perfect symmetry. 
 		(d)~Larger green regions are detected at $\epsilon=4$\% and (e)~$\epsilon=$10\%.}
 \end{figure*}
-
 \subsection{Parameter Selection}\label{para}
-The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external parameters to our algorithm
-and are unavoidable. Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
+The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external to our algorithm.
+Hence, the stability parameter $\alpha$ is the only parameter that is specific to our
 method.
 
 \noindent{\textbf{Stabilisation parameter $\alpha$}}.
@@ -1211,10 +1219,35 @@ symmetric contours are detected as shown in Figure~\ref{eps1}-\ref{eps10}. In ea
 contours belonging to the same cluster are shown with the same colour.
 Note that the same dataset was used by Thomas and Natarajan to emphasize the advantage of
 the extremum graph based method~\cite{ThomN13} over the contour tree based method. They illustrate, 
-with figures in the supplemental material, that their method is able to do detect
+that their method is able to detect 
 the global symmetry by virtue of being geometry-aware, while the contour tree based method~\cite{ThomN11} 
 fails to do so due to variations in the features of the left and the right regions. Our method is able
-to quantify the effect of these variations on the quality of symmetry. Moreover, it can
+to quantify the effect of these variations on the output quality. Moreover, it can
+recognize partial symmetry at different scales in addition to identifying the global symmetry.
+
+\noindent{\textbf{Noise parameter $\delta$}}.
+We determine the number of arcs of the contour tree with volume above a particular value and plot
+the drop in the number of arcs with increasing value of volume. For the fuel dataset in 
+Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
+drop in the number of arcs initially, similar to the graph used for determining the stabilisation
+parameter $\alpha$. This drop is due to a large number of small sized features in the data which are 
+considered to be noise.
+We choose a value immediately after this sudden drop. When
+$\delta$ is set to 200 vertices for the fuel dataset, three sets of symmetric features, each exhibiting
+4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20 vertices
+identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
+acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
+Observe that the supplemental material of the extremum graph based symmetry detection method shows 
+that it does a poor job in reporting symmetric regions within the fuel dataset. 
+Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
+cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
+method is able to easily capture the symmetry of smaller symmetric regions for this dataset. 
+They use a different model for determining noise based on persistence, which is the difference in 
+function value between the extremum and the saddle of a topological feature. 
+Although our implementation may be modified to incorporate
+persistence based noise determination, it is not possible to use a single model that works across
+datasets with different noise characteristics. Therefore, we suggest that the model for determining noise
+be adapted based on the application under consideration. 
 \begin{figure}[t]
 	\centering
 	\subfigure[]
@@ -1234,34 +1267,9 @@ to quantify the effect of these variations on the quality of symmetry. Moreover,
 	}
 	\caption{\label{delta}Influence of noise parameter, $\delta$, on symmetry detection. (a)~Volume rendering of 
 		the fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
-		(b)~Three symmetric regions identified when $\delta$ is set to 200. (c)~Lowering
-	$\delta$ to 20 results in the detection of two more smaller symmetric regions.}
+		(b)~Three symmetric regions reported when $\delta$ is set to 200 vertices. (c)~Lowering
+	$\delta$ to 20 vertices results in the detection of two additional symmetric regions that are smaller.}
 \end{figure}
-recognize partial symmetry at different scales in addition identifying the global symmetry.
-
-\noindent{\textbf{Noise parameter $\delta$}}.
-We determine the number of arcs of the contour tree with volume above a particular value and plot
-the drop in the number of arcs with increasing value of volume. For the fuel dataset in 
-Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
-drop in the number of arcs initially, similar to the graph used for determining the stabilisation
-parameter $\alpha$. This drop is due to a large number of small features in the data which are 
-considered to be noise under our simplistic model for determining noise based on the size of features.
-We choose a value immediately after this sudden drop as the value of $\delta$. When
-$\delta$ is set to 200 for the fuel dataset, three sets of symmetric features, each exhibiting
-4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20
-identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
-acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
-Observe that the the supplemental material of the extremum graph based symmetry detection method shows 
-that it does a poor job in reporting symmetric regions within the fuel dataset. 
-Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
-cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
-method is able to easily capture the symmetry of smaller symmetric regions for this dataset. 
-They use a different model for determining noise based on persistence, which is the difference in 
-function value between the extremum and the saddle of a topological feature. 
-Although our implementation may be modified to incorporate
-persistence based noise determination, it is not possible to use a single model that works across
-datasets with different noise characteristics. Therefore, the model for determining noise should
-be adapted based on the application under consideration. 
 \subsection{Performance}
 \begin{table}[t]
 \centering
@@ -1273,18 +1281,18 @@ be adapted based on the application under consideration.
 		&  	 			& Contour tree	& Contour	& Descriptor	\\%& \#simp.
 Dataset		& \#vertices 			& computation	& generation	& computation  	\\%& extrema
 \hline
-1HGA	 	& $72^3$ 			& 1.33 		& 7.86 		&  	28.39       	\\%& 14397		639
-EMDB-1654 	& $112^3$ 			& 4.64 		& 1.04		&  	8.70      	\\%& 6217		432 
-Vortex		& $253^3$			& 82.04	 	& 19.91		&  	163.56		\\
-EMDB-1179 	& $255^3$ 			& 67.39		& 10.63		&  	84.91     	\\%& 19452		4731 
+1HGA	 	& $72\times72\times72$ 		& 1.33 		& 7.86 		&  	28.39       	\\%& 14397		639
+EMDB-1654 	& $112\times112\times112$ 	& 4.64 		& 1.04		&  	8.70      	\\%& 621 
+Vortex		& $253\times253\times253$	& 82.04	 	& 19.91		&  	163.56		\\
+EMDB-1179 	& $255\times255\times255$ 	& 67.39		& 10.63		&  	84.91     	\\%& 
 Knee 		& $379\times229\times305$ 	& 120.42	& 94.55		& 	429.10		%& 18440		35 
 \end{tabular}
 }
 \end{table}
 Table~\ref{exp-table} lists the running time of our algorithm on different datasets. While the
-performance of contour tree computation depends on the size of the dataset and the number of
+time required to compute the contour tree depends on the size of the dataset and the number of
 critical points present in it, the contour generation and the descriptor computation stages
-are primarily affected by the size and the number of contours processed. The contour tree
+are primarily affected by the size and number of contours processed. The contour
 generation stage includes the time taken for the simplification of large meshes. 
 In our implementation, symmetry with respect to contours that evolve from maxima and minima 
 are identified in two separate passes and the running time listed above is for a single pass.
@@ -1292,8 +1300,8 @@ The clustering stage is very quick and requires less than a second.
 The current implementation is not very efficient and offers a lot of scope for improvement.
 However, we believe that even with our suboptimal implementation, the running times that 
 we report are reasonable for a geometry based algorithm that identifies
-symmetry at multiple scales. The results of our algorithm on Vortex and EMDB-1179 datasets
-are included in the supplemental figures.
+symmetry at multiple scales. The symmetries detected in the Vortex and EMDB-1179 datasets
+are shown in the supplemental material.
 \section{Conclusion}
 In this paper, we present a novel symmetry detection method based on the idea of clustering contours.
 We show that mapping contours to points in a descriptor space is a powerful representation for
@@ -1302,11 +1310,11 @@ symmetry identification is restricted to regions obtained from the segmentation 
 by the contour tree. We plan to extend our method to handle other kinds of segmentation by designing
 an appropriate surface representation for the segments. A related issue is that our method does not 
 consider symmetry within a contour. A preprocessing step that segments contours into smaller partial
-surfaces may be designed to solve this problem. Another limitation is that the current implementation
+surfaces may be designed to solve this problem. The current implementation
 does not incorporate geometric stability criteria for selecting representative contours. 
-It is beneficial to employ a geometric stability criterion that selects a stable contour 
+It is beneficial to employ such criteria that selects a stable contour 
 from each arc of the contour tree to ensure consistency
-in the shape of the contours extracted from different regions that are symmetric.
+in the shape of the contours extracted.
 We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
 similar features in collections of related datasets like time-varying and ensemble data and plan to 

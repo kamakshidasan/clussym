@@ -488,7 +488,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="98.757813"
+     inkscape:cx="-53.385044"
      inkscape:cy="434.28571"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -526,19 +526,19 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:5.65027427999999965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4328)"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:5.65027428;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:16.95082285,16.95082285;filter:url(#filter4328);stroke-dashoffset:0"
        d="M 570,1002.3622 820,752.36218"
        id="path4212"
        inkscape:connector-curvature="0"
        transform="matrix(0.82452015,-0.17095121,0.82452015,0.17095121,-1081.4442,465.65811)" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:2.30834976000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3875)"
+       style="fill:none;stroke:#000000;stroke-width:2.30834976;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:6.92504927,6.92504927;filter:url(#filter3875);stroke-dashoffset:0"
        d="M 181.42857,651.6479 213.57143,538.07647"
        id="path3896-7-5-3-1"
        inkscape:connector-curvature="0"
        transform="matrix(-2.2835618,0,0,0.73965043,742.57488,57.641771)" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:2.34341109000000003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3867)"
+       style="fill:none;stroke:#000000;stroke-width:2.34341109;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:7.03023328,7.03023328;filter:url(#filter3867);stroke-dashoffset:0;marker-start:none;marker-mid:none"
        d="M 181.42857,651.6479 213.57143,538.07647"
        id="path3896-7-5-3"
        inkscape:connector-curvature="0"

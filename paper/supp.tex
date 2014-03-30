@@ -1,0 +1,199 @@
+%\documentclass[journal]{vgtc}                % final (journal style)
+\documentclass[review,journal]{vgtc}         % review (journal style)
+%\documentclass[widereview]{vgtc}             % wide-spaced review
+%\documentclass[preprint,journal]{vgtc}       % preprint (journal style)
+%\documentclass[electronic,journal]{vgtc}     % electronic version, journal
+
+%% Uncomment one of the lines above depending on where your paper is
+%% in the conference process. ``review'' and ``widereview'' are for review
+%% submission, ``preprint'' is for pre-publication, and the final version
+%% doesn't use a specific qualifier. Further, ``electronic'' includes
+%% hyperreferences for more convenient online viewing.
+
+%% Please use one of the ``review'' options in combination with the
+%% assigned online id (see below) ONLY if your paper uses a double blind
+%% review process. Some conferences, like IEEE Vis and InfoVis, have NOT
+%% in the past.
+
+%% Please note that the use of figures other than the optional teaser is not permitted on the first page
+%% of the journal version.  Figures should begin on the second page and be
+%% in CMYK or Grey scale format, otherwise, colour shifting may occur
+%% during the printing process.  Papers submitted with figures other than the optional teaser on the
+%% first page will be refused.
+
+%% These three lines bring in essential packages: ``mathptmx'' for Type 1
+%% typefaces, ``graphicx'' for inclusion of EPS figures. and ``times''
+%% for proper handling of the times font family.
+
+\usepackage{mathptmx}
+\usepackage[pdftex]{graphicx, color}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{multirow}
+%TODO
+\usepackage{amsfonts}
+%% We encourage the use of mathptmx for consistent usage of times font
+%% throughout the proceedings. However, if you encounter conflicts
+%% with other math-related packages, you may want to disable it.
+
+%% If you are submitting a paper to a conference for review with a double
+%% blind reviewing process, please replace the value ``0'' below with your
+%% OnlineID. Otherwise, you may safely leave it at ``0''.
+\onlineid{111}
+
+%% declare the category of your paper, only shown in review mode
+\vgtccategory{Algorithm/Technique}
+
+%% allow for this line if you want the electronic option to work properly
+\vgtcinsertpkg
+
+%% In preprint mode you may define your own headline.
+%\preprinttext{To appear in an IEEE VGTC sponsored conference.}
+
+%% Paper title.
+
+%% This is how authors are specified in the journal style
+
+%% indicate IEEE Member or Student Member in form indicated below
+%\author{Dilip Mathew Thomas, and Vijay Natarajan, \textit{Member, IEEE}}
+%\authorfooter{
+% insert punctuation at end of each item
+%\item
+% Dilip Mathew Thomas is with Department of Computer Science and Automation, Indian Institute of Science, Bangalore, India. E-mail: dilip@csa.iisc.ernet.in.
+%\item
+% Vijay Natarajan is with Department of Computer Science and Automation, Supercomputer Education Research Centre, Indian Institute of Science, Bangalore, India. E-mail: vijayn@csa.iisc.ernet.in.
+
+%\item
+% Martha Stewart is with Martha Stewart Enterprises at Microsoft
+% Research, E-mail: martha.stewart@marthastewart.com.
+%}
+
+%other entries to be set up for journal
+\shortauthortitle{Biv \MakeLowercase{\textit{et al.}}: Multiscale Symmetry Detection in Scalar Fields by Clustering Contours}
+%\shortauthortitle{Biv \MakeLowercase{\textit{et al.}}: Global Illumination for Fun and Profit}
+%\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
+
+% ---------------------------------------------------------------------------
+% Author guideline and sample document for EG publication using LaTeX2e input
+% D.Fellner, v1.13, Jul 31, 2008
+\begin{document}
+\vspace{-1cm}
+\begin{figure*}[h]
+\onecolumn
+\begin{center}
+{\sffamily\huge{Multiscale Symmetry Detection in Scalar Fields\\
+by Clustering Contours\\}}
+\vspace{0.5cm}
+{\sffamily\LARGE{Supplemental Figures\\}}
+\end{center}
+
+% for anonymous conference submission please enter your SUBMISSION ID
+% instead of the author's name (and leave the affiliation blank) !!
+
+%{\sffamily\huge{Detecting Symmetry in Scalar Fields Using Distance Weighted Extremum Graphs\\}}
+%\vspace{0.5cm}
+%{\sffamily\LARGE{Supplemental Figures\\}}
+\vspace{0.5cm}
+\centering
+{\sffamily\large{1. Query Contour Driven Exploration\\}}
+\vspace{1cm}
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.09]{figures/isabel12.png}
+		\label{volisa12}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.09]{figures/isabel24.png}
+		\label{volisa24}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.09]{figures/isabel36.png}
+		\label{volisa36}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.09]{figures/isabel48.png}
+		\label{volisa48}
+	}
+\caption{\label{volisa}The yellow regions highlight the volumetric regions identified from 
+	the time steps, 12, 24, 36, and 48, using the query contour from the first time 
+	step shown in Figure~7(c). The extracted regions are displayed in the context
+of the rest of the volume.}
+\end{figure*}
+\begin{figure*}
+	\centering
+	{\sffamily\large{2. Plot for selecting noise parameter $\delta$}\\}
+	\centering
+		\includegraphics[scale=0.2]{figures/noiseplot.pdf}
+\caption{The plot of the drop in the number of arcs in the contour tree with a specific value of volume 
+	as the value of the volume increases. The curve shows a sudden drop initially due to the arcs
+corresponding to noise. A value immediately after this drop is chosen as the value of $\delta$.}
+\end{figure*}
+\begin{figure*}
+\centering
+\begin{minipage}{0.33\textwidth}
+	\centering
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/vortex-full.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/vortex-sym1.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/vortex-sym2.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/vortex-sym3.png}
+	}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+	\centering
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/1179-full.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/1179-sym1.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/1179-sym2.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.28]{figures/1179-symalt1.png}
+	}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+	\subfigure
+	{
+		\includegraphics[scale=0.32]{figures/neghip-full.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.32]{figures/neghip-sym1.png}
+	}
+	\subfigure
+	{
+		\includegraphics[scale=0.32]{figures/neghip-sym2.png}
+	}
+\end{minipage}
+\caption{\label{emdfigs}Symmetry detection results on additional cryo-electron microscopy datasets - EMDB 1319, 1659, and 5215.
+Each row shows a volume rendering of a dataset, the seed set, and
+the symmetric regions detected by our method. Each symmetric region is shown in a unique color.
+The violet regions are representative of the noise in the data. The symmetry detection method
+works even in the presence of noise.}
+\end{figure*}
+
+\end{document}

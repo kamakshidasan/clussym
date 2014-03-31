@@ -167,7 +167,7 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 	}
 	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the scalar field
 		obtained from cryo-electron microscopy imaging of AMP-activated kinase (EMDB-1897). 
-		(a)~The three fold rotational symmetry is apparent from the volume rendering. (b)~Contours 
+		(a)~The three-fold rotational symmetry is apparent from the volume rendering. (b)~Contours 
 		are represented as points in a high-dimensional shape descriptor space (illustrated in 2D). 
 		Symmetric contours form a cluster in the descriptor space and can be easily identified.  
 		Three such clusters are shown in gold, blue, and pink. (c)~Three symmetric regions of
@@ -218,7 +218,7 @@ detection is ongoing. Though symmetry identification in scalar
 fields is a relatively new area of research, the problem of detecting symmetry
 in shapes has been well studied in the geometry processing community.
 These studies have established that clustering based analyses result in superior
-performance and robust identification of symmetry. Some of these clustering methods
+performance and robust identification of symmetry. Some of these methods
 have been extended to scalar fields and they operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
 domain. Scalar field datasets are typically represented using scalar values 
@@ -236,7 +236,7 @@ higher than that in geometric shape datasets.
 Though it is clear from methods proposed in the geometry processing community
 that a clustering based analysis offers significant advantages in recognizing symmetry,
 we believe that unlike shapes, low-level information available at the sample points of the 
-domain is not suited for symmetry detection in scalar fields. In this work, we propose 
+domain is not suited for symmetry identification in scalar fields. In this work, we propose 
 a novel symmetry detection method based on the idea of clustering contours. Isosurfaces
 are extensively used in studying scalar field datasets and contours, which are 
 connected components of isosurfaces, capture information 
@@ -1038,7 +1038,7 @@ can be distinguished from the dark red regions that depict vertices with large d
 		of the electron density of a haemoglobin molecule (PDB-ID 1HGA) that exhibit 2-fold rotational symmetry. 
 		(i)~The two symmetric regions are detected by our method even though they lie in close proximity to each other.
 		(j)~Flat regions corresponding to the global maximum of the knee dataset and (k)~asymmetric distribution of
-	the extrema of the molecule dataset pose challenges in determining the seed set for the extremum graph based method.}
+		the extrema of the molecule dataset, shown within dotted boxes, pose challenges in determining the seed set for the extremum graph based method.}
 \end{figure*}
 \section{Discussion}
 In this section, we report the results of applying our method on different datasets and elaborate on
@@ -1105,7 +1105,7 @@ is not an easy task because of the flat regions and the asymmetric distribution 
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.1]{figures/alphaplot.png}
+		\includegraphics[scale=0.1]{figures/alphaplot.pdf}
 		\label{alphaplot}
 	}
 	\caption{\label{alpha}Influence of stabilisation parameter, $\alpha$, on symmetry detection. 

@@ -14,8 +14,8 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 	float minf = m_vlist[bd->bridsarr[1]->sad].w;
 	float curf = minf, nextf;
 	float alpha = orgalpha*(maxf - minf);
-//	std::cout<<"orgalpha range alpha "<<orgalpha<<" "<<maxf-minf<<" "<<alpha<<std::endl;
-//	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
+	std::cout<<"orgalpha range alpha "<<orgalpha<<" "<<maxf-minf<<" "<<alpha<<std::endl;
+	std::cout<<"saddle list sz fsz"<<sadidx.size()<<" "<<fsz<<std::endl;
 	for(unsigned int i = 0; i < sz; i++)
 	{
 //		std::cout<<"Saddle feature sz value: "<<sadidx[i]<<" "<<m_vlist[sadidx[i]].feature<<" "<<m_vlist[sadidx[i]].w<<std::endl;
@@ -25,16 +25,16 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 		{
 			float f = nextf - alpha;
 			isovals.push_back(f);
-//			std::cout<<"Isovalues: "<<f<<std::endl;
+			std::cout<<"Isovalues: "<<f<<std::endl;
 		}
 		curf = nextf;
 	}
 }
 void Sampler::Sample(std::vector<float> & isovals, float alpha)
 {
-	//isovals.push_back(-77.55);
-	PickValues(isovals, alpha);	
-	RestrictSamples(isovals);
+	isovals.push_back(-79.2065479);
+//	PickValues(isovals, alpha);	
+//	RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)
 {
@@ -95,17 +95,16 @@ void Sampler::RestrictSamples(std::vector<float> & isovals)
 		}
 	}
 }
-void Sampler::PropogateValues(std::vector<float> & fvals, float min, float max)
+void Sampler::PropogateValues(std::vector<float> & isovals, float alpha, float min, float max)
 {
-	std::vector<float> isovals;
+	PickValues(isovals, alpha);	
 	float curmax = m_vlist[bd->bridsarr[1]->ext].w;
 	float curmin = m_vlist[bd->bridsarr[1]->sad].w;
-//	isovals.push_back(-344.693);
+//	isovals.push_back(-95.2415365);
 /*	for(unsigned int i = 0; i < fvals.size(); i++)
 	{
 		float f = (fvals[i] - min)*(curmax-curmin)/(max - min) + curmin;
 		isovals.push_back(f);
 	}*/
-	fvals = isovals;
-	RestrictSamples(isovals);
+//	RestrictSamples(isovals);
 }

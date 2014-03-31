@@ -37,8 +37,9 @@ class Contours
 		std::vector<std::vector<Vertex> > verts;
 		boost::unordered_map<unsigned int, CompNode*> topcomps;
 		unsigned int cid;
-		std::vector<float> fvals;
+		std::vector<std::vector<float> >isovals;
 		vtkSmartPointer<vtkTriangleFilter> trifil;
 		vtkSmartPointer<vtkPolyDataWriter> writer;
+		class Cluster* cl;
 };
 #endif

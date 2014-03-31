@@ -6,13 +6,14 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <lemon/matching.h>
+#include "Utils.hpp"
 extern struct timeval clus_start, clus_end;
 CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd), maxd(0)
 {
 }
-void CompMgr::Init(std::vector<float> & fnvals)
+void CompMgr::Init(std::vector<float> fnvals)
 {
-	fvals = fnvals;
+	isovals.push_back(fnvals);
 	fnmap = std::vector<std::vector<unsigned int> > (fnvals.size());
 }
 void CompMgr::AddComp(CompNode* c)
@@ -20,10 +21,10 @@ void CompMgr::AddComp(CompNode* c)
 	unsigned int did1 = c->did;
 	assert(c->id == comps.size());
 	comps.push_back(c);
-	unsigned int sz = fnmap[c->fnid].size();
-	for(unsigned int i = 0; i < sz; i++)
+	unsigned int sz = 2;//fnmap[c->fnid].size();
+	for(unsigned int i = 0; i < Min(c->id,sz); i++)
 	{
-		unsigned int compidx = fnmap[c->fnid][i];
+		unsigned int compidx = i;//fnmap[c->fnid][i];
 		CompNode* other = comps[compidx];
 		unsigned int did2 = other->did;
 		if(bd[did1]->BrType(c->bid, -1) && bd[did2]->BrType(other->bid, -1))
@@ -33,7 +34,7 @@ void CompMgr::AddComp(CompNode* c)
 			//if(orgval > 0.98) val = 1.0;
 			//else val = 0.0;
 			c->votes[other->id] = orgval;
-//			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
+			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
 		}
 	}
 	fnmap[c->fnid].push_back(c->id);
@@ -230,7 +231,7 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 	Lrw = I - D*U;
 //	Lrw = D - U;
 }
-void CompMgr::ClusterComps(float epsd, unsigned int bsz)
+void CompMgr::ExportComps(Cluster* cl)
 {
 	unsigned int csz = comps.size();
 	/*Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
@@ -273,33 +274,27 @@ void CompMgr::ClusterComps(float epsd, unsigned int bsz)
 	
 	cl = new Cluster(symcords);
 	*/
-	float d = epsd*epsd*maxd;
-	gettimeofday(&clus_start, NULL);
-	cl = new Cluster(this,d);
-	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
-	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
-	gettimeofday(&clus_end, NULL);
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
-	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
+	bd[1]->SetVertMask(0, 0, vrmask, brmask, 0);
 	for(unsigned int i = 0; i < cl->clusters.size(); i++)
 	{
 		std::cout<<"For cluster "<<i<<"mebers are "<<std::endl;
 		int cid = -1;
 		for(unsigned int j = 0; j < cl->clusters[i].mem.size(); j++)
 		{
-			std::vector<unsigned int> brmask = std::vector<unsigned int> (bsz, 0);
 			cid = cl->clusters[i].mem[j];
-			std::cout<<cid<<" "<<std::endl;
-			Export(cid,i, brmask);
-		if(cid != -1)
-		{
-			CompNode* c = comps[cid];
-			unsigned int bid = c->bid;
-			unsigned int did = c->did;
-			std::vector<unsigned int> vmask;
-			bd[did]->SetVertMask(i, cid, vmask, brmask, fvals[c->fnid]);
-		}
+			if(cid != -1)
+			{
+				CompNode* c = comps[cid];
+				unsigned int did = c->did;
+				unsigned int bid = c->bid;
+				std::vector<unsigned int> brmask = std::vector<unsigned int> (bd[did]->bridsarr.size(), 0);
+				std::cout<<cid<<" "<<std::endl;
+				Export(cid,i, brmask);
+				std::vector<unsigned int> vmask;
+				bd[did]->SetVertMask(i, cid, vmask, brmask, isovals[did][c->fnid]);
+			}
 		}
 	}
 }
@@ -309,7 +304,7 @@ void CompMgr::Export(unsigned int cid, unsigned int clid, std::vector<unsigned i
 	CompNode* c = comps[cid];
 	unsigned int bid = c->bid;
 	unsigned int did = c->did;
-	bd[did]->SetBrMask(bid, brmask, fvals[c->fnid]);
+	bd[did]->SetBrMask(bid, brmask, isovals[did][c->fnid]);
 }
 float CompNode::Vote(CompNode* other, float & maxd)
 {

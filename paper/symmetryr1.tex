@@ -165,8 +165,8 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 		}
 		\end{minipage}
 	}
-	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales in the scalar field
-		obtained from cryo-electron microscopy imaging of AMP-activated kinase (EMDB-1897). 
+	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales 
+		in a 3D cryo-electron microscopy image of AMP-activated kinase (EMDB-1897). 
 		(a)~The three-fold rotational symmetry is apparent from the volume rendering. (b)~Contours 
 		are represented as points in a high-dimensional shape descriptor space (illustrated in 2D). 
 		Symmetric contours form a cluster in the descriptor space and can be easily identified.  
@@ -253,7 +253,7 @@ corresponding to each such contour can be extracted and these regions
 are reported as symmetric. Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
-Figure~\ref{teaser} illustrates our approach on a cryo-EM image of AMP-activated kinase (EMDB-1897) 
+Figure~\ref{teaser} illustrates our approach on a 3D cryo-EM image of AMP-activated kinase (EMDB-1897) 
 with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
 identification of symmetry with respect to large-scale features highlighted in gold as well
 as small-scale features shown in blue and pink.
@@ -1232,13 +1232,13 @@ recognize partial symmetry at different scales in addition to identifying the gl
 
 \noindent{\textbf{Noise parameter $\delta$}}.
 We determine the number of arcs of the contour tree with volume above a particular value and plot
-the drop in the number of arcs with increasing value of volume. For the fuel dataset in 
+the drop in the number of arcs with increasing value of volume. For the Fuel dataset in 
 Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
 drop in the number of arcs initially, similar to the graph used for determining the stabilisation
 parameter $\alpha$. This drop is due to a large number of small sized features in the data which are 
 considered to be noise.
 We choose a value immediately after this sudden drop. When
-$\delta$ is set to 200 vertices for the fuel dataset, three sets of symmetric features, each exhibiting
+$\delta$ is set to 200 vertices for the Fuel dataset, three sets of symmetric features, each exhibiting
 4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20 vertices
 identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
 acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
@@ -1269,7 +1269,7 @@ be adapted based on the application under consideration.
 		\label{fuel-sym20}
 	}
 	\caption{\label{delta}Influence of noise parameter, $\delta$, on symmetry detection. (a)~Volume rendering of 
-		the fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
+		the Fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
 		(b)~Three symmetric regions reported when $\delta$ is set to 200 vertices. (c)~Lowering
 	$\delta$ to 20 vertices results in the detection of two additional symmetric regions that are smaller.}
 \end{figure}

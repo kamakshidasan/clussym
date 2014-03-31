@@ -29,11 +29,12 @@ class CompMgr
 	public:
 		CompMgr(std::vector<class BD*> & pbd);
 		void AddComp(CompNode* c);
-		void ClusterComps(float epsd, unsigned int vsz);
+		void ExportComps(class Cluster* cl);
 		void Export(unsigned int cid, unsigned int clid, std::vector<unsigned int> & brmask);
-		void Init(std::vector<float> & fnvals);
+		void Init(std::vector<float> fnvals);
 		void DistanceList();
 		std::vector<CompNode*> comps;
+		float maxd;
 	private:
 		float Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<float, Dynamic, Dynamic> & A);
 		void UpSweep(Matrix<float, Dynamic, Dynamic> & A);
@@ -42,11 +43,9 @@ class CompMgr
 		void FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynamic, Dynamic> & U);
 		std::vector<std::vector<unsigned int> > fnmap;
 		std::vector<BD*> & bd;
-		class Cluster* cl;
 		Matrix<float, Dynamic, Dynamic> symcords;
 		Matrix<float, Dynamic, 1> fncords;
-		std::vector<float> fvals;
-		float maxd;
+		std::vector<std::vector<float> >isovals;
 };
 
 

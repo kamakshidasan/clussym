@@ -318,7 +318,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 	unsigned int nreg = confilter->GetNumberOfExtractedRegions();
 	confilter->SetExtractionModeToSpecifiedRegions();
 
-	float isoval = fvals[fid];
+	float isoval = isovals[did][fid];
 
 	for(unsigned int r = 0; r < nreg; r++)
 	{
@@ -334,25 +334,26 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		ohtime += (oh_end.tv_sec-oh_start.tv_sec+oh_end.tv_usec/1000000.0-oh_start.tv_usec/1000000.0);
 		//std::cout<<"end cleaning"<<std::endl;
 
-		if(nreg == 1)
+/*		if(nreg == 1)
 		{
-//			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
-//			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-//			std::cout<<" Only 1 contour, not processing"<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else if(polydata->GetNumberOfPoints() > 20)
+		else */
+		if(polydata->GetNumberOfPoints() > 20)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
-		//	std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
-		//	std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			if(bid == -1) 
 			{
-/*				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
+				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
 				writer->SetFileName(fn);
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();*/
+				writer->Write();
 //				std::cout<<"Branch Id is -1!!!"<<std::endl;
 				//assert(0);
 				//bid = 1;
@@ -361,11 +362,11 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			if(cit != b->comps.end() && cit->second == -1)
+			//if(cit != b->comps.end() && cit->second == -1)
 			//if(cit == b->comps.end())
 			{
 				
-//				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
+				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
 				gettimeofday(&dis_start, NULL);
@@ -381,19 +382,19 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 			}
-			else
+			/*else
 			{
-//				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
-//				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
-			}
+				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
+				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
+			}*/
 //			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 
 		}
 		else
 		{
-/*			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			std::cout<<" Too few points, not processing"<<std::endl;*/
+			std::cout<<" Too few points, not processing"<<std::endl;
 
 		}
 	}
@@ -411,10 +412,10 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	int i = 0;
 	unsigned int prev = 0;
 	gettimeofday(&ctr_start, NULL);
-	for(; i < fvals.size(); i++)
+	for(; i < isovals[did].size(); i++)
 	{
 //		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
-		ctr->SetValue(0, fvals[i]);
+		ctr->SetValue(0, isovals[did][i]);
 		ctr->Update();
 		ProcessIsoSurface(i, prev, ctr, did);
 		prev = i;
@@ -497,13 +498,13 @@ void Contours::Preprocess(vtkSmartPointer<vtkStructuredPoints> & tgrid, unsigned
 	Sampler s(bd[did], sadidx, verts[did]);
 	if(did == 0)
 	{
-		s.Sample(fvals, alpha);
+		s.Sample(isovals[did], alpha);
 	}
 	else
 	{
 		float max = verts[0][bd[0]->bridsarr[1]->ext].w;
 		float min = verts[0][bd[0]->bridsarr[1]->sad].w;
-		s.PropogateValues(fvals, min, max);
+		s.PropogateValues(isovals[did], alpha, min, max);
 	}
 	gettimeofday(&ct_end, NULL);
 }
@@ -550,15 +551,22 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	gettimeofday(&timeval_start, NULL);
 	compmgr = new CompMgr(bd);
 	verts = std::vector<std::vector<Vertex> >(dcnt);
+	isovals = std::vector<std::vector<float> >(dcnt);
 	for(unsigned int did = 0; did < dcnt; did++)
 	{
 		Preprocess(tgrid[did], inv, did, alpha, delta);
-		if(did == 0)
-			compmgr->Init(fvals);
+		compmgr->Init(isovals[did]);
 		GenerateIsoSpace(did);
 	}
-	compmgr->ClusterComps(epsd, bd[0]->bridsarr.size());
-	//compmgr->DistanceList();
+	float maxd = compmgr->maxd;
+	float d = epsd*epsd*maxd;
+	Cluster* cl = new Cluster(compmgr, d*0);
+	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
+	gettimeofday(&clus_start, NULL);
+	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
+	gettimeofday(&clus_end, NULL);
+
+	compmgr->ExportComps(cl);
 	gettimeofday(&timeval_end, NULL);
 	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
 	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;

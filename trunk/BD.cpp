@@ -351,7 +351,7 @@ void BD::SetBrMask(unsigned int bid, std::vector<unsigned int> & brmask, float f
 			if(fabs(per) > 0.01) fval = fchval;
 		}
 	}
-	MaskBranches(br, brmask, fval);
+	MaskBranches(br, brmask, fisoval);
 }
 void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned int> & vmask, std::vector<unsigned int> & brmask, float fval)
 {

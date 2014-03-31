@@ -1062,7 +1062,10 @@ cryo-EM datasets. The contour tree based method, on the other hand, can detect s
 Our method combines the advantage of these two methods. The first row in Figure~\ref{res} shows the result of our
 method on one of the noisy datasets used by Thomas and Natarajan~\cite{ThomN13}, EMDB-1654. In addition 
 to detecting symmetry at the largest scale, our method is able to identify smaller symmetric
-regions at different scales. The extremum graph based method requires user guidance for carefully
+regions at different scales. The supplemental
+material shows the projection of the descriptors onto 2D using multidimensional scaling that
+shows that the clusters are well separated and can be easily identified. In contrast,
+the extremum graph based method requires user guidance for carefully
 selecting a set of well separated and symmetrically distributed extrema, called the seed set, 
 for symmetry detection. Typical cryo-EM datasets is devoid of noise in the high and low density regions and therefore
 the symmetry of the extrema belonging to these regions can be easily identified for choosing
@@ -1159,7 +1162,7 @@ is not an easy task because of the flat regions and the asymmetric distribution 
 		$\epsilon$ to 1\% results in the addition of two more smaller contours of oval shape and a new set of symmetric
 		contours shown in maroon. (d)~At $\epsilon=4$\% a new maroon contour, which is only partially symmetric with
 		respect to the existing maroon contours, is located. Similarly, the green contours also deviate from perfect symmetry. 
-		(d)~Larger green regions are detected at $\epsilon=4$\% and (e)~$\epsilon=$10\%.}
+		(d)~Larger green regions are detected at $\epsilon=4$\% and (e)~$\epsilon=$10\%. The occluded contours are not shown.}
 \end{figure*}
 \subsection{Parameter Selection}\label{para}
 The approximation parameter $\epsilon$ and the noise parameter $\delta$ are external to our algorithm.

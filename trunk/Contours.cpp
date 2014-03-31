@@ -334,13 +334,13 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 		ohtime += (oh_end.tv_sec-oh_start.tv_sec+oh_end.tv_usec/1000000.0-oh_start.tv_usec/1000000.0);
 		//std::cout<<"end cleaning"<<std::endl;
 
-/*		if(nreg == 1)
+		if(nreg == 1)
 		{
 			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
 			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else */
+		else 
 		if(polydata->GetNumberOfPoints() > 20)
 		{
 			char fn[100];
@@ -362,7 +362,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			//if(cit != b->comps.end() && cit->second == -1)
+			if(cit != b->comps.end() && cit->second == -1)
 			//if(cit == b->comps.end())
 			{
 				
@@ -382,11 +382,11 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 			}
-			/*else
+			else
 			{
 				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
 				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
-			}*/
+			}
 //			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 
 		}
@@ -560,13 +560,17 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	}
 	float maxd = compmgr->maxd;
 	float d = epsd*epsd*maxd;
-	Cluster* cl = new Cluster(compmgr, d*0);
+	//Cluster* cl = new Cluster(compmgr, d);
+	compmgr->SpecCords(d);
+	Cluster* cl = new Cluster(compmgr->symcords, d);
+	cl->GetClusters(epsd);
 	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
+//	compmgr->DistanceList();
 	gettimeofday(&clus_start, NULL);
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	gettimeofday(&clus_end, NULL);
 
-	compmgr->ExportComps(cl);
+	//compmgr->ExportComps(cl);
 	gettimeofday(&timeval_end, NULL);
 	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
 	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;

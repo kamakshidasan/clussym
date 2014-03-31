@@ -21,8 +21,8 @@ void CompMgr::AddComp(CompNode* c)
 	unsigned int did1 = c->did;
 	assert(c->id == comps.size());
 	comps.push_back(c);
-	unsigned int sz = 2;//fnmap[c->fnid].size();
-	for(unsigned int i = 0; i < Min(c->id,sz); i++)
+	unsigned int sz = fnmap[c->fnid].size();
+	for(unsigned int i = 0; i < sz; i++)
 	{
 		unsigned int compidx = i;//fnmap[c->fnid][i];
 		CompNode* other = comps[compidx];
@@ -167,7 +167,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			unsigned int cid1 = fnmap[fidx][i];
 			unsigned int bid1 = comps[cid1]->bid;
 			unsigned int did1 = comps[cid1]->did;
-			unsigned int csz1 = comps[cid1]->csz;
+			unsigned int csz1 = 1;//comps[cid1]->csz;
 			unsigned int norm = csz1;
 			std::cout<<"size  of "<<cid1<<" "<<csz1<<std::endl;
 
@@ -176,7 +176,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 				unsigned int cid2 = fnmap[fidx][j];
 				unsigned int bid2 = comps[cid2]->bid;
 				unsigned int did2 = comps[cid2]->did;
-				unsigned int csz2 = comps[cid2]->csz;
+				unsigned int csz2 = 1;//comps[cid2]->csz;
 				std::cout<<"size  of "<<cid2<<" "<<csz2<<std::endl;
 				norm += csz2;
 				if(bd[did1]->BrType(bid1, -1) && bd[did2]->BrType(bid2, -1))
@@ -196,7 +196,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 		}
 	}
 }
-void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
+void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A, float dist)
 {
 	std::vector<CompNode*>::iterator it = comps.begin();
 	unsigned int csz = comps.size();
@@ -212,7 +212,7 @@ void CompMgr::BuildSimMatrix(Matrix<float, Dynamic, Dynamic> & A)
 			A(itm->first, c->id) = itm->second;
 		}
 		A(c->id, c->id) = 1.0;
-		fncords(c->id,0) = 0;//c->fnid*10;
+		fncords(c->id,0) = c->fnid*10 ;
 	}
 
 }
@@ -230,6 +230,47 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 //	Lrw = I - D*U*D;
 	Lrw = I - D*U;
 //	Lrw = D - U;
+}
+void CompMgr::SpecCords(float dist)
+{
+	unsigned int csz = comps.size();
+	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
+	Matrix<float, Dynamic, Dynamic> Lrw = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
+	BuildSimMatrix(A, dist);
+	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
+	Matrix<float, Dynamic, Dynamic> U = A;
+	UpSweep(U);
+	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
+	FormLrw(Lrw, U);
+	std::cout<<"Lrw matrix:"<<std::endl<<Lrw<<std::endl;
+	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(Lrw);
+	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
+	std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
+	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
+	Matrix<float, Dynamic, Dynamic> D = eigs.eigenvalues().asDiagonal();
+	Matrix<float, Dynamic, Dynamic> VD = V;
+	std::cout<<"VD matrix:"<<std::endl<<VD<<std::endl;
+
+
+
+	unsigned int trunc = csz;
+	float diff = 0;
+	for(unsigned int i = 1; i < csz; i++)
+	{
+		if(eigs.eigenvalues()[i] - eigs.eigenvalues()[i-1] > diff)
+		{
+			diff = eigs.eigenvalues()[i] - eigs.eigenvalues()[i-1];
+			trunc = i;
+
+		}
+		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
+		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
+	}
+	Matrix<float, Dynamic, Dynamic> eigcords = VD.topLeftCorner(csz, trunc);
+	symcords = Matrix<float, Dynamic, Dynamic>(eigcords.rows(), eigcords.cols()+1);
+	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
+	symcords.col(eigcords.cols()) = fncords;
+	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 }
 void CompMgr::ExportComps(Cluster* cl)
 {
@@ -276,7 +317,7 @@ void CompMgr::ExportComps(Cluster* cl)
 	*/
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
-	bd[1]->SetVertMask(0, 0, vrmask, brmask, 0);
+	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
 	for(unsigned int i = 0; i < cl->clusters.size(); i++)
 	{
 		std::cout<<"For cluster "<<i<<"mebers are "<<std::endl;
@@ -327,6 +368,7 @@ void CompMgr::DistanceList()
 	std::cout<<"Distance List"<<std::endl;
 	unsigned int n = comps.size();
 	for(unsigned int i = 0; i < n; i++)
+	{
 		for(unsigned int j = 0; j < n; j++)
 		{
 			float diff = 0;
@@ -339,7 +381,11 @@ void CompMgr::DistanceList()
 				bnorm += (*it2)*(*it2);
 				diff += (*it1 - *it2)*(*it1 - *it2);
 			}
-			std::cout<<"Distance between "<<i<<" and "<<j<<" "<<sqrt(diff)<<std::endl;
+			if(comps[i]->fnid != comps[j]->fnid)
+				diff += maxd;
+			std::cout<<sqrt(diff)<<" ";
 		
 		}
+		std::cout<<std::endl;
+	}
 }

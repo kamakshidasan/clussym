@@ -81,7 +81,7 @@
 % D.Fellner, v1.13, Jul 31, 2008
 \begin{document}
 \vspace{-1cm}
-\begin{figure*}[h]
+\begin{figure*}[t]
 \onecolumn
 \begin{center}
 {\sffamily\huge{Multiscale Symmetry Detection in Scalar Fields\\
@@ -89,7 +89,6 @@ by Clustering Contours\\}}
 \vspace{0.5cm}
 {\sffamily\LARGE{Supplemental Figures\\}}
 \end{center}
-
 % for anonymous conference submission please enter your SUBMISSION ID
 % instead of the author's name (and leave the affiliation blank) !!
 
@@ -98,8 +97,25 @@ by Clustering Contours\\}}
 %{\sffamily\LARGE{Supplemental Figures\\}}
 \vspace{0.5cm}
 \centering
-{\sffamily\large{1. Query Contour Driven Exploration\\}}
-\vspace{1cm}
+{\sffamily\large{1. Plot for Selecting Noise Parameter $\delta$}\\}
+	\centering
+		\includegraphics[scale=0.15]{figures/noiseplot.pdf}
+\caption{The plot of the number of arcs in the contour tree with a specific value of volume 
+	as the value of the volume increases. The curve shows a significant drop initially due to the arcs
+corresponding to noise. A value immediately after this drop is chosen as the value of $\delta$.}
+\end{figure*}
+\begin{figure*}[t]
+\centering
+{\sffamily\large{2. Descriptor Space Projection to 2D\\}}
+	\centering
+	\includegraphics[scale=0.3]{inkscape/1654mds.pdf}
+\caption{Projection of 93 points in the descriptor space to 2D using multidimensional scaling
+	for the dataset EMDB-1654. Observe that the clusters are well separated. For the two clusters within the
+	dotted circles, their sizes are annotated below the cluster.}
+\end{figure*}
+\begin{figure*}
+	\centering
+	{\sffamily\large{3. Query Contour Driven Exploration\\}}
 	\centering
 	\subfigure[]
 	{
@@ -121,21 +137,67 @@ by Clustering Contours\\}}
 		\includegraphics[scale=0.09]{figures/isabel48.png}
 		\label{volisa48}
 	}
-\caption{\label{volisa}The yellow regions highlight the volumetric regions identified from 
+\caption{\label{volisa}Low pressure regions extracted through query contour driven exploration of 
+	the hurrican Isabel dataset. The yellow regions highlight the volumetric regions identified from 
 	the time steps, 12, 24, 36, and 48, using the query contour from the first time 
 	step shown in Figure~7(c). The extracted regions are displayed in the context
-of the rest of the volume.}
+	of the rest of the volume.}
 \end{figure*}
 \begin{figure*}
+\centering
+\begin{minipage}{\textwidth}
 	\centering
-	{\sffamily\large{2. Plot for selecting noise parameter $\delta$}\\}
-	\centering
-		\includegraphics[scale=0.2]{figures/noiseplot.pdf}
-\caption{The plot of the drop in the number of arcs in the contour tree with a specific value of volume 
-	as the value of the volume increases. The curve shows a sudden drop initially due to the arcs
-corresponding to noise. A value immediately after this drop is chosen as the value of $\delta$.}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac18-full.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac18ctrs.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac19-sym.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac19ctrs.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac20-sym.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac20ctrs.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac21-sym.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac21ctrs.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac22-sym.png}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.18]{figures/pac22ctrs.png}
+	}
+\end{minipage}
+\caption{\label{pacdep}Query contour driven exploration using multiple contours on a weather simulation dataset of size $306\times285\times27$.
+	(a)~Volume rendering of the pressure field from the first time step of a simulation that shows two depressions in the Pacific ocean in red.
+	(b)~Two query contours selected from the low pressure region of the first time step shown in gold and cyan.
+	(c)-(j)~The result of the query on four subsequent time steps that are one hour apart shows the two low pressure regions
+	detected in gold and cyan. The left and the right columns show the volumetric region extracted and the contour located.}
 \end{figure*}
 \begin{figure*}
+\centering
+{\sffamily\large{4. Results on additional datasets\\}}
+\vspace{0.5cm}
 \centering
 \begin{minipage}{0.33\textwidth}
 	\centering
@@ -164,7 +226,7 @@ corresponding to noise. A value immediately after this drop is chosen as the val
 	}
 	\subfigure
 	{
-		\includegraphics[scale=0.28]{figures/1179-sym1.png}
+		\includegraphics[scale=0.28]{figures/1179-sym3.png}
 	}
 	\subfigure
 	{
@@ -172,7 +234,7 @@ corresponding to noise. A value immediately after this drop is chosen as the val
 	}
 	\subfigure
 	{
-		\includegraphics[scale=0.28]{figures/1179-symalt1.png}
+		\includegraphics[scale=0.28]{figures/1179-sym1.png}
 	}
 \end{minipage}
 \begin{minipage}{0.33\textwidth}
@@ -189,11 +251,8 @@ corresponding to noise. A value immediately after this drop is chosen as the val
 		\includegraphics[scale=0.32]{figures/neghip-sym2.png}
 	}
 \end{minipage}
-\caption{\label{emdfigs}Symmetry detection results on additional cryo-electron microscopy datasets - EMDB 1319, 1659, and 5215.
-Each row shows a volume rendering of a dataset, the seed set, and
-the symmetric regions detected by our method. Each symmetric region is shown in a unique color.
-The violet regions are representative of the noise in the data. The symmetry detection method
-works even in the presence of noise.}
+\caption{\label{addres}Multiscale symmetry detected on (left column)~Vortex (middle column)~EMDB-1179 and (right column)~Neghip datasets.
+	The topmost figure in each column shows a volume rendering of the dataset and different symmetric regions detected
+are shown below it.}
 \end{figure*}
-
 \end{document}

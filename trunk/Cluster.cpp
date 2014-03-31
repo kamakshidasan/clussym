@@ -27,7 +27,7 @@ Cluster::Cluster(CompMgr* cmp, float dist) : clidarr(cmp->comps.size(), 0)
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
 	}
 }
-Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows(),0)
+Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords, float d) : clidarr(cords.rows(),0)
 {
 	clusters.push_back(ClusInfo());
 	nPts = cords.rows();
@@ -40,13 +40,14 @@ Cluster::Cluster(Matrix<float, Dynamic, Dynamic> & cords) : clidarr(cords.rows()
 		{
 			for(unsigned int d = 0; d < dim; d++)
 				datapts[i][d] = cords(i,d);
+
 //			std::cout<<"Cord "<<i<<" : "<<std::endl<<cords.row(i)<<std::endl;
 		}
 
 		kdTree = new ANNkd_tree(datapts, nPts, dim);	
 	}
 }
-std::vector<unsigned int> & Cluster::GetClusters(float d)
+std::vector<unsigned int> & Cluster::GetClusters(float dist)
 {
 	for(unsigned int i = 0; i < nPts; i++)
 	{
@@ -54,7 +55,7 @@ std::vector<unsigned int> & Cluster::GetClusters(float d)
 		{
 			ClusInfo clinfo;
 			clinfo.id = clusters.size();
-			GetMembers(i, clinfo.mem, d);
+			GetMembers(i, clinfo.mem, dist);
 			clusters.push_back(clinfo);
 		}
 	}

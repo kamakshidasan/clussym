@@ -14,7 +14,7 @@ struct ClusInfo
 class Cluster
 {
 	public:
-		Cluster(class Matrix<float, Dynamic, Dynamic> & cords);
+		Cluster(class Matrix<float, Dynamic, Dynamic> & cords, float d);
 		Cluster(class CompMgr* cmg, float d);
 		void GetMembers(unsigned int id, std::vector<unsigned int> & mem, float d);
 		std::vector<unsigned int> & GetClusters(float d);

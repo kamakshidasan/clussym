@@ -253,7 +253,7 @@ corresponding to each such contour can be extracted and these regions
 are reported as symmetric. Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
-Figure~\ref{teaser} illustrates our approach for a cryo-EM dataset (EMDB-1897) 
+Figure~\ref{teaser} illustrates our approach on a cryo-EM image of AMP-activated kinase (EMDB-1897) 
 with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
 identification of symmetry with respect to large-scale features highlighted in gold as well
 as small-scale features shown in blue and pink.
@@ -521,8 +521,8 @@ contour is approximated as the number of vertices of the domain enclosed by the 
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
 efficiently~\cite{CarrSP10}. In the absence of the metadata information provided by the contour tree,
-all contours would have had to be treated as equally important. Contour tree driven sampling ensures
-that each region has a unique representative contour and avoids sampling of contours from noisy regions.
+all contours would have had to be treated as equally important. In summary, contour tree driven sampling 
+both ensures that each region has a unique representative contour and avoids sampling of contours from noisy regions.
 \subsection{Contour Representation in Descriptor Space}
 Once a representative contour is generated from each region of interest, the next step
 is to generate its descriptor. The similarity score between a pair of
@@ -535,8 +535,8 @@ of the shape descriptor. Instead, it offers flexibility in choosing
 the descriptor appropriate for an application.  Hence, our method may be viewed as a generic framework for identifying
 similar regions in a scalar field. For example, if an application is interested in 
 identifying similarity only with respect to rotation, a rotation invariant descriptor may be used. 
-The only prerequisite on the descriptor is that it should be discriminative, i.e., contours which are 
-similar should be mapped to points that are nearby in the descriptor space while contours that differ 
+The only prerequisite on the descriptor is that it should be discriminative, i.e., similar contours 
+should be mapped to points that are nearby in the descriptor space while contours that differ 
 from each other should be mapped to far away points. Therefore, it is important to use shape descriptors 
 with high precision and recall ratios~\cite{lian2013} for applications that cannot tolerate false 
 positives during shape retrieval.
@@ -580,7 +580,7 @@ positives during shape retrieval.
 \subsection{Contour Clustering}\label{clus}
 After the descriptor generation stage, any standard clustering method may be used to
 locate the clusters in the descriptor space that represent symmetric contours. However,
-enforcing the generation of descriptors as a constraint limits the flexibility of 
+requiring the explicit generation of descriptors as a constraint limits the flexibility of 
 using our approach as a generic framework for similarity detection. We observe that mapping of
 contours to points in the
 descriptor space is not a prerequisite for clustering. A similarity correspondence
@@ -596,7 +596,7 @@ In particular, for symmetry identification, the distance between points in the d
 used to assign the score between pairs of contours. 
 
 Given a set of contours marked as symmetric, the arc in the contour tree 
-to which each contour belongs can be determined. The region of the domain
+to which each contour belongs to can be determined. The region of the domain
 enclosed by the largest contour of the arc can then be extracted and reported
 as a symmetric region. Although this works well in practice, note that the contour
 itself may have evolved due to the merging of contours nested within it.
@@ -629,7 +629,7 @@ with the score between ${c_i}^p$ and ${c_j}^q$. The maximum weight
 matching is computed to determine the similarity score between the children
 contours. The score between the contours $p$ and $q$ obtained
 directly from the descriptor space is added to the value of maximum weight matching
-to obtain the cumulative similarity score between $p$ and $q$. Analogous procedure
+to obtain the cumulative similarity score between $p$ and $q$. An analogous procedure
 may be used for nested contours that split from a parent contour.
 \begin{figure}[b]
 \centering
@@ -656,14 +656,16 @@ at which the contours from symmetric regions merge and split may not be consiste
 shows an example where, for the same isovalue, children contours of the green contours 
 have already merged to form a single component while the blue contours are yet to merge
 and form a single component. We require an isovalue that is
-close to the saddle and generates isocontours that are consistent, with respect to merging. 
-The simple strategy we adopt is to ensure that none of the contours merge by
+both close to the saddle and generates isocontours that are consistent, with respect to merging. 
+A simple strategy we adopt is to ensure that none of the contours merge by
 selecting an isovalue that is lower than the lowest join saddle at which the contours merge.
-The length of the interval of function values within which the saddle values are not consistent 
-with respect to merging of contours is captured using a \emph{stabilisation parameter} $\alpha$.
-After discarding the saddles of all arcs that are considered to be noise, for a join saddle $s$,
-where contours merge into one, we select an isovalue $w = f(s)-\alpha$ if there are no other 
-saddles in the interval $[w,f(s)]$. Among the set of isovalues thus generated,
+We introduce a \emph{stabilisation parameter} $\alpha$ that determines
+the length of the interval of function values within which the saddle values are not consistent 
+with respect to merging of contours. From the list of all saddles in the contour tree, we first remove 
+all saddles belonging to arcs that are considered to 
+be noise with respect to the threshold $\delta$. Within the reduced list, we consider each join saddle $s$,
+where contours merge into one, and select an isovalue $w = f(s)-\alpha$ if there are no other 
+saddles whose function value lie within the interval $[w,f(s)]$. Among the set of isovalues thus generated,
 if $w$ is the highest isovalue that lies in between the function values at the 
 end points of an arc, then $w$ is chosen as the isovalue for the arc. 
 An analogous procedure is used to select isovalues with respect to split saddles. 
@@ -764,7 +766,7 @@ correspondence graph.
 Let $c_i$ and $c_j$ be two contours that belong to the same level set and $d$ be
 the distance between their descriptors. The ideal metric for computing
 distances in the descriptor space may be determined using methods like
-metric learning~\cite{Kulis13}, however, we use
+metric learning~\cite{Kulis13}. However, we use
 Euclidean distances since it has yielded good results 
 for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. 
 We build a symmetry correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
@@ -893,9 +895,9 @@ volume and compute their scale invariant descriptors. Finally, we locate the nea
 representing the query object in the descriptor space. We identify the contour
 shown in Figure~\ref{conisa1} through this search. Note that the size and the exact shape of the
 query object is different from that of the contour.
-The descriptor is robust to these variations and therefore the query successfully identifies 
+The descriptor is robust to small variations and therefore the query successfully identifies 
 a contour from the low pressure region. The volumetric region of the domain from which the contour
-is generated, shown in yellow, is extracted and displayed in the context of the rest of the volume in 
+is generated is extracted and displayed in the context of the rest of the volume in 
 Figure~\ref{detisa1}. 
 
 We describe the above experiment to demonstrate the power of the descriptor space as a geometry based representation 
@@ -1237,8 +1239,6 @@ $\delta$ is set to 200 vertices for the fuel dataset, three sets of symmetric fe
 4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20 vertices
 identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
 acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
-Observe that the supplemental material of the extremum graph based symmetry detection method shows 
-that it does a poor job in reporting symmetric regions within the fuel dataset. 
 Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
 cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
 method is able to easily capture the symmetry of smaller symmetric regions for this dataset. 

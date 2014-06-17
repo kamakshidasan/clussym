@@ -570,7 +570,7 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	gettimeofday(&clus_end, NULL);
 
-	//compmgr->ExportComps(cl);
+	compmgr->ExportComps(cl);
 	gettimeofday(&timeval_end, NULL);
 	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
 	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;

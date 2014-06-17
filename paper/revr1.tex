@@ -1,0 +1,217 @@
+\documentclass[10pt]{article}
+\usepackage{color}
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9in}
+\setlength{\headheight}{0.05in}
+\setlength{\headsep}{0.05in}
+\setlength\paperheight {10.75in}
+\setlength\paperwidth  {7.875in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\title{}
+\date{}
+
+\begin{document}
+\noindent Dear IEEE Visualization Papers Chairs and Reviewers,\\\\
+
+We thank all reviewers for their detailed comments. We have revised the paper to address the issues raised by the reviewers including 
+\begin{itemize}
+\item a new experiment and illustrations to discuss sensitivity to the selection of seed sets;	experiments 
+	on additional datasets are included in the supplemental material
+\item expanded discussion on the thresholds selection
+\item detailed description of a semi-automatic procedure to select seed sets which requires only minimal 
+	user interaction; the procedure is illustrated in the supplemental material
+\item improved and expanded description of the comparison with the contour tree method, and
+\item improved exposition of the short-cutting in the extremum graph.
+\end{itemize} 
+Below, we respond to all reviewer comments. The main changes are highlighted in the paper also.\\\\
+
+{\noindent \LARGE Response to Summary Review}\\\\
+
+The paper is based on many steps that are only provided in form of
+   references, e.g., the computation of a contour tree. However, this cannot
+   be avoided. The only thing that I would have liked to see added is an
+   equation for the descriptor based on the Laplace-Beltrami spectra.\\\\
+
+   One comment:
+   Since the performance depends on the number of critical points and the
+   number of contours, they should be listed in Table 1.
+
+   The paper is technically sound and discusses almost all relevant aspects.
+   I only have a few comments (many are "nice to have" but not crucial):
+   * Assuming that we have symmetric regions that are not perfectly matching
+   in terms of the isosurfaces like in Fig. 10b. What if there is no single
+   isovalue that captures all symmetries before the components falling
+   apart? Can we still find the symmetries? One step further: What if we
+   have to use different isovalues for the different arcs to have matching
+   symmetries? Can that be captured?
+   * The authors describe their work as a general framework and mention that
+   different shape descriptors can be used. Other examples than the
+   implemented one are mentioned. It would have been nice to see the use of
+   others, as well. 
+   * It is not clear from Table 1, how the algorithm scales with the number
+   of critical points or contours. Respective plots would be helpful.
+   * The Laplace-Beltrami spectra are computed after simplifying the meshes.
+   How (if at all) does this affect the result? How much can the meshes be
+   simplified?
+   * Robustness against noise has been given as a main advantage of this
+   approach. It would have been nice to see how much noise can be handled by
+   taking a noise-free (synthetic) data set and successively add noise until
+   it fails. Also, the change of the shape descriptor space would have been
+   interesting to see.
+
+
+
+{\noindent \LARGE Response to Reviewer 2}\\\\
+
+	In the following I summarize some questions and comments that could be
+   further discussed in the paper:
+   - The method requires a proper treatment of noise, which is done by
+   counting vertices of contours. This requires a continuously sampled
+   scalar field, this could be mentioned.
+
+   - Shape comparison using the Laplace-Beltrami spectrum:
+   o How many modes to you use for the comparison. This number determines
+   the dimension of the descriptor space and thus the performance of the
+   clustering step. For high dimensions it may be possible that the
+   distribution of points in the descriptor space is very spars and a simple
+   neighborhood search might not be sufficient. 
+   o Is the Euclidean distance a meaningful distance measure in this space?
+   The order of magnitude of the single eigenvalues might differ
+   significantly. You might consider a lexicographic distance measure
+   instead.
+   o The statement that two different shapes have a different
+   Laplace-Beltrami spectrum is only partially true. The spectrum is
+   invariant with respect to isometric transformations.  
+   o The cotangent weighted scheme for the computation of the
+   Laplace-Beltrami spectrum is very sensitive with respect to the quality
+   of the triangulation mesh. Could you please discuss related issues. Many
+   simple isosurface computation algorithms have some badly shaped
+   triangles.
+
+   - Clustering:
+   o It is stated that it is observed that the clusters in the descriptor
+   space are well separated. This might be due to the choice of data sets
+   that you considered for your evaluation. All these datasets exhibit a
+   nice inherent symmetry. Looking at a more general data set this might not
+   be the case.
+	
+   Most examples used for the evaluation show impressive results. This are
+   data sets which show strong symmetries, that are well known in advance.
+
+   In contrast the Isabel data set is not really convincing and seems a
+   little bit artificial. Could you discuss in more details for what
+   scenarios this is a meaningful approach and where are the limitations.
+
+{\noindent \LARGE Response to Reviewer 1}\\\\
+   First, I would not say that the paper addresses symmetry detection. In my
+   opinion, it addresses partial self-similarity detection. At no point in
+   the paper the algorithm studies or makes use of the transformation that
+   maps a region to another. The technique seems oblivious to the type of
+   symmetry (reflective or rotational symmetry). For instance, if a scalar
+   field is given such that a contour is repeated in random locations of
+   space, I suspect the proposed technique will identify the original
+   contour and its repetitions as being symmetric although their layout in
+   space is completely random. Thus I would encourage the authors to modify
+   the title to better reflect this. The application described in section
+   6.1 also goes in the direction of this remark.
+   Second, symmetry and similarity evaluation in between scalar fields using
+   a contour-tree based domain decomposition has been used in many other
+   recent papers such as the one by Thomas and Natarajan, or the following
+   others:
+   * "Measuring the Distance Between Merge Trees", Beketayev, Yeliussizov, 
+   Morozov, Weber, Hamann, TopoInVis 2013.
+   * "Extended Branch Decomposition Graphs: Structural Comparison of Scalar
+   Data", Saikia et al., EuroVis 2014
+   * "Measuring Distance between Reeb Graphs", Bauer, Ge, Wang, arXiv 2013.
+   Thus, the development of the presented technique is not particularly
+   surprising in the light of the above references and other work in shape
+   comparison (where the Laplace-Beltrami spectrum has been used for quite a
+   while now). Overall, the paper seems to build on top of a collection of
+   known techniques (contour tree based segmentation, Laplace-Beltrami
+   spectra and spectral clustering).
+
+   Still, the authors show a few visual comparisons with the approach by
+   Thomas and Natarajan and show that their technique is additionally able
+   to detect "nested" symmetries (more than multi-scale).
+   I found the application described in Figure 8 particularly relevant and I
+   believe it is probably the most interesting result of the paper. However,
+   it is unclear if such an application couldn't be derived with previous
+   techniques such as the one by Thomas and Natarajan.
+
+The paper is very well written and the exposition is mostly clear except
+   for the discussion of the clustering algorithm. In section 5.3, the
+   authors present two strategies (nearest neighbors and spectral
+   clustering) and it's not clear which one is used in the remainder of the
+   paper.
+   How did the authors simplify the contour surfaces prior to computing
+   their spectra? The simplification strategies here can have a major impact
+   on the subsequent similarity estimation.
+
+   When reading the paper, I was concerned with computation time
+   performance, especially for the clustering side of things. I would
+   encourage the authors to detail this part in table 1 or in a new table.
+   For instance, maximal clique identification in a graph is computationally
+   expensive. Also, at the end of section 4.4, the authors evaluate the
+   maximum weight matching in the bipartite graph of contours' children.
+   This part is also computationally expensive. I was really surprised to
+   read in the text that the clustering part takes less than a 
+   second. I wish the authors could detail for each data-set the number of 
+   contours extracted from the contour tree, which directly impacts the
+   run-time of the maximum clique computation and maximum weight matching.
+   How do the clustering performances scale when this number increases for
+   large data-sets or when the simplification level of the contour tree is
+   kept minimal (to maintain small-scale features in the analysis)?
+   Also, I believe comparing Laplace-Beltrami spectra only makes sense from
+   a geometrical point of view if the two surfaces have the same topology.
+   Such a thing cannot be guaranteed with scalar field contours due to
+   boundary components or different genus. Does it affect the similarity
+   evaluation performances in practice?
+
+   I believe it would have been nice to further experiment the robustness of
+   the techniques with synthetic data-sets, designed to assess specific
+   features of the algorithm (for instance, robustness to noise, ambiguous
+   symmetries, etc.)
+   Also, the title (and other remarks throughout the paper) suggests that
+   the approach can detect symmetries at multiple scale. I didn't find any
+   evidence of this in the experiments. Can the approach detect symmetries
+   between regions of similar shapes but drastically different volumes (i.e.
+   scale)?
+   It seems that the authors make a mis-usage of the word multi-scale since
+   they seem to refer to the ability of their technique to detect
+   similarities between groups of nested contours. This is misleading.
+
+   This paper addresses a topic which has been studied in several recent
+   papers, using a very similar angle of attack (topology based
+   segmentation). It mostly differs from these in its usage of different
+   shape descriptors, which however have already been largely studied in the
+   shape comparison community. 
+   A novelty seems to be the ability of the technique to detect nested
+   symmetries (Fig. 9b and 9c) but the paper does not make a good case at
+   motivating this new feature. 
+
+{\noindent \LARGE Response to Reviewer 4}\\\\
+   The paper provides a new geometry-based approach to symmetry detection in
+   scalar fields. It is shown to improve over previous methods based on a
+   topological approach which apply the contour tree or the extremum graph.
+
+Significance/Novelty: How To Improve? 
+
+   The authors should provide a better justification of their definition of
+   symmetry. It is not clear how the definition based on shape descriptors
+   that they introduce is related to the one based on symmetry
+   transformation. 
+
+   Also, the authors say that the approach proposed in the paper is related
+   to the work of Bruckner et al.. They provide a general comparison in the
+   related work. I think that a more in-depth comparison should be performed
+   at the end of the paper after that the proposed method and the results
+   have been described.
+
+   The authors provide a comparison with previous approaches in the related
+   work. I think that there is too much detail here since at this point we
+   do not know the details of the proposed approach. My suggestion is to
+   postpone some of the comments and have a more in-depth comparison in
+   particular with the method by Bruckner et al.
+
+\end{document}

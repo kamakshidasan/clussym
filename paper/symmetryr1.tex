@@ -34,7 +34,9 @@
 \usepackage{algorithm2e}
 \usepackage{transparent}
 \usepackage{amsthm}
-
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{lipsum}
 \newtheorem*{defi}{Definition}
 
 %% We encourage the use of mathptmx for consistent usage of times font
@@ -54,7 +56,8 @@
   pageanchor=true,
   urlcolor = black,
   plainpages = false,
-  linktocpage
+  linktocpage = true,
+  hyperindex = true
 }
 
 %% If you are submitting a paper to a conference for review with a double
@@ -108,8 +111,8 @@ by Clustering Contours}
 
 %% Abstract section.
 \abstract{The complexity in visualizing volumetric data often limits the scope of direct exploration
-of scalar fields. Isocontour extraction is a popular method for analysing the characteristics
-of scalar field because of its simplicity in presenting features in the data. 
+of scalar fields. Isocontour extraction is a popular method for exploring
+scalar fields because of its simplicity in presenting features in the data. 
 In this paper, we present a novel representation of contours with 
 the aim of studying the similarity relationship between the contours. The representation 
 maps contours to points in a high-dimensional transformation-invariant descriptor space. 
@@ -136,18 +139,18 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 %}
 \teaser{
 	\centering
-	\subfigure[]
-	{
+%	\subfigure[]
+%	{
 		\begin{minipage}[c][1\width]{0.32\textwidth}
 		{
 			\centering
 			\includegraphics[scale=.33]{figures/1897-full.png}
 		}
 		\end{minipage}
-	}
+%	}
 	\hspace{0.02cm}
-	\subfigure[]
-	{
+%	\subfigure[]
+%	{
 		\begin{minipage}[c][1\width]{0.32\textwidth}
 		{
 			\centering
@@ -155,22 +158,22 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 			\includegraphics[scale=.31]{inkscape/descspace.pdf}
 		}
 		\end{minipage}
-	}	
-	\subfigure[]
-	{
+%	}	
+%	\subfigure[]
+%	{
 		\begin{minipage}[c][1\width]{0.32\textwidth}
 		{
 			\centering
 			\includegraphics[scale=.33]{figures/1897-sym.png}
 		}
 		\end{minipage}
-	}
+%	}
 	\caption{\label{teaser}Clustering based analysis detects symmetry at different scales 
 		in a 3D cryo-electron microscopy image of AMP-activated kinase (EMDB-1897). 
-		(a)~The three-fold rotational symmetry is apparent from the volume rendering. (b)~Contours 
+		(left)~The three-fold rotational symmetry is apparent from the volume rendering. (center)~Contours 
 		are represented as points in a high-dimensional shape descriptor space (illustrated in 2D). 
 		Symmetric contours form a cluster in the descriptor space and can be easily identified.  
-		Three such clusters are shown in gold, blue, and pink. (c)~Three symmetric regions of
+		Three such clusters are shown in gold, blue, and pink. (right)~Three symmetric regions of
 		different sizes, highlighted in gold, blue, and pink, detected by the method.}
 }
 
@@ -221,7 +224,10 @@ These studies have established that clustering based analyses result in superior
 performance and robust identification of symmetry. Some of these methods
 have been extended to scalar fields and they operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
-domain. Scalar field datasets are typically represented using scalar values 
+domain. {\color{blue}Symmetry in shapes is associated with a group structure on
+geometric objects that are invariant under transformations. In scalar fields, it is more
+meaningful to relax this constraint and identify all repeating occurrences since this is
+more useful for data exploration.} Scalar field datasets are typically represented using scalar values 
 assigned to a discrete set of sample points that represent the domain under 
 consideration. However, the domain and the scalar values are assumed to be continuous by
 interpolating the values at the sample points. Therefore, the sample points in a scalar 
@@ -254,32 +260,36 @@ are reported as symmetric. Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
 Figure~\ref{teaser} illustrates our approach on a 3D cryo-EM image of AMP-activated kinase (EMDB-1897) 
-with three-fold rotational symmetry. The multiscale aspect of our approach facilitates
-identification of symmetry with respect to large-scale features highlighted in gold as well
-as small-scale features shown in blue and pink.
+with three-fold rotational symmetry. {\color{blue}Our method identifies symmetric regions of different
+scales. The large-scale features shown in gold and the small-scale features shown in blue and pink
+highlight the multiscale aspect of our approach.}
 
 The main contributions of this paper are the following:
-\begin{itemize}
+\begin{itemize}[itemsep=0mm]
+%\vspace{-0.25cm}
 \item A formulation of the problem of symmetry detection in scalar fields
 as a clustering problem in a shape descriptor space. This model
 provides a lot of flexibility in analysing similarity of scalar fields
 as well as handling noise since it allows the shape representation and the 
 descriptor space to be varied.
+%\vspace{-0.25cm}
 \item A novel representation of contours as points in a contour descriptor space.
 Similarity between contours is naturally defined as the distance between points 
 in this space. This is a generic representation of independent interest 
 and we show its benefit in similarity analysis of scalar fields.
+%\vspace{-0.25cm}
 \item A robust algorithm to detect symmetric regions at multiple scales. Though geometry based 
 symmetry detection methods are typically computationally costly, we design an efficient algorithm 
 that employs elegant optimisations by incorporating topological information 
 about the contours using the contour tree.
+%\vspace{-0.25cm}
 \item Applications to query driven exploration and asymmetry visualization.
 \end{itemize}
 Symmetry information in scalar fields
 has been used for transfer function design, exploration of isosurfaces, selection of cross-section
 planes and view directions, linked selection and editing, query driven exploration,
 and visualization of features through dual rendering~\cite{ThomN11,HongS08,ThomN13,MasoodTN13}.
-We believe that as better techniques for robust detection of symmetry in scalar fields are developed,
+We believe that as better techniques for symmetry detection are developed,
 many more applications will emerge.
 \section{Related Work}
 Existing symmetry identification methods in scalar fields can be broadly classified into two
@@ -287,7 +297,7 @@ categories, namely, geometry based methods and topology based methods. We briefl
 these methods in this section.
 \subsection{Geometry based approaches}
 Several methods have been proposed in the literature for detecting
-symmetry in shapes and these methods are described in a survey paper by
+symmetry in shapes as described in the survey paper by
 Mitra~et~al.~\cite{MitPWC2012}. Some of these methods~\cite{Mitra06,KazhdanCDFR03,BokBWSS09} have 
 been applied to scalar fields~\cite{MasoodTN13,HongS08,kerbWKS11}. However, they struggle to address 
 the challenges in extending geometric methods to scalar fields.
@@ -297,7 +307,7 @@ point of the domain for symmetry recognition. A direct extension of this approac
 suffers from the difficulty of capturing important features and leads to poor performance 
 in extracting higher level features and handling of noise in the data.
 Moreover, the scalar field is considered to be continuous over the domain by interpolating the values at 
-the discrete set of sample points. Inspecting only local information at the sample points
+the discrete set of sample points. Inspecting only the sample points
 introduces additional challenges due to discretization errors since the symmetric counterpart for a 
 given point may be an interpolated point.
 
@@ -305,7 +315,7 @@ Hong and Shen~\cite{HongS08} propose a method to detect global reflective symmet
 of reflection that minimize the difference between the scalar value at a point and its
 reflection. This method is computationally inefficient and cannot be easily extended to identify 
 other types of symmetry. Kerber~et~al.~\cite{kerbWKS11} build a graph network of crease line features 
-and detect symmetry by computing geometric transformations that match subgraphs within the crease line network.
+and detect symmetry by computing transformations that match subgraphs within the crease line network.
 Since only a small subset of features in scalar fields contain crease lines, 
 this method is not very useful in practice. Masood~et~al.~\cite{MasoodTN13} detect
 symmetry by identifying symmetry transformations as clusters in the space of all transformations.
@@ -314,7 +324,7 @@ domain. This method relies on local signatures of sample points for determining
 transformations and as a result several parameters need to be tweaked at various stages of 
 the symmetry detection pipeline to limit the adverse effects of variations in the local signatures 
 and discretization errors.  Moreover, the transformation space often contains additional transformations
-that introduces artifacts. The above methods compute geometric transformations between 
+that introduces artifacts. The above methods compute transformations between 
 candidate pairs for identifying symmetry and are computationally costly. Moreover, they 
 are driven by purely local geometric measures and do not incorporate any criterion 
 to either recognize important features or discard pairs corresponding to noise. 
@@ -325,12 +335,12 @@ Bruckner~et~al. propose an information theoretic approach for isosurface similar
 detection~\cite{BrucknerM10,haidacher11}. This method uses mutual information between distance 
 transforms to quantify the information common to two isosurfaces and builds a similarity map 
 between all pairs of isosurfaces. Clusters with high mutual information correspond to
-similar isosurfaces both within and across datasets. Although closely related to our method, 
-by virtue of using distance transforms as the descriptor, 
-this method identifies similar family of isosurfaces within a range of isovalues that 
-form an onion-peel like layered arrangement. Our method, on the other hand, is more suited 
-for identifying partial similarities and extracting symmetric regions by identifying
-similarity between contours and not isosurfaces. While the isosurface similarity map based
+similar isosurfaces both within and across datasets. {\color{blue}While this method is related since
+it is also based on isosurface similarity, their goal is to select a subset of isovalues
+which are important. They use distance transforms to identify redundant isovalues by
+computing similar family of isosurfaces that form an onion-peel like layered arrangement. 
+The goal of our method, on the other hand, is to locate regions which are similar and hence
+we compute similarity between contours and not isosurfaces.} While the isosurface similarity map based
 method is limited to analysing similarity between pairs of datasets, the descriptor space can 
 be used to analyse multiple datasets simultaneously. Similarity between different scalar 
 fields has also been studied by measuring the extent of overlap
@@ -420,8 +430,10 @@ transformation $T$, which is a costly operation. Therefore, we use an alternate 
 Let $\mathbb{C}$ be the set of all contours. 
 Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
 where $T$ is a transformation. In other words, $g$ is a function that maps each
-contour to a point in a high-dimensional space such that a contour and its symmetric 
-copies are mapped to the same point. The point to which a contour is mapped is called a 
+contour to a point in a high-dimensional space such that a contour and its 
+copies are mapped to the same point. {\color{blue}The contours which are mapped to the same
+point need not form a symmetry group. Instead, all repeating instances of a contour
+are mapped to the same point.} The point to which a contour is mapped is called a 
 \emph{descriptor} and the high-dimensional space is called the \emph{descriptor space}, see Figure~\ref{ctmap}. 
 For illustration, the descriptor space is shown in 2D but the actual dimension of the space
 depends on the choice of the descriptor. The distance between contours in the descriptor space is a
@@ -441,8 +453,7 @@ where $\lVert \cdot \rVert$ is a norm in the descriptor space. They are
 Shape descriptors have been extensively used in the
 geometry processing community for shape matching and there is a
 vast collection of research papers in this 
-area~\cite{lian2013,van2011,tangelder2008survey,qin2008content}. Note that
-different norms may have to be used for different descriptors. 
+area~\cite{lian2013,van2011,tangelder2008survey,qin2008content}. 
 It is possible that a shape descriptor may incorrectly map contours $c_1$ and 
 $c_2$ to the same point even when they have totally different shapes. A good shape descriptor should 
 discriminate well between different shapes and minimize such incorrect
@@ -542,7 +553,7 @@ with high precision and recall ratios~\cite{lian2013} for applications that cann
 positives during shape retrieval.
 \begin{figure}[b]
 	\centering
-	\subfigure[]
+%	\subfigure[]
 	{
 		\begin{minipage}[c][1\width]{0.3\linewidth}
 		{
@@ -552,7 +563,7 @@ positives during shape retrieval.
 		}
 		\end{minipage}
 	}
-	\subfigure[]
+%	\subfigure[]
 	{
 		\begin{minipage}[c][1\width]{0.3\linewidth}
 		{
@@ -562,7 +573,7 @@ positives during shape retrieval.
 		}
 		\end{minipage}
 	}
-	\subfigure[]
+%	\subfigure[]
 	{
 		\begin{minipage}[c][1\width]{0.3\linewidth}
 		{
@@ -574,8 +585,8 @@ positives during shape retrieval.
 
 	}
 	\caption{\label{ct-merge}When contours merge, their shape change significantly. 
-		(a)~Six contours before they merge. (b)~Part of the contour tree depicting
-		merging of pairs of contours. (c)~Three contours after the merge.}
+		(left)~Six contours before they merge. (center)~Part of the contour tree depicting
+		merging of pairs of contours. (right)~Three contours after the merge.}
 \end{figure}
 \subsection{Contour Clustering}\label{clus}
 After the descriptor generation stage, any standard clustering method may be used to
@@ -1320,10 +1331,10 @@ does not incorporate geometric stability criteria for selecting representative c
 It is beneficial to employ such criteria that selects a stable contour 
 from each arc of the contour tree to ensure consistency
 in the shape of the contours extracted.
-We believe
+{\color{blue}We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
-similar features in collections of related datasets like time-varying and ensemble data and plan to 
-investigate this in future.
+similar features for applications like querying  and tracking in collections of related datasets 
+like time-varying and ensemble data.}
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

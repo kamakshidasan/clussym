@@ -26,12 +26,13 @@ We thank all reviewers for their detailed comments. We have revised the paper to
 \end{itemize} 
 Below, we respond to all reviewer comments. The main changes are highlighted in the paper also.\\\\
 
-{\noindent \LARGE Response to Summary Review}\\\\
+{\noindent \LARGE Response to Summary Review}\\
 
 The paper is based on many steps that are only provided in form of
    references, e.g., the computation of a contour tree. However, this cannot
    be avoided. The only thing that I would have liked to see added is an
    equation for the descriptor based on the Laplace-Beltrami spectra.
+
 
    One comment:
    Since the performance depends on the number of critical points and the
@@ -56,12 +57,24 @@ The paper is based on many steps that are only provided in form of
 	to implement shape descriptors from scratch. Hence, we have not
 performed experiments with other shape descriptors.}\\
 
-   * It is not clear from Table 1, how the algorithm scales with the number
+   It is not clear from Table 1, how the algorithm scales with the number
    of critical points or contours. Respective plots would be helpful.
-   * The Laplace-Beltrami spectra are computed after simplifying the meshes.
+
+   The Laplace-Beltrami spectra are computed after simplifying the meshes.
    How (if at all) does this affect the result? How much can the meshes be
    simplified?
-   * Robustness against noise has been given as a main advantage of this
+
+   {\color{blue}As described in Section 5.2, we set a budget of 1000 vertices
+	   for mesh simplification. For the datasets which we have considered,
+	   simplification does not affect the results. In general, it is difficult
+	   to estimate upfront how much the meshes can be simplified. A possibility
+	   is to make use of the error metric used by the simplification algorithm
+	   and stop simplification when the error exceeds a threshold. However, we have
+	   not explored this approach since evaluating different strategies for simplification
+	   and its effect on shape descriptors is a subject in itself and is beyond the scope
+   of this work.}\\
+
+   Robustness against noise has been given as a main advantage of this
    approach. It would have been nice to see how much noise can be handled by
    taking a noise-free (synthetic) data set and successively add noise until
    it fails. Also, the change of the shape descriptor space would have been
@@ -73,9 +86,12 @@ performed experiments with other shape descriptors.}\\
 
 	In the following I summarize some questions and comments that could be
    further discussed in the paper:
-   - The method requires a proper treatment of noise, which is done by
+
+   The method requires a proper treatment of noise, which is done by
    counting vertices of contours. This requires a continuously sampled
    scalar field, this could be mentioned.
+
+   {\color{blue}Added this in Section 4.2}\\
 
    - Shape comparison using the Laplace-Beltrami spectrum:
    o How many modes to you use for the comparison. This number determines
@@ -83,10 +99,26 @@ performed experiments with other shape descriptors.}\\
    clustering step. For high dimensions it may be possible that the
    distribution of points in the descriptor space is very spars and a simple
    neighborhood search might not be sufficient. 
-   o Is the Euclidean distance a meaningful distance measure in this space?
+
+   {\color{blue}We state in Section 5.2 that we use the first ten non-zero eigen
+	   values as the shape descriptor. We agree that the low dimension
+	   may be the reason why
+	   nearest neighbour search works well for us is 
+	   and for higher dimensions a more sophisticated clustering
+   scheme and distance metric may be needed.}\\
+
+   Is the Euclidean distance a meaningful distance measure in this space?
    The order of magnitude of the single eigenvalues might differ
    significantly. You might consider a lexicographic distance measure
-   instead.\\
+   instead.
+
+   {\color{blue}We mention in Section 5.3 that we use Euclidean distance
+	   since it has been used in the past and has yielded good results.
+	   However, this is not the ideal metric since the first few eigen
+	   values are more important than the rest. This does not affect our
+	   algorithm in a big way since we use only the first ten non-zero
+	   eigen values. As described in Section 5.3, a better metric may
+   be determined using methods like metric learning.}\\
 
    The statement that two different shapes have a different
    Laplace-Beltrami spectrum is only partially true. The spectrum is

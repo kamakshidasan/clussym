@@ -529,6 +529,7 @@ a feature and not noise. The definition of noise is subjective and depends on th
 In this work, we consider an arc to be noise if the volume of the 
 largest contour associated with the arc is below a user defined \emph{noise threshold} $\delta$. The volume of a
 contour is approximated as the number of vertices of the domain enclosed by the contour. 
+{\color{blue}This approximation assumes that the scalar field is continously sampled.}
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
 efficiently~\cite{CarrSP10}. In the absence of the metadata information provided by the contour tree,
@@ -743,8 +744,8 @@ A procedure for determining the value of $\alpha$ is described in Section~\ref{p
 %
 \subsection{Shape Descriptor}
 The choice of shape descriptor depends on the kind of similarity
-analysis required by an application. For symmetry detection, we use the 
-Laplace-Beltrami spectra as the shape descriptor. This descriptor has been used for 
+analysis required by an application. {\color{blue}We use the first ten non-zero eigen values
+of the Laplace-Beltrami spectra as the shape descriptor}. This descriptor has been used for 
 shape matching and retrieval and is robust in the 
 presence of noise, deformations in shape, and differences in the underlying 
 triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}. 
@@ -754,8 +755,8 @@ discriminative with high precision and recall ratios~\cite{lian2013}.
 We use the popular cotangent weighted scheme for computing the 
 Laplace-Beltrami spectra~\cite{PinkallP93}. Computation of the Laplace-Beltrami spectra 
 on large meshes is costly and therefore we simplify the contour meshes 
-so that the number of vertices is small. We simplify the mesh down to 1000 
-vertices in our experiments. 
+so that the number of vertices is small. {\color{blue}We simplify the mesh down to 1000 
+vertices in our experiments. }
 %The presence of a large number of skinny triangles
 %in the mesh may introduce numerical errors in the computation of the spectra
 %and may require remeshing of the simplified mesh.
@@ -768,35 +769,36 @@ space that lie within a sphere of radius $\epsilon$ centred at $p_c$,
 where $p_c$ is the point in the descriptor space to which $c$ is mapped.
 We limit the number of points in the search space 
 by considering only those points that represent the contours that belong to
-the level set of $c$. The value of the approximation parameter $\epsilon$
-is specified by the user.
-
-In addition to clustering based on nearest neighbour search,
-for completeness, we also implement spectral clustering to locate cliques in the symmetry
-correspondence graph.
-Let $c_i$ and $c_j$ be two contours that belong to the same level set and $d$ be
-the distance between their descriptors. The ideal metric for computing
+the level set of $c$. 
+{\color{blue}The ideal metric for computing
 distances in the descriptor space may be determined using methods like
 metric learning~\cite{Kulis13}. However, we use
 Euclidean distances since it has yielded good results 
-for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. 
-We build a symmetry correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
-matrix denotes the similarity score between the contours $c_i$
-and $c_j$.
-$$s_{ij} = 
-\begin{cases}
-	e^{-\frac{d}{\sigma}} & \text{if $c_i$ and $c_j$ belong to the same level set}\\
-	0 & \text{otherwise}
-\end{cases}
-$$
-Here, $\sigma$ is chosen such that for distances greater than $\epsilon$, $s_{ij}$ quickly drops to 0.
-We use spectral clustering
-to identify clusters of symmetric contours from $\mathrm{S}$. As described by 
-Lipman~et~al.~\cite{Lip10}, spectral clustering is well suited for identifying
-cliques in the symmetry correspondence graph and clusters of symmetric
-contours can be detected from their spectral coordinates. Any standard clustering
-method may be used to recognize the clusters. We reuse the nearest neighbour search
-procedure outlined above to identify the clusters in the spectral domain.
+for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. }
+The value of the approximation parameter $\epsilon$
+is specified by the user.
+%In addition to clustering based on nearest neighbour search,
+%for completeness, we also implement spectral clustering to locate cliques in the symmetry
+%correspondence graph.
+%Let $c_i$ and $c_j$ be two contours that belong to the same level set and $d$ be
+%the distance between their descriptors. 
+%We build a symmetry correspondence matrix, $\mathrm{S}$, where the entry $s_{ij}$ of the
+%matrix denotes the similarity score between the contours $c_i$
+%and $c_j$.
+%$$s_{ij} = 
+%\begin{cases}
+%	e^{-\frac{d}{\sigma}} & \text{if $c_i$ and $c_j$ belong to the same level set}\\
+%	0 & \text{otherwise}
+%\end{cases}
+%$$
+%Here, $\sigma$ is chosen such that for distances greater than $\epsilon$, $s_{ij}$ quickly drops to 0.
+%We use spectral clustering
+%to identify clusters of symmetric contours from $\mathrm{S}$. As described by 
+%Lipman~et~al.~\cite{Lip10}, spectral clustering is well suited for identifying
+%cliques in the symmetry correspondence graph and clusters of symmetric
+%contours can be detected from their spectral coordinates. Any standard clustering
+%method may be used to recognize the clusters. We reuse the nearest neighbour search
+%procedure outlined above to identify the clusters in the spectral domain.
 \begin{figure*}[t]
 \begin{minipage}{\textwidth}
 	\centering

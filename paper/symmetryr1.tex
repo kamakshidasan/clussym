@@ -744,11 +744,16 @@ A procedure for determining the value of $\alpha$ is described in Section~\ref{p
 %
 \subsection{Shape Descriptor}
 The choice of shape descriptor depends on the kind of similarity
-analysis required by an application. {\color{blue}We use the first ten non-zero eigen values
-of the Laplace-Beltrami spectra as the shape descriptor}. This descriptor has been used for 
+analysis required by an application. {\color{blue}A function $\phi$ which satisfies the equation 
+$\Delta \phi = -\lambda \phi$, where $\Delta$ is the Laplace-Beltrami operator, is called an eigen
+function of $\Delta$ and $\lambda$ is called an eigen value~\cite{LB}.
+We use the first ten non-zero eigen values of the Laplace-Beltrami spectra as the shape descriptor
+since noise in the shape has limited influence on the initial eigen values~\cite{lian2013}.
+This descriptor has been used for 
 shape matching and retrieval and is robust in the 
 presence of noise, deformations in shape, and differences in the underlying 
-triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}. 
+triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}.
+}
 Although it is possible that two different shapes may have the same spectra,
 it is very rare in practice~\cite{reuter2006laplace}. The descriptor is 
 discriminative with high precision and recall ratios~\cite{lian2013}. 
@@ -756,10 +761,10 @@ We use the popular cotangent weighted scheme for computing the
 Laplace-Beltrami spectra~\cite{PinkallP93}. Computation of the Laplace-Beltrami spectra 
 on large meshes is costly and therefore we simplify the contour meshes 
 so that the number of vertices is small. {\color{blue}We simplify the mesh down to 1000 
-vertices in our experiments. }
-%The presence of a large number of skinny triangles
-%in the mesh may introduce numerical errors in the computation of the spectra
-%and may require remeshing of the simplified mesh.
+vertices in our experiments through edge collapses driven by the quadric error metric~\cite{Hoppe99}. 
+If the isosurfaces contain skinny triangles that result in numerical errors in the computation of the spectra,
+mesh quality aware isosurface generation or remeshing~\cite{Schreiner06EG,Schreiner06Vis} may have 
+to be performed.}
 \subsection{Clustering}
 We observe that clusters in the descriptor space are well separated and therefore
 employ a simple scheme based on nearest neighbour search for clustering.

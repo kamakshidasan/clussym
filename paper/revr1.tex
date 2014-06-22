@@ -12,18 +12,9 @@
 \date{}
 
 \begin{document}
-\noindent Dear IEEE Sci Vis Reviewers,\\\\
+\noindent Dear IEEE Visulization Reviewers,\\\\
 
-We thank all reviewers for their detailed comments. We have revised the paper to address the issues raised by the reviewers including 
-\begin{itemize}
-\item a new experiment and illustrations to discuss sensitivity to the selection of seed sets;	experiments 
-	on additional datasets are included in the supplemental material
-\item expanded discussion on the thresholds selection
-\item detailed description of a semi-automatic procedure to select seed sets which requires only minimal 
-	user interaction; the procedure is illustrated in the supplemental material
-\item improved and expanded description of the comparison with the contour tree method, and
-\item improved exposition of the short-cutting in the extremum graph.
-\end{itemize} 
+We thank all reviewers for their detailed comments. We have revised the paper to address the issues raised by the reviewers.
 Below, we respond to all reviewer comments. The main changes are highlighted in the paper also.\\\\
 
 {\noindent \LARGE Response to Summary Review}\\
@@ -33,6 +24,7 @@ The paper is based on many steps that are only provided in form of
    be avoided. The only thing that I would have liked to see added is an
    equation for the descriptor based on the Laplace-Beltrami spectra.
 
+   {\color{blue}Added this in Section 5.2}\\
 
    One comment:
    Since the performance depends on the number of critical points and the
@@ -40,7 +32,8 @@ The paper is based on many steps that are only provided in form of
 
    The paper is technically sound and discusses almost all relevant aspects.
    I only have a few comments (many are ``nice to have'' but not crucial):\\
-   * Assuming that we have symmetric regions that are not perfectly matching
+
+   Assuming that we have symmetric regions that are not perfectly matching
    in terms of the isosurfaces like in Fig. 10b. What if there is no single
    isovalue that captures all symmetries before the components falling
    apart? Can we still find the symmetries? One step further: What if we
@@ -94,7 +87,8 @@ performed experiments with other shape descriptors.}\\
    {\color{blue}Added this in Section 4.2}\\
 
    - Shape comparison using the Laplace-Beltrami spectrum:
-   o How many modes to you use for the comparison. This number determines
+
+   How many modes to you use for the comparison. This number determines
    the dimension of the descriptor space and thus the performance of the
    clustering step. For high dimensions it may be possible that the
    distribution of points in the descriptor space is very spars and a simple
@@ -103,7 +97,7 @@ performed experiments with other shape descriptors.}\\
    {\color{blue}We state in Section 5.2 that we use the first ten non-zero eigen
 	   values as the shape descriptor. We agree that the low dimension
 	   may be the reason why
-	   nearest neighbour search works well for us is 
+	   nearest neighbour search works well for us 
 	   and for higher dimensions a more sophisticated clustering
    scheme and distance metric may be needed.}\\
 
@@ -128,11 +122,16 @@ performed experiments with other shape descriptors.}\\
 	   isometric shapes are also considered to be symmetric (called instrinsic symmetry).
    Therefore, we feel it is not wrong to classify isometric contours as symmetric.}\\
 
-   o The cotangent weighted scheme for the computation of the
+   The cotangent weighted scheme for the computation of the
    Laplace-Beltrami spectrum is very sensitive with respect to the quality
    of the triangulation mesh. Could you please discuss related issues. Many
    simple isosurface computation algorithms have some badly shaped
    triangles.
+
+   {\color{blue}In Section 5.2, we state that in case of bad triangulations,
+	   mesh quality aware isosurface generation or remeshing may have to
+   be performed.}\\
+
 
    It is stated that it is observed that the clusters in the descriptor
    space are well separated. This might be due to the choice of data sets
@@ -195,9 +194,18 @@ The paper is very well written and the exposition is mostly clear except
    authors present two strategies (nearest neighbors and spectral
    clustering) and it's not clear which one is used in the remainder of the
    paper.
+
+   {\color{blue}All the results were generated using nearest neighbor search.
+	   To avoid confusion, we have dropped the discussion on spectral
+	   clustering in Section 5 (implementation) and retain the discussion
+	   on Section 4 which points readers interested in the implementation
+   to [15].}\\
+   
    How did the authors simplify the contour surfaces prior to computing
    their spectra? The simplification strategies here can have a major impact
    on the subsequent similarity estimation.
+
+   {\color{blue}This is added to Section 5.2}
 
    When reading the paper, I was concerned with computation time
    performance, especially for the clustering side of things. I would
@@ -231,7 +239,7 @@ The paper is very well written and the exposition is mostly clear except
    scale)?
    It seems that the authors make a mis-usage of the word multi-scale since
    they seem to refer to the ability of their technique to detect
-   similarities between groups of nested contours. This is misleading.\\
+   similarities between groups of nested contours. This is misleading.
 
    {\color{blue}The usage of the term ``multiscale symmetry detection'' in
 	   the geometry processing community refers to symmetry detection of
@@ -241,8 +249,7 @@ The paper is very well written and the exposition is mostly clear except
    We follow the same convention in the usage of the term. ``multiscale''.
    We have also rephrased the sentences that introduce the term ``multiscale''
    in Section 1 to make this clear. On a related note, it is possible to
-   detect similar shapes with different volumes using a scale invariant descriptor
-   as we describe in Section 6.1}\\
+   detect similar shapes with different volumes using a scale invariant descriptor  as we describe in Section 6.1}\\
    
 
 {\noindent \LARGE Response to Reviewer 4}\\\\

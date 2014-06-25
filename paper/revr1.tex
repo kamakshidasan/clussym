@@ -12,7 +12,7 @@
 \date{}
 
 \begin{document}
-\noindent Dear IEEE Visulization Reviewers,\\\\
+\noindent Dear IEEE Visulization Reviewers,\\
 
 We thank all reviewers for their detailed comments. We have revised the paper to address the issues raised by the reviewers.
 Below, we respond to all reviewer comments. The main changes are highlighted in the paper also.\\\\
@@ -39,6 +39,11 @@ The paper is based on many steps that are only provided in form of
    apart? Can we still find the symmetries? One step further: What if we
    have to use different isovalues for the different arcs to have matching
    symmetries? Can that be captured?\\
+   {\color{blue}We mention in Section 7.2 that expecting a single isovalue
+	to capture the symmetry is a limitation of our
+	   implementation. We note that this constraint can be relaxed to allow
+	   a range of isovalues instead and are exploring ways to incorporate
+   the differences in isovalue into the distance measure between contours.}\\
    
    The authors describe their work as a general framework and mention that
    different shape descriptors can be used. Other examples than the
@@ -75,7 +80,7 @@ performed experiments with other shape descriptors.}\\
 
 
 
-{\noindent \LARGE Response to Reviewer 2}\\\\
+{\noindent \LARGE Response to Reviewer 2}\\
 
 	In the following I summarize some questions and comments that could be
    further discussed in the paper:
@@ -205,7 +210,8 @@ The paper is very well written and the exposition is mostly clear except
    their spectra? The simplification strategies here can have a major impact
    on the subsequent similarity estimation.
 
-   {\color{blue}This is added to Section 5.2}
+   {\color{blue}The simplification strategy used is added to Section 5.2. We did not observe
+   any major impact on similarity estimation due to simplification.}\\
 
    When reading the paper, I was concerned with computation time
    performance, especially for the clustering side of things. I would
@@ -256,7 +262,7 @@ The paper is very well written and the exposition is mostly clear except
    The authors should provide a better justification of their definition of
    symmetry. It is not clear how the definition based on shape descriptors
    that they introduce is related to the one based on symmetry
-   transformation. \\
+   transformation. 
 
    {\color{blue}This is now clarified in Section 1 and Section 3.}\\
 
@@ -276,6 +282,6 @@ The paper is very well written and the exposition is mostly clear except
 	   Hence, it is not meaningful to do a more in-depth comparison of the results
 	   of the two methods at the end of the paper. Therefore, we only provide
 	   a general comparion in Section 2. Moving it to a later section will
-   disrupt the organization of the contents.}
+   disrupt the flow of the text.}
 
 \end{document}

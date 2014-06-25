@@ -1217,9 +1217,15 @@ very small arcs of the contour tree. These contours are very transient and quick
 into another contour during a level set sweep. For both values of $\alpha$, the symmetry of
 the tube-like regions is detected correctly at a different isovalue that is more stable, 
 see Figure~\ref{1292-sym}. This is because these contours belong to longer arcs and are 
-insensitive to the exact value of $\alpha$. We believe that employing a geometric criterion like 
-maximally stable contour~\cite{MatasCUP04} is a better strategy for selecting a stable contour 
-from an arc and plan to explore this approach in our future work.
+insensitive to the exact value of $\alpha$. {\color{blue}The inability to detect symmetric
+regions due to unstable contours is a limitation of our implementation that enforces the constraint
+that for the same isovalue, contours should be consistent with respect to merging. A solution is
+to relax this constraint and allow a small interval of isovalues from which stable contours 
+may be generated independently by employing a geometric criterion like maximally stable contour~\cite{MatasCUP04}.
+However, when contours at different isovalues are used to detect symmetry, the variation in the isovalues
+should also be considered in determining the quality of the symmetry. For this purpose, we are currently
+exploring ways to include the differences in the isovalues into the distance measure between contours
+in the descriptor space.}
 
 \noindent{\textbf{Approximation parameter $\epsilon$}}.
 Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
@@ -1231,6 +1237,47 @@ $\epsilon$. Nearest neighbour search can be performed efficiently. Therefore, if
 second stages of our method are precomputed, it is possible to efficiently regenerate the output
 as $\epsilon$ is varied. This makes it possible to provide the user with a slider interface
 to visualize the effect of varying $\epsilon$ and choose the ideal value 
+\begin{figure}[t]
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.14]{figures/fuel-full.png}
+		\label{fuel-full}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.12]{figures/fuel-sym200.png}
+		\label{fuel-sym200}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.12]{figures/fuel-sym20.png}
+		\label{fuel-sym20}
+	}
+	\caption{\label{delta}Influence of noise parameter, $\delta$, on symmetry detection. (a)~Volume rendering of 
+		the Fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
+		(b)~Three symmetric regions reported when $\delta$ is set to 200 vertices. (c)~Lowering
+	$\delta$ to 20 vertices results in the detection of two additional symmetric regions that are smaller.}
+\end{figure}
+\begin{table}[b]
+\centering
+{\small
+\caption{Running time, measured in seconds, for the different steps in the symmetry detection algorithm.
+	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM. The time taken for
+	computing contour tree is denoted by $t_{ct}$, generating contours by $t_{cg}$, and computing contour descriptors
+	by $t_{cd}$.}
+\label{exp-table}
+\begin{tabular}{c||c|c|c|c|c}
+Dataset		& \#vertices 			& $t_{ct}$	& $t_{cg}$	& $t_{cd}$	&  \#c\\%& extrema
+\hline
+1HGA	 	& $72\times72\times72$ 		& 1.33 		& 7.86 		&  28.39       	& 78\\%& 14397		639
+EMDB-1654 	& $112\times112\times112$ 	& 4.64 		& 1.04		&  8.70      	& 92\\%& 621 
+Vortex		& $253\times253\times253$	& 82.04	 	& 19.91		&  163.56	& 119	\\
+EMDB-1179 	& $255\times255\times255$ 	& 67.39		& 10.63		&  84.91     	& 339\\%& 
+Knee 		& $379\times229\times305$ 	& 120.42	& 94.55		& 429.10	&	%& 18440		35 
+\end{tabular}
+}
+\end{table}
 for a dataset.
 
 Figure~\ref{eps} illustrates the effect of varying $\epsilon$ on a cryo-EM dataset (EMDB-5214).
@@ -1271,47 +1318,7 @@ Although our implementation may be modified to incorporate
 persistence based noise determination, it is not possible to use a single model that works across
 datasets with different noise characteristics. Therefore, we suggest that the model for determining noise
 be adapted based on the application under consideration. 
-\begin{figure}[t]
-	\centering
-	\subfigure[]
-	{
-		\includegraphics[scale=0.14]{figures/fuel-full.png}
-		\label{fuel-full}
-	}
-	\subfigure[]
-	{
-		\includegraphics[scale=0.12]{figures/fuel-sym200.png}
-		\label{fuel-sym200}
-	}
-	\subfigure[]
-	{
-		\includegraphics[scale=0.12]{figures/fuel-sym20.png}
-		\label{fuel-sym20}
-	}
-	\caption{\label{delta}Influence of noise parameter, $\delta$, on symmetry detection. (a)~Volume rendering of 
-		the Fuel dataset, which exhibits 4-fold rotational symmetry at the top of the long tube-like region.
-		(b)~Three symmetric regions reported when $\delta$ is set to 200 vertices. (c)~Lowering
-	$\delta$ to 20 vertices results in the detection of two additional symmetric regions that are smaller.}
-\end{figure}
 \subsection{Performance}
-\begin{table}[t]
-\centering
-{\small
-\caption{Running time, measured in seconds, for the different steps in the symmetry detection algorithm.
-	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM.}
-\label{exp-table}
-\begin{tabular}{c||c|c|c|c}
-		&  	 			& Contour tree	& Contour	& Descriptor	\\%& \#simp.
-Dataset		& \#vertices 			& computation	& generation	& computation  	\\%& extrema
-\hline
-1HGA	 	& $72\times72\times72$ 		& 1.33 		& 7.86 		&  	28.39       	\\%& 14397		639
-EMDB-1654 	& $112\times112\times112$ 	& 4.64 		& 1.04		&  	8.70      	\\%& 621 
-Vortex		& $253\times253\times253$	& 82.04	 	& 19.91		&  	163.56		\\
-EMDB-1179 	& $255\times255\times255$ 	& 67.39		& 10.63		&  	84.91     	\\%& 
-Knee 		& $379\times229\times305$ 	& 120.42	& 94.55		& 	429.10		%& 18440		35 
-\end{tabular}
-}
-\end{table}
 Table~\ref{exp-table} lists the running time of our algorithm on different datasets. While the
 time required to compute the contour tree depends on the size of the dataset and the number of
 critical points present in it, the contour generation and the descriptor computation stages

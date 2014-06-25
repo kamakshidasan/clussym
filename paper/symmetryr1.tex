@@ -1261,21 +1261,23 @@ to visualize the effect of varying $\epsilon$ and choose the ideal value
 \end{figure}
 \begin{table}[b]
 \centering
+{\color{blue}
 {\small
 \caption{Running time, measured in seconds, for the different steps in the symmetry detection algorithm.
 	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM. The time taken for
 	computing contour tree is denoted by $t_{ct}$, generating contours by $t_{cg}$, and computing contour descriptors
-	by $t_{cd}$.}
+	by $t_{cd}$. The number of contours processed is denoted by \#ctrs and the number of critical points by \#crit.}
 \label{exp-table}
-\begin{tabular}{c||c|c|c|c|c}
-Dataset		& \#vertices 			& $t_{ct}$	& $t_{cg}$	& $t_{cd}$	&  \#c\\%& extrema
+\begin{tabular}{c||c|c|c|c|c|c}
+Dataset		&\#vertices 			&$t_{ct}$	&$t_{cg}$	&$t_{cd}$	&\#ctrs	&\#crit\\
 \hline
-1HGA	 	& $72\times72\times72$ 		& 1.33 		& 7.86 		&  28.39       	& 78\\%& 14397		639
-EMDB-1654 	& $112\times112\times112$ 	& 4.64 		& 1.04		&  8.70      	& 92\\%& 621 
-Vortex		& $253\times253\times253$	& 82.04	 	& 19.91		&  163.56	& 119	\\
-EMDB-1179 	& $255\times255\times255$ 	& 67.39		& 10.63		&  84.91     	& 339\\%& 
-Knee 		& $379\times229\times305$ 	& 120.42	& 94.55		& 429.10	&	%& 18440		35 
+1HGA	 	&$72\times72\times72$ 		&1.3 		&7.7 		&28.7       	&78	&4698\\
+EMDB-1654 	&$112\times112\times112$ 	&4.6 		&1.0		&8.7      	&92	&55762\\ 
+Vortex		&$253\times253\times253$	&82.0	 	&19.9		&163.7		&119	&1184142\\
+EMDB-1179 	&$255\times255\times255$ 	&67.4		&10.6		&84.9     	&339	&338688\\ 
+Knee 		&$379\times229\times305$ 	&120.4		&94.6		&429.1		&TBD	&1222491 
 \end{tabular}
+}
 }
 \end{table}
 for a dataset.

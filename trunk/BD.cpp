@@ -266,7 +266,7 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	assert(ndidx == numNodes);
 	assert(arcidx == numarcs);
 
-	//std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
+	std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
 	//std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
 
 	std::vector<unsigned int> arcids;

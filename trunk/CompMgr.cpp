@@ -34,7 +34,7 @@ void CompMgr::AddComp(CompNode* c)
 			//if(orgval > 0.98) val = 1.0;
 			//else val = 0.0;
 			c->votes[other->id] = orgval;
-			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
+//			printf("Vote(%d %d) = %f %f\n", c->id, other->id, val, orgval);
 		}
 	}
 	fnmap[c->fnid].push_back(c->id);

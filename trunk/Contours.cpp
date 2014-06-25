@@ -336,18 +336,18 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 
 		if(nreg == 1)
 		{
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			std::cout<<" Only 1 contour, not processing"<<std::endl;
+//			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+//			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+//			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
 		else 
 		if(polydata->GetNumberOfPoints() > 20)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			if(bid == -1) 
+//			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<" bid "<<bid<<std::endl;
+//			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+/*			if(bid == -1) 
 			{
 				sprintf(fn,"disbid-%d-%d.vtk",cid, fid);
 				writer->SetFileName(fn);
@@ -358,7 +358,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				//assert(0);
 				//bid = 1;
 				continue;
-			}
+			}*/
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
@@ -366,7 +366,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			//if(cit == b->comps.end())
 			{
 				
-				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
+//				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
 				CompNode* c = new CompNode(cid++, bid, fid);
 				b->comps[fid] = c->id;
 				gettimeofday(&dis_start, NULL);
@@ -376,25 +376,25 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				c->csz = polydata->GetNumberOfPoints();
 				c->did = did;
 				compmgr->AddComp(c);
-				sprintf(fn,"%d-%d.vtk",c->did, c->id);
+				/*sprintf(fn,"%d-%d.vtk",c->did, c->id);
 				writer->SetFileName(fn);
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();
+				writer->Write();*/
 			}
 			else
 			{
-				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
-				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
+//				sprintf(fn,"%d-%d-dis.vtk",bid, fid);
+//				std::cout<<"Discarding contour for bid "<<bid<<" at "<<isoval<<std::endl;
 			}
 //			std::cout<<" ext "<<verts[did][bd[did]->bridsarr[bid]->ext].w<<" sad "<<verts[did][bd[did]->bridsarr[bid]->sad].w<<std::endl;
 
 		}
 		else
 		{
-			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
-			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
-			std::cout<<" Too few points, not processing"<<std::endl;
+//			std::cout<<" fnid "<<fid<<" did "<<did<<" cid "<<cid<<" nreg "<<r<<" of "<<nreg<<std::endl;
+//			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
+//			std::cout<<" Too few points, not processing"<<std::endl;
 
 		}
 	}
@@ -414,7 +414,8 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	gettimeofday(&ctr_start, NULL);
 	for(; i < isovals[did].size(); i++)
 	{
-//		std::cout<<"GenIso iso"<<fvals[i]<<std::endl;
+//		std::cout<<"GenIso iso"<<isovals[did][i]<<std::endl;
+//		if(isovals[did][i] > -50)break;
 		ctr->SetValue(0, isovals[did][i]);
 		ctr->Update();
 		ProcessIsoSurface(i, prev, ctr, did);
@@ -560,17 +561,17 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	}
 	float maxd = compmgr->maxd;
 	float d = epsd*epsd*maxd;
-	//Cluster* cl = new Cluster(compmgr, d);
-	compmgr->SpecCords(d);
-	Cluster* cl = new Cluster(compmgr->symcords, d);
-	cl->GetClusters(epsd);
-	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<std::endl;
+	Cluster* cl = new Cluster(compmgr, d);
+//	compmgr->SpecCords(d);
+	//Cluster* cl = new Cluster(compmgr->symcords, d);
+//	cl->GetClusters(epsd);
+	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<" ctrs "<<cid<<std::endl;
 //	compmgr->DistanceList();
 	gettimeofday(&clus_start, NULL);
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	gettimeofday(&clus_end, NULL);
 
-	compmgr->ExportComps(cl);
+	//compmgr->ExportComps(cl);
 	gettimeofday(&timeval_end, NULL);
 	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
 	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;

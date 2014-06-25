@@ -25,7 +25,7 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 		{
 			float f = nextf - alpha;
 			isovals.push_back(f);
-			std::cout<<"Isovalues: "<<f<<std::endl;
+//			std::cout<<"Isovalues: "<<f<<std::endl;
 		}
 		curf = nextf;
 	}

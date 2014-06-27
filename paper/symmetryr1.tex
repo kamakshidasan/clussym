@@ -431,9 +431,8 @@ Let $\mathbb{C}$ be the set of all contours.
 Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
 where $T$ is a transformation. In other words, $g$ is a function that maps each
 contour to a point in a high-dimensional space such that a contour and its 
-copies are mapped to the same point. {\color{blue}The contours which are mapped to the same
-point need not form a symmetry group. Instead, all repeating instances of a contour
-are mapped to the same point.} The point to which a contour is mapped is called a 
+copies are mapped to the same point. {\color{blue}The contours that are mapped to the same
+point need not form a symmetry group.} The point to which a contour is mapped is called a 
 \emph{descriptor} and the high-dimensional space is called the \emph{descriptor space}, see Figure~\ref{ctmap}. 
 For illustration, the descriptor space is shown in 2D but the actual dimension of the space
 depends on the choice of the descriptor. The distance between contours in the descriptor space is a
@@ -1218,8 +1217,8 @@ into another contour during a level set sweep. For both values of $\alpha$, the 
 the tube-like regions is detected correctly at a different isovalue that is more stable, 
 see Figure~\ref{1292-sym}. This is because these contours belong to longer arcs and are 
 insensitive to the exact value of $\alpha$. {\color{blue}The inability to detect symmetric
-regions due to unstable contours is a limitation of our implementation that enforces the constraint
-that for the same isovalue, contours should be consistent with respect to merging. A solution is
+regions due to unstable contours is a limitation of our implementation. This limitation arises
+from the constraint that for the same isovalue, contours should be consistent with respect to merging. A solution is
 to relax this constraint and allow a small interval of isovalues from which stable contours 
 may be generated independently by employing a geometric criterion like maximally stable contour~\cite{MatasCUP04}.
 However, when contours at different isovalues are used to detect symmetry, the variation in the isovalues
@@ -1269,7 +1268,7 @@ to visualize the effect of varying $\epsilon$ and choose the ideal value
 	by $t_{cd}$. The number of contours processed is denoted by \#ctrs and the number of critical points by \#crit.}
 \label{exp-table}
 \begin{tabular}{c||c|c|c|c|c|c}
-Dataset		&\#vertices 			&$t_{ct}$	&$t_{cg}$	&$t_{cd}$	&\#ctrs	&\#crit\\
+	Dataset		&\#vertices 			&$t_{ct} (s)$	&$t_{cg} (s)$	&$t_{cd} (s)$	&\#ctrs	&\#crit\\
 \hline
 1HGA	 	&$72\times72\times72$ 		&1.3 		&7.7 		&28.7       	&78	&4698\\
 EMDB-1654 	&$112\times112\times112$ 	&4.6 		&1.0		&8.7      	&92	&55762\\ 
@@ -1349,8 +1348,8 @@ from each arc of the contour tree to ensure consistency
 in the shape of the contours extracted.
 {\color{blue}We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
-similar features for applications like querying  and tracking in collections of related datasets 
-like time-varying and ensemble data.}
+similar features for applications like querying  and tracking in 
+time-varying and ensemble data.}
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.

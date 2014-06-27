@@ -257,4 +257,43 @@ corresponds to the Fuel dataset. Plots corresponding to the other datasets behav
 	The topmost figure in each column shows a volume rendering of the dataset and different symmetric regions detected
 are shown below it.}
 \end{figure*}
+\begin{figure*}
+	\centering
+	{\sffamily\large{5. Robustness\\}}
+	\centering
+	\subfigure[]
+	{
+		\includegraphics[scale=0.16]{figures/sph0.png}
+		\label{sph0}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.16]{figures/sph1.png}
+		\label{sph1}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.16]{figures/sph2.png}
+		\label{sph2}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.16]{figures/sph5.png}
+		\label{sph5}
+	}
+	\subfigure[]
+	{
+		\includegraphics[scale=0.5]{figures/path4.png}
+		\label{path4}
+	}
+	\caption{Robustness to noise. (a)~An isosurface of a synthetic dataset 
+		which has the shape of a sphere. The number of critical points for this dataset
+		is 16. (b)-(d)~Adding increasing levels of noise to the dataset deforms the
+		isosurface. The number of critical points increase to 2673, 12690, and 80885.  
+		(e)~For each datasets, the first ten non-zero eigen values of the Laplace-Beltrami spectra 
+		are normalized by dividing with the first non-zero eigen value and plotted as a 1D curve. 
+		The similarity of the curves shows that the similarity of the contour can be identified easily even in the presence
+		of noise. }
+\end{figure*}
+
 \end{document}

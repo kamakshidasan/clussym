@@ -12,12 +12,17 @@
 \date{}
 
 \begin{document}
-\noindent Dear IEEE Visulization Reviewers,\\
+\noindent Dear IEEE SciVis Reviewers,\\
 
-We thank all reviewers for their detailed comments. We have revised the paper to address the issues raised by the reviewers.
-Below, we respond to all reviewer comments. The main changes are highlighted in the paper also.\\\\
+We thank you for the detailed comments. We have revised the paper to address the issues raised in the reviews. Below, we respond to all reviewer comments. The main changes are highlighted in the paper.
+
+Dilip M. Thomas
+Vijay Natarajan
 
 {\noindent \LARGE Response to Summary Review}\\
+
+
+{\noindent \LARGE Response to Reviewer 3}\\
 
 The paper is based on many steps that are only provided in form of
    references, e.g., the computation of a contour tree. However, this cannot
@@ -30,6 +35,8 @@ The paper is based on many steps that are only provided in form of
    Since the performance depends on the number of critical points and the
    number of contours, they should be listed in Table 1.
 
+   {\color{blue}This is added.}
+
    The paper is technically sound and discusses almost all relevant aspects.
    I only have a few comments (many are ``nice to have'' but not crucial):\\
 
@@ -38,7 +45,8 @@ The paper is based on many steps that are only provided in form of
    isovalue that captures all symmetries before the components falling
    apart? Can we still find the symmetries? One step further: What if we
    have to use different isovalues for the different arcs to have matching
-   symmetries? Can that be captured?\\
+   symmetries? Can that be captured?
+
    {\color{blue}We mention in Section 7.2 that expecting a single isovalue
 	to capture the symmetry is a limitation of our
 	   implementation. We note that this constraint can be relaxed to allow
@@ -58,6 +66,8 @@ performed experiments with other shape descriptors.}\\
    It is not clear from Table 1, how the algorithm scales with the number
    of critical points or contours. Respective plots would be helpful.
 
+   {\color{blue}This is added as a new Table in the supplemental material.}\\
+
    The Laplace-Beltrami spectra are computed after simplifying the meshes.
    How (if at all) does this affect the result? How much can the meshes be
    simplified?
@@ -65,7 +75,7 @@ performed experiments with other shape descriptors.}\\
    {\color{blue}As described in Section 5.2, we set a budget of 1000 vertices
 	   for mesh simplification. For the datasets which we have considered,
 	   simplification does not affect the results. In general, it is difficult
-	   to estimate upfront how much the meshes can be simplified. A possibility
+	   to estimate upfront how much the meshes can be simplified. One possible approach
 	   is to make use of the error metric used by the simplification algorithm
 	   and stop simplification when the error exceeds a threshold. However, we have
 	   not explored this approach since evaluating different strategies for simplification
@@ -77,6 +87,15 @@ performed experiments with other shape descriptors.}\\
    taking a noise-free (synthetic) data set and successively add noise until
    it fails. Also, the change of the shape descriptor space would have been
    interesting to see.
+
+   {\color{blue}We have added a new experiment in the supplemental section
+	   that shows the robustness of the shape descriptor. It is difficult
+	   to design an experiment that can show how much noise can be handled by the
+	   method because the changes to the shape descriptor due to the addition of
+	   noise can be alleviated by appropriately changing the approximation parameter.
+	   Since it is difficult to visualize the changes
+	   to the high-dimensional shape descriptor space, we plot the shape descriptors
+   as curves and it can be seen that curves are quite similar for different levels of noise.}\\
 
 
 
@@ -100,7 +119,9 @@ performed experiments with other shape descriptors.}\\
    neighborhood search might not be sufficient. 
 
    {\color{blue}We state in Section 5.2 that we use the first ten non-zero eigen
-	   values as the shape descriptor. We agree that the low dimension
+	   values as the shape descriptor and this was sufficient to produce
+	   good results. 
+	   We agree that the low dimension
 	   may be the reason why
 	   nearest neighbour search works well for us 
 	   and for higher dimensions a more sophisticated clustering
@@ -124,8 +145,8 @@ performed experiments with other shape descriptors.}\\
    invariant with respect to isometric transformations.  
 
    {\color{blue} We agree. In geometry processing community,
-	   isometric shapes are also considered to be symmetric (called instrinsic symmetry).
-   Therefore, we feel it is not wrong to classify isometric contours as symmetric.}\\
+	   isometric shapes are also considered to be symmetric (called intrinsic symmetry).
+   We think it is appropriate to classify isometric contours as symmetric.}\\
 
    The cotangent weighted scheme for the computation of the
    Laplace-Beltrami spectrum is very sensitive with respect to the quality
@@ -144,8 +165,10 @@ performed experiments with other shape descriptors.}\\
    nice inherent symmetry. Looking at a more general data set this might not
    be the case.
 
-   {\color{blue} We agree. For more complex datasets, a more sophisticated
-   shape descriptor may be needed.}\\
+   {\color{blue} The goal of our method is to identify repeating patterns even in
+	   the presence of noise. Therefore, we chose datasets which exhibited symmetry in our
+	   evaluation. For more general datasets where the symmetry is not apparent, a more sophisticated
+	   notion of similarity and an appropriate  shape descriptor may be needed.}\\
 
 	
    Most examples used for the evaluation show impressive results. This are
@@ -203,8 +226,8 @@ The paper is very well written and the exposition is mostly clear except
    {\color{blue}All the results were generated using nearest neighbor search.
 	   To avoid confusion, we have dropped the discussion on spectral
 	   clustering in Section 5 (implementation) and retain the discussion
-	   on Section 4 which points readers interested in the implementation
-   to [15].}\\
+	   on Section 4 which points interested readers to the implementation
+  by Lipman et al. [16]].}\\
    
    How did the authors simplify the contour surfaces prior to computing
    their spectra? The simplification strategies here can have a major impact
@@ -227,16 +250,36 @@ The paper is very well written and the exposition is mostly clear except
    How do the clustering performances scale when this number increases for
    large data-sets or when the simplification level of the contour tree is
    kept minimal (to maintain small-scale features in the analysis)?
+
+   {\color{blue}In our experiments, the maximal clique identification
+	   is reduced to nearest neighbour search since the contours
+	   that form a clique with respect to symmetry correspondence
+	   lie in close proximity in the descriptor space. Since the 
+	   nearest neigbour search can be performed very fast, the
+	   computation time for clustering is very small. 
+	   All the results we show are without the
+	   use of the maximum weight matching. Table 1 
+	   has been expanded and a new table has been added to highlight
+   the scaling of computational performance.}\\
+
    Also, I believe comparing Laplace-Beltrami spectra only makes sense from
    a geometrical point of view if the two surfaces have the same topology.
    Such a thing cannot be guaranteed with scalar field contours due to
    boundary components or different genus. Does it affect the similarity
    evaluation performances in practice?
+	
+   {\color{blue}Our observation is that the Laplace-Beltrami spectra
+	   does not show drastic changes when the boundary components or genus changes
+	   as long as the geometric size of the genus and boundary components 
+   are also small. Hence the similarity evaluation was not affected.}\\
 
    I believe it would have been nice to further experiment the robustness of
    the techniques with synthetic data-sets, designed to assess specific
    features of the algorithm (for instance, robustness to noise, ambiguous
    symmetries, etc.)
+
+   {\color{blue}A new experiment is added in the supplemental material
+   to highlight robustness to noise.}\\
 
    Also, the title (and other remarks throughout the paper) suggests that
    the approach can detect symmetries at multiple scale. I didn't find any
@@ -281,7 +324,7 @@ The paper is very well written and the exposition is mostly clear except
 	   is related to our method, the goals of the two methods are quite different.
 	   Hence, it is not meaningful to do a more in-depth comparison of the results
 	   of the two methods at the end of the paper. Therefore, we only provide
-	   a general comparion in Section 2. Moving it to a later section will
+	   a general comparison in Section 2. Moving it to a later section will
    disrupt the flow of the text.}
 
 \end{document}

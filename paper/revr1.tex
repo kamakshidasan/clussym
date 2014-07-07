@@ -14,13 +14,26 @@
 \begin{document}
 \noindent Dear IEEE SciVis Reviewers,\\
 
-We thank you for the detailed comments. We have revised the paper to address the issues raised in the reviews. Below, we respond to all reviewer comments. The main changes are highlighted in the paper.
-
-Dilip M. Thomas
-Vijay Natarajan
+We thank you for the detailed comments. We have revised the paper to address the issues raised in the reviews. Below, we respond to all reviewer comments. The main changes are highlighted in the paper.\\\\
+Dilip M. Thomas\\
+Vijay Natarajan\\
 
 {\noindent \LARGE Response to Summary Review}\\
 
+The reviews about this paper were generally positive. There were some
+   suggestions for improving the paper, but the reviewers feel that they can
+      all be addressed in a minor revision. Hence, the summary rating of a
+         "probably accept". This rating assumes that the authors do address all
+	    the comments made by the reviewers.
+
+	    {\color{blue}We have incorporated the suggestions for improving the paper.
+		    The revised version of the paper includes
+		    \begin{itemize}
+		    \item An experiment to highlight robustness of the method
+		\item A plot to show scaling of computational performance with respect to the number of contours
+		    \item Expanded description of Section 5.2 to discuss more details about the shape descriptor
+			    and mesh simplification
+    \end{itemize}}
 
 {\noindent \LARGE Response to Reviewer 3}\\
 
@@ -35,7 +48,7 @@ The paper is based on many steps that are only provided in form of
    Since the performance depends on the number of critical points and the
    number of contours, they should be listed in Table 1.
 
-   {\color{blue}This is added.}
+   {\color{blue}This is added.}\\
 
    The paper is technically sound and discusses almost all relevant aspects.
    I only have a few comments (many are ``nice to have'' but not crucial):\\
@@ -66,7 +79,7 @@ performed experiments with other shape descriptors.}\\
    It is not clear from Table 1, how the algorithm scales with the number
    of critical points or contours. Respective plots would be helpful.
 
-   {\color{blue}This is added as a new Table in the supplemental material.}\\
+   {\color{blue}This is added as a new figure in the supplemental material.}\\
 
    The Laplace-Beltrami spectra are computed after simplifying the meshes.
    How (if at all) does this affect the result? How much can the meshes be
@@ -259,8 +272,8 @@ The paper is very well written and the exposition is mostly clear except
 	   computation time for clustering is very small. 
 	   All the results we show are without the
 	   use of the maximum weight matching. Table 1 
-	   has been expanded and a new table has been added to highlight
-   the scaling of computational performance.}\\
+	   has been expanded and a new figure has been added in
+	   the supplemental to highlight  the scaling of computational performance.}\\
 
    Also, I believe comparing Laplace-Beltrami spectra only makes sense from
    a geometrical point of view if the two surfaces have the same topology.

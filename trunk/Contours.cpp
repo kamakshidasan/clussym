@@ -340,8 +340,8 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 //			std::cout <<" size  = "<<polydata->GetNumberOfCells()<<" "<<polydata->GetNumberOfPolys()<<" "<<polydata->GetNumberOfPoints()<<std::endl;
 //			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
-		else 
-		if(polydata->GetNumberOfPoints() > 20)
+//		else 
+		if(polydata->GetNumberOfPoints() > 400)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);
@@ -362,8 +362,8 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 			SymBranch* b = bd[did]->GetBranch(bid);
 			boost::unordered_map<unsigned int, unsigned int>::iterator cit;
 			cit = b->comps.find(fid);
-			if(cit != b->comps.end() && cit->second == -1)
-			//if(cit == b->comps.end())
+//			if(cit != b->comps.end() && cit->second == -1)
+			if(cit == b->comps.end())
 			{
 				
 //				std::cout<<"Selecting contour "<<cid<<" from bid "<<bid<<" at fnid"<<fid<<" - "<<isoval<<std::endl;
@@ -376,11 +376,11 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				c->csz = polydata->GetNumberOfPoints();
 				c->did = did;
 				compmgr->AddComp(c);
-				/*sprintf(fn,"%d-%d.vtk",c->did, c->id);
+				sprintf(fn,"%d-%d.vtk",c->did, c->id);
 				writer->SetFileName(fn);
 				trifil->SetInput(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
-				writer->Write();*/
+				writer->Write();
 			}
 			else
 			{
@@ -415,7 +415,6 @@ void Contours::GenerateIsoSpace(unsigned int did)
 	for(; i < isovals[did].size(); i++)
 	{
 //		std::cout<<"GenIso iso"<<isovals[did][i]<<std::endl;
-//		if(isovals[did][i] > -50)break;
 		ctr->SetValue(0, isovals[did][i]);
 		ctr->Update();
 		ProcessIsoSurface(i, prev, ctr, did);

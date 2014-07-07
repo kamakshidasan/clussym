@@ -121,22 +121,22 @@ corresponds to the Fuel dataset. Plots corresponding to the other datasets behav
 	\centering
 	\subfigure[]
 	{
-		\includegraphics[scale=0.09]{figures/isabel12.png}
+		\includegraphics[scale=0.09]{figures/isabel12-c.png}
 		\label{volisa12}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.09]{figures/isabel24.png}
+		\includegraphics[scale=0.09]{figures/isabel24-c.png}
 		\label{volisa24}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.09]{figures/isabel36.png}
+		\includegraphics[scale=0.09]{figures/isabel36-c.png}
 		\label{volisa36}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.09]{figures/isabel48.png}
+		\includegraphics[scale=0.09]{figures/isabel48-c.png}
 		\label{volisa48}
 	}
 \caption{\label{volisa}Low pressure regions extracted through query contour driven exploration of 
@@ -283,7 +283,7 @@ are shown below it.}
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.5]{figures/path4.png}
+		\includegraphics[scale=0.5]{figures/descplot.png}
 		\label{path4}
 	}
 	\caption{Robustness to noise. (a)~An isosurface of a synthetic dataset 
@@ -292,8 +292,20 @@ are shown below it.}
 		isosurface. The number of critical points increase to 2673, 12690, and 80885.  
 		(e)~For each datasets, the first ten non-zero eigen values of the Laplace-Beltrami spectra 
 		are normalized by dividing with the first non-zero eigen value and plotted as a 1D curve. 
-		The similarity of the curves shows that the similarity of the contour can be identified easily even in the presence
+		The similarity of the curves shows that the similarity of the contours can be identified easily even in the presence
 		of noise. }
 \end{figure*}
-
+\begin{figure*}
+	\centering
+	{\sffamily\large{6. Scalability\\}}
+	\centering
+	\includegraphics[scale=0.5]{figures/scaleplot.png}
+	\caption{Computational performance scales linearly with respect to the number of contours.
+		The time taken, in seconds, for contour generation, descriptor computation, and clustering are
+		plotted when the number of contours processed are 40, 200, 400, 800, and 1600. The plot
+		shows linear scale up in the computation time for contour generation and descriptor computation. 
+		The nearest neighbour search takes only a fraction of a second. The contours are generated from the
+		dataset EMDB-1654. To limit the variation in performance due to differences in the size
+	of the contours, this experiment was performed with contours belonging to a single scale.}
+\end{figure*}
 \end{document}

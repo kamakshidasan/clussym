@@ -528,7 +528,7 @@ a feature and not noise. The definition of noise is subjective and depends on th
 In this work, we consider an arc to be noise if the volume of the 
 largest contour associated with the arc is below a user defined \emph{noise threshold} $\delta$. The volume of a
 contour is approximated as the number of vertices of the domain enclosed by the contour. 
-{\color{blue}This approximation assumes that the scalar field is continously sampled.}
+{\color{blue}This approximation assumes that the scalar field is continuously sampled.}
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
 efficiently~\cite{CarrSP10}. In the absence of the metadata information provided by the contour tree,
@@ -769,7 +769,7 @@ We observe that clusters in the descriptor space are well separated and therefor
 employ a simple scheme based on nearest neighbour search for clustering.
 For a given contour $c$, other contours that are $\epsilon$-symmetric
 with respect to $c$ are determined by locating points in the descriptor
-space that lie within a sphere of radius $\epsilon$ centred at $p_c$,
+space that lie within a sphere of radius $\epsilon$ centered at $p_c$,
 where $p_c$ is the point in the descriptor space to which $c$ is mapped.
 We limit the number of points in the search space 
 by considering only those points that represent the contours that belong to
@@ -1101,7 +1101,7 @@ and forms a flat region.
 Figure~\ref{1hga-full} shows an electron density field
 derived from the atomic coordinates of a haemoglobin molecule using EMAN software~\cite{ludtke1999eman}.
 Our method identifies two symmetric regions, shown in blue and pink in Figure~\ref{1hga-sym},
-despite these two regions being in close proximity to each other. An isovalue close to the
+despite these two regions being in close proximity to each other. The isosurface for an isovalue close to the
 global maximum, see Figure~\ref{1hgaext}, shows that the extrema belonging to the high density regions are not
 symmetrically distributed within the two regions. In both these cases, selection of a set of extrema as seed set 
 is not an easy task because of the flat regions and the asymmetric distribution of the extrema.
@@ -1301,14 +1301,14 @@ recognize partial symmetry at different scales in addition to identifying the gl
 \noindent{\textbf{Noise parameter $\delta$}}.
 We determine the number of arcs of the contour tree with volume above a particular value and plot
 the drop in the number of arcs with increasing value of volume. For the Fuel dataset in 
-Figure~\ref{fuel-full}, this plot is shown in the supplemental material. This plot shows a sudden
+Figure~\ref{fuel-full}, this plot is shown in the supplemental material. The plot shows a sudden
 drop in the number of arcs initially, similar to the graph used for determining the stabilisation
 parameter $\alpha$. This drop is due to a large number of small sized features in the data which are 
 considered to be noise.
 We choose a value immediately after this sudden drop. When
 $\delta$ is set to 200 vertices for the Fuel dataset, three sets of symmetric features, each exhibiting
 4-fold rotational symmetry are identified, see Figure~\ref{fuel-sym200}. Lowering $\delta$ to 20 vertices
-identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus $\delta$
+identifies two more smaller symmetric regions as illustrated in Figure~\ref{fuel-sym20}. Thus, $\delta$
 acts as a parameter that controls the size of features analysed for multiscale symmetry detection.
 Setting $\delta$ to an even lower value generates contours of very small size whose descriptors 
 cannot be reliably compared due to numerical errors. In comparison, the contour tree based 
@@ -1343,7 +1343,7 @@ an appropriate surface representation for the segments. A related issue is that 
 consider symmetry within a contour. A preprocessing step that segments contours into smaller partial
 surfaces may be designed to solve this problem. The current implementation
 does not incorporate geometric stability criteria for selecting representative contours. 
-It is beneficial to employ such criteria that selects a stable contour 
+It is beneficial to employ such a criteria that selects a stable contour 
 from each arc of the contour tree to ensure consistency
 in the shape of the contours extracted.
 {\color{blue}We believe

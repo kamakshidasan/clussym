@@ -808,7 +808,7 @@ is specified by the user.
 	\centering
 	\subfigure[]
 	{
-		\includegraphics[scale=0.1]{figures/isabel1.png}
+		\includegraphics[scale=0.1]{figures/isabel1-c.png}
 		\label{volisa1}
 	}
 	\subfigure[]
@@ -823,7 +823,7 @@ is specified by the user.
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.1]{figures/isabel1-det.png}
+		\includegraphics[scale=0.1]{figures/isabel1-det-c.png}
 		\label{detisa1}
 	}
 \end{minipage}
@@ -1274,7 +1274,7 @@ to visualize the effect of varying $\epsilon$ and choose the ideal value
 EMDB-1654 	&$112\times112\times112$ 	&4.6 		&1.0		&8.7      	&92	&55762\\ 
 Vortex		&$253\times253\times253$	&82.0	 	&19.9		&163.7		&119	&1184142\\
 EMDB-1179 	&$255\times255\times255$ 	&67.4		&10.6		&84.9     	&339	&338688\\ 
-Knee 		&$379\times229\times305$ 	&120.4		&94.6		&429.1		&TBD	&1222491 
+Knee 		&$379\times229\times305$ 	&120.4		&94.6		&429.1		&442	&1222491 
 \end{tabular}
 }
 }
@@ -1320,9 +1320,9 @@ persistence based noise determination, it is not possible to use a single model 
 datasets with different noise characteristics. Therefore, we suggest that the model for determining noise
 be adapted based on the application under consideration. 
 \subsection{Performance}
-Table~\ref{exp-table} lists the running time of our algorithm on different datasets. While the
+Table~\ref{exp-table} lists the running time of our algorithm on different datasets. The
 time required to compute the contour tree depends on the size of the dataset and the number of
-critical points present in it, the contour generation and the descriptor computation stages
+critical points present in it. The contour generation and the descriptor computation stages
 are primarily affected by the size and number of contours processed. The contour
 generation stage includes the time taken for the simplification of large meshes. 
 In our implementation, symmetry with respect to contours that evolve from maxima and minima 
@@ -1669,10 +1669,7 @@ time-varying and ensemble data.}
 %
 \bibliographystyle{abbrv}
 \acknowledgments{
-This work was supported by a grant from Department of Science and
-Technology, India (SR/S3/EECE/0086/2012) and by the Robert Bosch
-Centre for Cyber Physical Systems, Indian Institute of Science. Travel
-was supported by IBM travel grant.
+	This work was partially supported by the Department of Science and Technology, India, under Grant SR/S3/EECE/0086/2012 and by the Robert Bosch Centre for Cyber Physical Systems, Indian Institute of Science. The second author was supported by a fellowship for experienced researchers from the Alexander von Humboldt Foundation.
 Volume rendered images
 used in the paper were generated using Voreen (www.voreen.org).}
 \bibliography{db}

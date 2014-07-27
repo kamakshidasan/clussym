@@ -1,5 +1,5 @@
-%\documentclass[journal]{vgtc}                % final (journal style)
-\documentclass[review,journal]{vgtc}         % review (journal style)
+\documentclass[journal]{vgtc}                % final (journal style)
+%\documentclass[review,journal]{vgtc}         % review (journal style)
 %\documentclass[widereview]{vgtc}             % wide-spaced review
 %\documentclass[preprint,journal]{vgtc}       % preprint (journal style)
 %\documentclass[electronic,journal]{vgtc}     % electronic version, journal
@@ -144,7 +144,7 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 		\begin{minipage}[c][1\width]{0.32\textwidth}
 		{
 			\centering
-			\includegraphics[scale=.33]{figures/1897-full.png}
+			\includegraphics[scale=.3]{figures/1897-full.png}
 		}
 		\end{minipage}
 %	}
@@ -155,7 +155,7 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 		{
 			\centering
 			\hspace{0.2cm}
-			\includegraphics[scale=.31]{inkscape/descspace.pdf}
+			\includegraphics[scale=.3]{inkscape/descspace.pdf}
 		}
 		\end{minipage}
 %	}	
@@ -164,7 +164,7 @@ and asymmetry visualization, that demonstrate the effectiveness of the approach.
 		\begin{minipage}[c][1\width]{0.32\textwidth}
 		{
 			\centering
-			\includegraphics[scale=.33]{figures/1897-sym.png}
+			\includegraphics[scale=.3]{figures/1897-sym.png}
 		}
 		\end{minipage}
 %	}
@@ -224,10 +224,10 @@ These studies have established that clustering based analyses result in superior
 performance and robust identification of symmetry. Some of these methods
 have been extended to scalar fields and they operate by determining symmetry
 transformations through aggregation of local symmetry of sample points of the
-domain. {\color{blue}Symmetry in shapes is associated with a group structure on
+domain. Symmetry in shapes is associated with a group structure on
 geometric objects that are invariant under transformations. In scalar fields, it is more
 meaningful to relax this constraint and identify all repeating occurrences since this is
-more useful for data exploration.} Scalar field datasets are typically represented using scalar values 
+more useful for data exploration. Scalar field datasets are typically represented using scalar values 
 assigned to a discrete set of sample points that represent the domain under 
 consideration. However, the domain and the scalar values are assumed to be continuous by
 interpolating the values at the sample points. Therefore, the sample points in a scalar 
@@ -260,9 +260,9 @@ are reported as symmetric. Note that the choice
 of the shape descriptor is not fixed and depending on the noise characteristics and the definition
 of similarity relevant to the application of interest, an appropriate descriptor may be used.
 Figure~\ref{teaser} illustrates our approach on a 3D cryo-EM image of AMP-activated kinase (EMDB-1897) 
-with three-fold rotational symmetry. {\color{blue}Our method identifies symmetric regions of different
+with three-fold rotational symmetry. Our method identifies symmetric regions of different
 scales. The large-scale features shown in gold and the small-scale features shown in blue and pink
-highlight the multiscale aspect of our approach.}
+highlight the multiscale aspect of our approach.
 
 The main contributions of this paper are the following:
 \begin{itemize}[itemsep=0mm]
@@ -335,12 +335,12 @@ Bruckner~et~al. propose an information theoretic approach for isosurface similar
 detection~\cite{BrucknerM10,haidacher11}. This method uses mutual information between distance 
 transforms to quantify the information common to two isosurfaces and builds a similarity map 
 between all pairs of isosurfaces. Clusters with high mutual information correspond to
-similar isosurfaces both within and across datasets. {\color{blue}While this method is related since
+similar isosurfaces both within and across datasets. While this method is related since
 it is also based on isosurface similarity, their goal is to select a subset of isovalues
 which are important. They use distance transforms to identify redundant isovalues by
 computing similar family of isosurfaces that form an onion-peel like layered arrangement. 
 The goal of our method, on the other hand, is to locate regions which are similar and hence
-we compute similarity between contours and not isosurfaces.} While the isosurface similarity map based
+we compute similarity between contours and not isosurfaces. While the isosurface similarity map based
 method is limited to analysing similarity between pairs of datasets, the descriptor space can 
 be used to analyse multiple datasets simultaneously. Similarity between different scalar 
 fields has also been studied by measuring the extent of overlap
@@ -431,8 +431,8 @@ Let $\mathbb{C}$ be the set of all contours.
 Consider a function $g : \mathbb{C} \rightarrow \mathbb{R}^n$ such that $g(c) = g(T(c))$
 where $T$ is a transformation. In other words, $g$ is a function that maps each
 contour to a point in a high-dimensional space such that a contour and its 
-copies are mapped to the same point. {\color{blue}The contours that are mapped to the same
-point need not form a symmetry group.} The point to which a contour is mapped is called a 
+copies are mapped to the same point. The contours that are mapped to the same
+point need not form a symmetry group. The point to which a contour is mapped is called a 
 \emph{descriptor} and the high-dimensional space is called the \emph{descriptor space}, see Figure~\ref{ctmap}. 
 For illustration, the descriptor space is shown in 2D but the actual dimension of the space
 depends on the choice of the descriptor. The distance between contours in the descriptor space is a
@@ -490,7 +490,7 @@ regions represented by the contours within a cluster are then reported as
 symmetric regions.
 \begin{figure*}[t]
 	\centering
-		\includegraphics[scale=0.14]{inkscape/pipe.pdf}
+		\includegraphics[scale=0.12]{inkscape/pipe.pdf}
 	\caption{\label{pipeline} Symmetry detection pipeline. Contours are extracted
 		from the scalar field and a descriptor is generated for each contour.
 		A similarity score is estimated between pairs of contours based on the
@@ -528,7 +528,7 @@ a feature and not noise. The definition of noise is subjective and depends on th
 In this work, we consider an arc to be noise if the volume of the 
 largest contour associated with the arc is below a user defined \emph{noise threshold} $\delta$. The volume of a
 contour is approximated as the number of vertices of the domain enclosed by the contour. 
-{\color{blue}This approximation assumes that the scalar field is continuously sampled.}
+This approximation assumes that the scalar field is continuously sampled.
 Since each arc of the contour tree can be associated with the set of vertices of the domain 
 that comprise the subvolume corresponding to the arc, this estimation of the volume can be done 
 efficiently~\cite{CarrSP10}. In the absence of the metadata information provided by the contour tree,
@@ -743,7 +743,7 @@ A procedure for determining the value of $\alpha$ is described in Section~\ref{p
 %
 \subsection{Shape Descriptor}
 The choice of shape descriptor depends on the kind of similarity
-analysis required by an application. {\color{blue}A function $\phi$ which satisfies the equation 
+analysis required by an application. A function $\phi$ which satisfies the equation 
 $\Delta \phi = -\lambda \phi$, where $\Delta$ is the Laplace-Beltrami operator, is called an eigen
 function of $\Delta$ and $\lambda$ is called an eigen value~\cite{LB}.
 We use the first ten non-zero eigen values of the Laplace-Beltrami spectra as the shape descriptor
@@ -752,18 +752,17 @@ This descriptor has been used for
 shape matching and retrieval and is robust in the 
 presence of noise, deformations in shape, and differences in the underlying 
 triangulation~\cite{reuter2006laplace,niethammer2007global,reuter2009laplace}.
-}
 Although it is possible that two different shapes may have the same spectra,
 it is very rare in practice~\cite{reuter2006laplace}. The descriptor is 
 discriminative with high precision and recall ratios~\cite{lian2013}. 
 We use the popular cotangent weighted scheme for computing the 
 Laplace-Beltrami spectra~\cite{PinkallP93}. Computation of the Laplace-Beltrami spectra 
 on large meshes is costly and therefore we simplify the contour meshes 
-so that the number of vertices is small. {\color{blue}We simplify the mesh down to 1000 
+so that the number of vertices is small. We simplify the mesh down to 1000 
 vertices in our experiments through edge collapses driven by the quadric error metric~\cite{Hoppe99}. 
 If the isosurfaces contain skinny triangles that result in numerical errors in the computation of the spectra,
 mesh quality aware isosurface generation or remeshing~\cite{Schreiner06EG,Schreiner06Vis} may have 
-to be performed.}
+to be performed.
 \subsection{Clustering}
 We observe that clusters in the descriptor space are well separated and therefore
 employ a simple scheme based on nearest neighbour search for clustering.
@@ -774,11 +773,11 @@ where $p_c$ is the point in the descriptor space to which $c$ is mapped.
 We limit the number of points in the search space 
 by considering only those points that represent the contours that belong to
 the level set of $c$. 
-{\color{blue}The ideal metric for computing
+The ideal metric for computing
 distances in the descriptor space may be determined using methods like
 metric learning~\cite{Kulis13}. However, we use
 Euclidean distances since it has yielded good results 
-for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. }
+for shape retrieval with the Laplace-Beltrami spectra~\cite{reuter2006laplace,lian2013}. 
 The value of the approximation parameter $\epsilon$
 is specified by the user.
 %In addition to clustering based on nearest neighbour search,
@@ -808,7 +807,7 @@ is specified by the user.
 	\centering
 	\subfigure[]
 	{
-		\includegraphics[scale=0.1]{figures/isabel1-c.png}
+		\includegraphics[scale=0.1]{figures/isabel1.png}
 		\label{volisa1}
 	}
 	\subfigure[]
@@ -823,7 +822,7 @@ is specified by the user.
 	}
 	\subfigure[]
 	{
-		\includegraphics[scale=0.1]{figures/isabel1-det-c.png}
+		\includegraphics[scale=0.1]{figures/isabel1-det.png}
 		\label{detisa1}
 	}
 \end{minipage}
@@ -1216,7 +1215,7 @@ very small arcs of the contour tree. These contours are very transient and quick
 into another contour during a level set sweep. For both values of $\alpha$, the symmetry of
 the tube-like regions is detected correctly at a different isovalue that is more stable, 
 see Figure~\ref{1292-sym}. This is because these contours belong to longer arcs and are 
-insensitive to the exact value of $\alpha$. {\color{blue}The inability to detect symmetric
+insensitive to the exact value of $\alpha$. The inability to detect symmetric
 regions due to unstable contours is a limitation of our implementation. This limitation arises
 from the constraint that for the same isovalue, contours should be consistent with respect to merging. A solution is
 to relax this constraint and allow a small interval of isovalues from which stable contours 
@@ -1224,7 +1223,7 @@ may be generated independently by employing a geometric criterion like maximally
 However, when contours at different isovalues are used to detect symmetry, the variation in the isovalues
 should also be considered in determining the quality of the symmetry. For this purpose, we are currently
 exploring ways to include the differences in the isovalues into the distance measure between contours
-in the descriptor space.}
+in the descriptor space.
 
 \noindent{\textbf{Approximation parameter $\epsilon$}}.
 Changing the value of $\epsilon$ directly affects the output of  our method since $\epsilon$
@@ -1260,7 +1259,6 @@ to visualize the effect of varying $\epsilon$ and choose the ideal value
 \end{figure}
 \begin{table}[b]
 \centering
-{\color{blue}
 {\small
 \caption{Running time, measured in seconds, for the different steps in the symmetry detection algorithm.
 	All experiments were performed on a 2~GHz Intel Xeon processor with 8GB RAM. The time taken for
@@ -1276,7 +1274,6 @@ Vortex		&$253\times253\times253$	&82.0	 	&19.9		&163.7		&119	&1184142\\
 EMDB-1179 	&$255\times255\times255$ 	&67.4		&10.6		&84.9     	&339	&338688\\ 
 Knee 		&$379\times229\times305$ 	&120.4		&94.6		&429.1		&442	&1222491 
 \end{tabular}
-}
 }
 \end{table}
 for a dataset.
@@ -1346,10 +1343,10 @@ does not incorporate geometric stability criteria for selecting representative c
 It is beneficial to employ such a criteria that selects a stable contour 
 from each arc of the contour tree to ensure consistency
 in the shape of the contours extracted.
-{\color{blue}We believe
+We believe
 that the descriptor space representation of scalar fields will spur research in determining structurally
 similar features for applications like querying  and tracking in 
-time-varying and ensemble data.}
+time-varying and ensemble data.
 %All text with the exception of the abstract must be in a two-column format.
 %The total allowable width of the text area -- including header and footer
 %lines -- is 161\,mm (6.34 inch) wide by 231\,mm (9.10 inch) high.
@@ -1669,8 +1666,8 @@ time-varying and ensemble data.}
 %
 \bibliographystyle{abbrv}
 \acknowledgments{
-	This work was partially supported by the Department of Science and Technology, India, under Grant SR/S3/EECE/0086/2012 and by the Robert Bosch Centre for Cyber Physical Systems, Indian Institute of Science. The second author was supported by a fellowship for experienced researchers from the Alexander von Humboldt Foundation.
-Volume rendered images
+	This work was partially supported by the Department of Science and Technology, India, under Grant SR/S3/EECE/0086/2012 and by the Robert Bosch Centre for Cyber Physical Systems, Indian Institute of Science. The second author was supported by a fellowship for experienced researchers from the Alexander von Humboldt Foundation. Hurricane Isabel data produced by the Weather Research and Forecast (WRF) model, courtesy of NCAR and the U.S. National Science Foundation
+	(NSF). Volume rendered images
 used in the paper were generated using Voreen (www.voreen.org).}
 \bibliography{db}
 %

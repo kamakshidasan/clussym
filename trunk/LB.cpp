@@ -10,8 +10,8 @@
 
 #include <eigen3/Eigen/Dense>
 
-#include <arlsmat.h>
-#include <arlssym.h>
+//#include <arlsmat.h>
+//#include <arlssym.h>
 
 //#include <flens/flens.cxx>
 

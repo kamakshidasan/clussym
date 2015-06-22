@@ -341,7 +341,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 //			std::cout<<" Only 1 contour, not processing"<<std::endl;
 		}
 //		else 
-		if(polydata->GetNumberOfPoints() > 400)
+		if(polydata->GetNumberOfPoints() > 20)
 		{
 			char fn[100];
 			int bid = FindBranchId(polydata, isoval, did);

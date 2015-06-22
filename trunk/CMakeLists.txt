@@ -12,8 +12,6 @@ include(${CGAL_USE_FILE})
 add_executable(sym main Contours LB Decompose Cluster Utils BD CompMgr Export Sampler)
 
 include_directories("/usr/include/eigen3/")
-include_directories("/home/ibis/Downloads/arpack++/include")
-include_directories("/home/ibis/Downloads/FLENS-2012-10-01/")
 
 target_link_libraries(sym ${VTK_LIBRARIES} tourtre arpack superlu ANN ) 
 

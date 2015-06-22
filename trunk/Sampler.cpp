@@ -32,8 +32,8 @@ void Sampler::PickValues(std::vector<float> & isovals, float orgalpha)
 }
 void Sampler::Sample(std::vector<float> & isovals, float alpha)
 {
-	isovals.push_back(-64);
-/*	isovals.push_back(-8.38);
+/*	isovals.push_back(-64);
+	isovals.push_back(-8.38);
 	isovals.push_back(-8.38);
 	isovals.push_back(-8.38);
 	isovals.push_back(-8.38);
@@ -57,7 +57,7 @@ void Sampler::Sample(std::vector<float> & isovals, float alpha)
 	isovals.push_back(-8.38);
 	isovals.push_back(-8.38);
 */
-//	PickValues(isovals, alpha);	
+	PickValues(isovals, alpha);	
 //	RestrictSamples(isovals);
 }
 void Sampler::RestrictSamples(std::vector<float> & isovals)

@@ -34,7 +34,6 @@ void Export::FlushVolume(const std::string & fn, unsigned int maskf)
 	}
 
 	//newstrpts->GetPointData()->SetScalars(f);
-	strpwriter->SetInput(newstrpts);
+	strpwriter->SetInputData(newstrpts);
 	strpwriter->SetFileName(fn.c_str());
-
 }

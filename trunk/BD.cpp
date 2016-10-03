@@ -266,7 +266,7 @@ void BD::BuildBD(std::vector<unsigned int> & sadidx, std::vector<float> & isoval
 	assert(ndidx == numNodes);
 	assert(arcidx == numarcs);
 
-	std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
+	//std::cout<<"Num Nodes: "<<ndidx<<" "<<numNodes<<std::endl;
 	//std::cout<<"Num Arcs: "<<arcidx<<" "<<numarcs<<std::endl;
 
 	std::vector<unsigned int> arcids;
@@ -358,7 +358,7 @@ void BD::SetVertMask(unsigned int clid, unsigned int cid, std::vector<unsigned i
 	const float minval = m_vlist[symroot->sad].w;
 	const float maxval = m_vlist[symroot->ext].w;
 	char clnm[50];
-	sprintf(clnm, "%d-%d.raw",clid, cid);
+	sprintf(clnm, "%d-%d-%d.raw",getpid(),clid, cid);
 	FILE* fpminbin = fopen(clnm, "w+b");
 
 	std::vector<unsigned int> umask = std::vector<unsigned int> (m_vlist.size(), 0);

@@ -253,13 +253,14 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	cleanpolydata->SetInput(mesh);*/
 
-	cleanpolydata->SetInput(contour);
+	cleanpolydata->SetInputData(contour);
 	cleanpolydata->Update();
 	contour = cleanpolydata->GetOutput();
 	unsigned int ntri = contour->GetNumberOfPolys();
 	if(ntri > 2000)
 	{
-		decimate->SetInputConnection(contour->GetProducerPort());
+		decimate->SetInputData(contour);
+		//decimate->SetInputConnection(contour->GetProducerPort());
 		float target = 1 - 2000.0/ntri;
 //		if(target > 0.95) target = 0.95;
 		decimate->SetTargetReduction(target);
@@ -272,7 +273,8 @@ void Contours::GenCompCords(CompNode* c, vtkSmartPointer<vtkPolyData> contour)
 
 	LB lb;
 	lb.GetEigen(contour, c->cords);
-	allcts->AddInputConnection(contour->GetProducerPort());
+	allcts->AddInputData(contour);
+	//allcts->AddInputConnection(contour->GetProducerPort());
 
 	//mesh->Delete();
 }
@@ -376,9 +378,10 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 				c->csz = polydata->GetNumberOfPoints();
 				c->did = did;
 				compmgr->AddComp(c);
-				sprintf(fn,"%d-%d.vtk",c->did, c->id);
+				
+				sprintf(fn,"%d-%d.vtk",getpid(), c->id);
 				writer->SetFileName(fn);
-				trifil->SetInput(polydata);
+				trifil->SetInputData(polydata);
 				writer->SetInputConnection(trifil->GetOutputPort());
 				writer->Write();
 			}
@@ -403,7 +406,7 @@ void Contours::ProcessIsoSurface(unsigned int fid, unsigned int prev, vtkSmartPo
 void Contours::GenerateIsoSpace(unsigned int did)
 {
 	vtkSmartPointer<vtkContourFilter> ctr =	vtkSmartPointer<vtkContourFilter>::New();
-	ctr->SetInput(tgrid[did]);
+	ctr->SetInputData(tgrid[did]);
 	//ctr->SetInputConnection(reader->GetOutputPort());
 	ctr->ComputeNormalsOff();
 	ctr->ComputeGradientsOff();
@@ -437,7 +440,7 @@ Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAp
 	//vtktet1->SetInputConnection(reader1->GetOutputPort());
 	//tgrid.push_back(vtktet1->GetOutput());
 	tgrid.push_back(reader1->GetOutput());
-	tgrid[0]->Update();
+	//tgrid[0]->Update();
 
 	if(fname2)
 	{
@@ -448,7 +451,7 @@ Contours::Contours(const char* fname1, const char* fname2, vtkSmartPointer<vtkAp
 		//vtktet2->SetInputConnection(reader2->GetOutputPort());
 		//tgrid.push_back(vtktet2->GetOutput());
 		tgrid.push_back(reader2->GetOutput());
-		tgrid[1]->Update();
+		//tgrid[1]->Update();
 
 	}
 }
@@ -564,13 +567,14 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 //	compmgr->SpecCords(d);
 	//Cluster* cl = new Cluster(compmgr->symcords, d);
 //	cl->GetClusters(epsd);
-	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<" ctrs "<<cid<<std::endl;
+//	std::cout<<"Maxd: "<<maxd<<" epsd "<<epsd<<" clusterd "<<d<<" ctrs "<<cid<<std::endl;
 //	compmgr->DistanceList();
 	gettimeofday(&clus_start, NULL);
 	std::vector<unsigned int> & cltrs = cl->GetClusters(d);
 	gettimeofday(&clus_end, NULL);
 
-	//compmgr->ExportComps(cl);
+	compmgr->ExportComps(cl);
+/*	
 	gettimeofday(&timeval_end, NULL);
 	double time_start = ct_start.tv_sec + (double) ct_start.tv_usec/1000000;
 	double time_end= ct_end.tv_sec + (double) ct_end.tv_usec/1000000;
@@ -586,6 +590,7 @@ void Contours::ExtractSymmetry(unsigned int inv, float epsd, float alpha, float 
 	time_start = timeval_start.tv_sec + (double) timeval_start.tv_usec/1000000;
 	time_end= timeval_end.tv_sec + (double) timeval_end.tv_usec/1000000;
 	printf("Time: tottime %f\n", time_end-time_start);
+*/
 	fflush(stdout);
 }
 

@@ -13,5 +13,5 @@ add_executable(sym main Contours LB Decompose Cluster Utils BD CompMgr Export Sa
 
 include_directories("/usr/include/eigen3/")
 
-target_link_libraries(sym ${VTK_LIBRARIES} tourtre arpack superlu ANN ) 
+target_link_libraries(sym ${VTK_LIBRARIES} tourtre arpack superlu ANN) 
 

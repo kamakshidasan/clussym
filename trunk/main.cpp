@@ -25,13 +25,13 @@ int main(int argc, char* argv[])
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
 	allcontours->Update();
-	mapper->SetInput(allcontours->GetOutput());
+	mapper->SetInputData(allcontours->GetOutput());
 
 
 	mapper->ScalarVisibilityOff();    // utilize actor's property I set
 
 	// Visualize
-	vtkSmartPointer<vtkActor> actor =
+	/*vtkSmartPointer<vtkActor> actor =
 		vtkSmartPointer<vtkActor>::New();
 	actor->GetProperty()->SetColor(1,1,1);
 	actor->GetProperty()->SetInterpolationToFlat();
@@ -53,6 +53,6 @@ int main(int argc, char* argv[])
 	iren->SetRenderWindow(renwin);
 	iren->Initialize();
 	iren->Start();
-
+	*/
 	return EXIT_SUCCESS;
 }

@@ -7,6 +7,10 @@
 #include <sys/time.h>
 #include <lemon/matching.h>
 #include "Utils.hpp"
+#include <string>
+#include <iostream>
+#include <fstream>
+
 extern struct timeval clus_start, clus_end;
 CompMgr::CompMgr(std::vector<BD*> & pbd) : bd(pbd), maxd(0)
 {
@@ -94,19 +98,19 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 	boost::unordered_map<unsigned int, LNode> nodes;
 	bool create = true;
 	
-	std::cout<<"Size contribution before matching "<<norm<<std::endl;
-	std::cout<<"Children of "<<c1->id<<" ";
+	//std::cout<<"Size contribution before matching "<<norm<<std::endl;
+	//std::cout<<"Children of "<<c1->id<<" ";
 	for(; it1 != c1->ch.end(); it1++)
 	{
-		std::cout<<(*it1)->id<<" "<<"("<<(*it1)->csz<<")";
+		//std::cout<<(*it1)->id<<" "<<"("<<(*it1)->csz<<")";
 	}
-	std::cout<<std::endl;
-	std::cout<<"Children of "<<c2->id<<" ";
+	//std::cout<<std::endl;
+	//std::cout<<"Children of "<<c2->id<<" ";
 	for(; it2 != c2->ch.end(); it2++)
 	{
-		std::cout<<(*it2)->id<<"("<<(*it2)->csz<<")"<<" ";
+		//std::cout<<(*it2)->id<<"("<<(*it2)->csz<<")"<<" ";
 	}
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
 
 	it1 = c1->ch.begin();
 	for(; it1 != c1->ch.end(); it1++)
@@ -131,8 +135,7 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 			LNode n2 = nodes[id2];
 			LEdge e = g.addEdge(n1,n2);
 			edmap[e] = (csz1+csz2)*A(id1,id2);
-			std::cout<<"Edge "<<id1<<" "<<id2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
-				A(id1,id2)<<" = "<<edmap[e]<<std::endl;
+			//std::cout<<"Edge "<<id1<<" "<<id2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<< A(id1,id2)<<" = "<<edmap[e]<<std::endl;
 		}
 		create = false;
 	}
@@ -140,7 +143,7 @@ float CompMgr::Match(CompNode* c1, CompNode* c2, unsigned int & norm, Matrix<flo
 	lemon::MaxWeightedMatching<LGraph,LEdgeMap> mwm(g, edmap);
       	mwm.run();
 	float tot = mwm.matchingWeight();
-	std::cout<<"Matching "<<tot<<" Size "<<norm<<std::endl;
+	//std::cout<<"Matching "<<tot<<" Size "<<norm<<std::endl;
 	return tot;
 }
 
@@ -169,7 +172,7 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 			unsigned int did1 = comps[cid1]->did;
 			unsigned int csz1 = 1;//comps[cid1]->csz;
 			unsigned int norm = csz1;
-			std::cout<<"size  of "<<cid1<<" "<<csz1<<std::endl;
+			//std::cout<<"size  of "<<cid1<<" "<<csz1<<std::endl;
 
 			for(unsigned int j = i+1; j < fnmap[fidx].size(); j++)
 			{
@@ -177,18 +180,18 @@ void CompMgr::UpSweep(Matrix<float, Dynamic, Dynamic> & U)
 				unsigned int bid2 = comps[cid2]->bid;
 				unsigned int did2 = comps[cid2]->did;
 				unsigned int csz2 = 1;//comps[cid2]->csz;
-				std::cout<<"size  of "<<cid2<<" "<<csz2<<std::endl;
+				//std::cout<<"size  of "<<cid2<<" "<<csz2<<std::endl;
 				norm += csz2;
 				if(bd[did1]->BrType(bid1, -1) && bd[did2]->BrType(bid2, -1))
 				{
 					float fval = Match(comps[cid1], comps[cid2], norm, U);
-					std::cout<<"Par Edge "<<cid1<<" "<<cid2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
-						U(cid1,cid2)<<" = "<<(csz1+csz2)*U(cid1, cid2)<<std::endl;
+				//std::cout<<"Par Edge "<<cid1<<" "<<cid2<<" (sz1+sz2)*wt = w: "<<csz1<<"+"<<csz2<<" * "<<
+				//		U(cid1,cid2)<<" = "<<(csz1+csz2)*U(cid1, cid2)<<std::endl;
 					U(cid1, cid2) = ((csz1+csz2)*U(cid1, cid2) + fval)/norm;
 					U(cid2, cid1) = ((csz1+csz2)*U(cid2, cid1) + fval)/norm;
 					if(fval > maxval) 
 						maxval = fval;
-					std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
+					//std::cout<<"U of "<<cid1<<" "<<cid2<<": "<<U(cid1,cid2)<<" "<<U(cid2, cid1)<<std::endl;
 				}
 				norm = csz1;
 			}
@@ -220,12 +223,12 @@ void CompMgr::FormLrw(Matrix<float, Dynamic, Dynamic> & Lrw, Matrix<float, Dynam
 {
 	Matrix<float, Dynamic, 1> d = U.rowwise().sum();
 	unsigned int rows = d.rows();
-	std::cout<<"Rows sum :"<<std::endl<<d<<std::endl;
+	//std::cout<<"Rows sum :"<<std::endl<<d<<std::endl;
 	for(unsigned int i = 0; i < rows; i++)
 		//d(i) = 1.0/sqrt(d(i));
 		d(i) = 1.0/d(i);
 	Matrix<float, Dynamic, Dynamic> D = d.asDiagonal();
-	std::cout<<"Inv Rows sum Matrix:"<<std::endl<<D<<std::endl;
+	//std::cout<<"Inv Rows sum Matrix:"<<std::endl<<D<<std::endl;
 	Matrix<float, Dynamic, Dynamic> I = Matrix<float, Dynamic, Dynamic>::Identity(rows, rows);
 //	Lrw = I - D*U*D;
 	Lrw = I - D*U;
@@ -237,19 +240,19 @@ void CompMgr::SpecCords(float dist)
 	Matrix<float, Dynamic, Dynamic> A = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	Matrix<float, Dynamic, Dynamic> Lrw = Matrix<float, Dynamic, Dynamic>::Zero(csz, csz);
 	BuildSimMatrix(A, dist);
-	std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
+	//std::cout<<"A matrix:"<<std::endl<<A<<std::endl;
 	Matrix<float, Dynamic, Dynamic> U = A;
 	UpSweep(U);
-	std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
+	//std::cout<<"U matrix:"<<std::endl<<U<<std::endl;
 	FormLrw(Lrw, U);
-	std::cout<<"Lrw matrix:"<<std::endl<<Lrw<<std::endl;
+	//std::cout<<"Lrw matrix:"<<std::endl<<Lrw<<std::endl;
 	SelfAdjointEigenSolver<Eigen::Matrix<float, Dynamic, Dynamic> > eigs(Lrw);
-	std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
-	std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
+	//std::cout<<"Eigen Values:"<<std::endl<<eigs.eigenvalues()<<std::endl;
+	//std::cout<<"Eigen Vectors:"<<std::endl<<eigs.eigenvectors()<<std::endl;
 	Matrix<float, Dynamic, Dynamic> V = eigs.eigenvectors();
 	Matrix<float, Dynamic, Dynamic> D = eigs.eigenvalues().asDiagonal();
 	Matrix<float, Dynamic, Dynamic> VD = V;
-	std::cout<<"VD matrix:"<<std::endl<<VD<<std::endl;
+	//std::cout<<"VD matrix:"<<std::endl<<VD<<std::endl;
 
 
 
@@ -264,13 +267,13 @@ void CompMgr::SpecCords(float dist)
 
 		}
 		//std::cout<<"Eigen Vector "<<j<<": "<<std::endl<<eigs.eigenvectors().col(j).transpose()<<std::endl;
-		std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
+		//std::cout<<"Eigen Vector "<<i<<": "<<std::endl<<eigs.eigenvalues()[i]*eigs.eigenvectors().col(i).transpose()<<std::endl;
 	}
 	Matrix<float, Dynamic, Dynamic> eigcords = VD.topLeftCorner(csz, trunc);
 	symcords = Matrix<float, Dynamic, Dynamic>(eigcords.rows(), eigcords.cols()+1);
 	symcords.topLeftCorner(eigcords.rows(),eigcords.cols()) = eigcords;
 	symcords.col(eigcords.cols()) = fncords;
-	std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
+	//std::cout<<"Cords: "<<std::endl<<symcords<<std::endl;
 }
 void CompMgr::ExportComps(Cluster* cl)
 {
@@ -318,9 +321,17 @@ void CompMgr::ExportComps(Cluster* cl)
 	std::vector<unsigned int> vrmask;
 	std::vector<unsigned int> brmask;
 	bd[0]->SetVertMask(0, 0, vrmask, brmask, 0);
+	
+
+	std::ostringstream oss;
+	oss << getpid();
+	std::string pidstring = oss.str();
+	std::string filename = pidstring + "-output.txt";
+	ofstream outfile(filename.c_str());
+
 	for(unsigned int i = 0; i < cl->clusters.size(); i++)
 	{
-		std::cout<<"For cluster "<<i<<"mebers are "<<std::endl;
+		//std::cout<<"For cluster "<<i<<" members are "<<std::endl;
 		int cid = -1;
 		for(unsigned int j = 0; j < cl->clusters[i].mem.size(); j++)
 		{
@@ -331,13 +342,15 @@ void CompMgr::ExportComps(Cluster* cl)
 				unsigned int did = c->did;
 				unsigned int bid = c->bid;
 				std::vector<unsigned int> brmask = std::vector<unsigned int> (bd[did]->bridsarr.size(), 0);
-				std::cout<<cid<<" "<<std::endl;
+				outfile <<i<<"-"<<cid<< std::endl;			
+				//std::cout<<i<<"-"<<cid<<std::endl;
 				Export(cid,i, brmask);
 				std::vector<unsigned int> vmask;
 				bd[did]->SetVertMask(i, cid, vmask, brmask, isovals[did][c->fnid]);
 			}
 		}
 	}
+	outfile.close();
 }
 
 void CompMgr::Export(unsigned int cid, unsigned int clid, std::vector<unsigned int> & brmask)
@@ -365,7 +378,7 @@ float CompNode::Vote(CompNode* other, float & maxd)
 }
 void CompMgr::DistanceList()
 {
-	std::cout<<"Distance List"<<std::endl;
+	//std::cout<<"Distance List"<<std::endl;
 	unsigned int n = comps.size();
 	for(unsigned int i = 0; i < n; i++)
 	{
@@ -383,9 +396,9 @@ void CompMgr::DistanceList()
 			}
 			if(comps[i]->fnid != comps[j]->fnid)
 				diff += maxd;
-			std::cout<<sqrt(diff)<<" ";
+			//std::cout<<sqrt(diff)<<" ";
 		
 		}
-		std::cout<<std::endl;
+		//std::cout<<std::endl;
 	}
 }
